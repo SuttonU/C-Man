@@ -5,26 +5,21 @@
 
 int main()
 {
-    const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 144.f);
+    Game game;
+    const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    Game game1;
-    player player1;
-    sf::RenderWindow window(sf::VideoMode(1920 , 1080), "C-Man");
-    sf::Event event;
-    direction dir = left;   //Starts pacman going left
-    while (game1.getLives() > 0 && window.isOpen())
+    Player player;
+    while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
-        game1.closeWindow(window);
+        game.closeWindow();
         while (timeSinceLastUpdate > TIME_PER_FRAME)
         {
             timeSinceLastUpdate -= TIME_PER_FRAME;
-            player1.move(dir, window);
+            game.update();
         }
-        window.clear();
-        window.draw(player1);
-        window.display();
+        game.render();
     }
 
     return 0;
