@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @author Sutton Jones, Ryan, and Ryan
+ * @brief Runs the game in a loop
+ * @version 0.1
+ * @date 2024-03-20
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "game.h"
 #include "player.h"
 #include <iostream>

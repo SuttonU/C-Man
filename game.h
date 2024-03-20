@@ -1,3 +1,13 @@
+/**
+ * @file game.h
+ * @author Sutton Jones
+ * @brief Header for Game class
+ * @version 0.1
+ * @date 2024-03-20
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #ifndef GAME_H
 #define GAME_H
 #include <SFML/Graphics.hpp>
@@ -10,13 +20,16 @@ class Game
 {
 protected:
     int lives;
+    float plyrMvSpeed = 1;
+    sf::RenderWindow mWindow;
+    //Player data
     sf::Texture plyrStillTexture;
     sf::Texture plyrMvTexture;
-    sf::Vector2f plyrPosition;
-    float plyrMvSpeed = 1;
-    direction plyrDir = left;
-    sf::RenderWindow mWindow;
     sf::Sprite plyrSprite;
+    direction plyrDir = left;
+    sf::Vector2f plyrPosition;
+    //Ghost data
+    
 public: 
     Game();
     void setLives(int num);

@@ -1,3 +1,13 @@
+/**
+ * @file player.cpp
+ * @author Sutton Jones
+ * @brief Player class function definitions
+ * @version 0.1
+ * @date 2024-03-20
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "player.h"
 #include <iostream>
 /**

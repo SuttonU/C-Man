@@ -1,3 +1,13 @@
+/**
+ * @file game.cpp
+ * @author Sutton Jones
+ * @brief Functions for game class.
+ * @version 0.1
+ * @date 2024-03-20
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "game.h"
 Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
 {
