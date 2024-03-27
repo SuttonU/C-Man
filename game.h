@@ -29,6 +29,12 @@ protected:
     direction plyrDir = left;
     sf::Vector2f plyrPosition;
     //Ghost data
+    //Title menu data
+    sf::Sprite titleimage;
+    sf::Texture texture;
+    sf::Font font;
+    sf::Text playbutton;
+    sf::Text infobutton;
     
 public: 
     Game();
@@ -39,5 +45,9 @@ public:
     void render();
     bool isDone() const;
     void movePlyr();
+    void displaymenu();
+    bool updatemenu();
+    bool updatebutton(sf::Event &event, sf::Text &button);
+    void displayinstructions();
 };
 #endif
