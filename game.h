@@ -18,26 +18,46 @@ enum direction
 {up, down, left, right};
 class Game
 {
-protected:
-    int lives;
-    float plyrMvSpeed = 1;
+private:
+    //Game data
     sf::RenderWindow mWindow;
     //Player data
+    sf::Texture plyrFrames[3];
     sf::Texture plyrStillTexture;
     sf::Texture plyrMvTexture;
     sf::Sprite plyrSprite;
-    direction plyrDir = left;
     sf::Vector2f plyrPosition;
+    sf::FloatRect plyrHitbox;
+    direction plyrDir = left;
+    int playerFrame = 2;
+    int lives;
+    float plyrMvSpeed = 2;
+    float plyrScale = 1;
     //Ghost data
     
 public: 
+    //Game functions
     Game();
-    void setLives(int num);
-    int getLives()const;
     void closeWindow();
     void update();
     void render();
     bool isDone() const;
+    //Player functions
+    struct Player
+    {
+        sf::Sprite mSprite;
+        sf::Vector2f mPos;
+        sf::Texture mTexture[3];
+        sf::Texture mDeath[10];
+        sf::FloatRect mHB;
+        direction mDir = left;
+        Player();
+    };
+    void destroyPlyr(Player plyr);
+    void reset(Player plyr);
+    void setLives(int num);
+    int getLives()const;
     void movePlyr();
+    void plyrAnim();
 };
 #endif

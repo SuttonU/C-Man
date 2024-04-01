@@ -9,7 +9,6 @@
  * 
  */
 #include "game.h"
-#include "player.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -19,7 +18,7 @@ int main()
     const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    Player player;
+    Game::Player player;
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
