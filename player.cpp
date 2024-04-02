@@ -25,5 +25,5 @@ Player::Player()
  */
 Player::~Player()
 {
-    lives--;
+    //lives--;
 }

@@ -9,6 +9,137 @@
  * 
  */
 #include "game.h"
+void Game :: displaymenu(){
+    texture.loadFromFile("Pacmantitle.png");
+    titleimage.setTexture(texture);
+    titleimage.setOrigin(texture.getSize().x/2, texture.getSize().y/2);
+    titleimage.setScale(0.5,0.5);
+    titleimage.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/3);
+
+    font.loadFromFile("PixelFont.ttf");
+    playbutton.setFont(font);
+    playbutton.setCharacterSize(50);
+    playbutton.setString("Start");
+    playbutton.setOrigin(playbutton.getGlobalBounds().width/2, playbutton.getGlobalBounds().height/2 + 15);
+    playbutton.setPosition(mWindow.getSize().x/2, 600);
+
+    infobutton.setFont(font);
+    infobutton.setString("How to play");
+    infobutton.setCharacterSize(50);
+    infobutton.setOrigin(infobutton.getGlobalBounds().width/2, infobutton.getGlobalBounds().height/2 + 15);
+    infobutton.setPosition(mWindow.getSize().x/2, 700);
+
+    mWindow.draw(titleimage);
+    mWindow.draw(playbutton);
+    mWindow.draw(infobutton);
+    mWindow.display();
+    while(1){
+    if (updatemenu()){
+        break;
+    }
+    }
+}
+
+bool Game :: updatemenu(){
+    sf::Event event;
+    while(mWindow.pollEvent(event)){
+        if (event.type == sf::Event::Closed)
+        mWindow.close();
+
+        if (updatebutton(event, playbutton))
+            return true;
+        if (updatebutton(event, infobutton)){
+            displayinstructions();
+        }
+        mWindow.clear();
+        mWindow.draw(titleimage);
+        mWindow.draw(playbutton);
+        mWindow.draw(infobutton);
+        mWindow.display();
+    }
+    return false;
+}
+
+bool Game :: updatebutton(sf::Event &event, sf::Text &button){
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
+    bool mouseinbutton = mousePosition.x >= button.getPosition().x - button.getGlobalBounds().width/2
+                        && mousePosition.x <= button.getPosition().x + button.getGlobalBounds().width/2
+                        && mousePosition.y >= button.getPosition().y - button.getGlobalBounds().height/2
+                        && mousePosition.y <= button.getPosition().y + button.getGlobalBounds().height/2;
+
+    if (event.type == sf::Event::MouseMoved){
+        if (mouseinbutton){
+            button.setFillColor(sf::Color::Red);
+            mWindow.draw(button);
+        } else {
+            button.setFillColor(sf::Color::White);
+            mWindow.draw(button);
+        }
+    }
+    if (event.type == sf::Event::MouseButtonPressed){
+        if (event.mouseButton.button == sf::Mouse::Left && mouseinbutton){
+            button.setFillColor(sf::Color(150,0,0));
+            mWindow.draw(button);
+        } else {
+            button.setFillColor(sf::Color::White);
+            mWindow.draw(button);
+        }
+    }
+    if (event.type == sf::Event::MouseButtonReleased){
+        if(event.mouseButton.button==sf::Mouse::Left){
+            if(mouseinbutton)
+                {
+                    button.setFillColor(sf::Color::White);
+                    return true;
+                }
+                else
+                {
+                    button.setFillColor(sf::Color::White);
+                }
+        }
+    }
+    return false;
+}
+
+void Game :: displayinstructions(){
+    mWindow.clear();
+    sf::Event event;
+    bool backtomenu = false;
+    sf::Text instructions;
+    instructions.setFont(font);
+    instructions.setString("Instructions: \n\nUse WASD keys or the arrow keys to move.\n\nDon't get killed by the ghosts.\n\nCollect the dots.");
+    instructions.setCharacterSize(40);
+    instructions.setOrigin(instructions.getGlobalBounds().width/2, instructions.getGlobalBounds().height/2 + 15);
+    instructions.setPosition(mWindow.getSize().x/2, 700);
+
+    sf::Text backbutton;
+    backbutton.setFont(font);
+    backbutton.setString("back");
+    backbutton.setCharacterSize(50);
+    backbutton.setOrigin(backbutton.getGlobalBounds().width/2, backbutton.getGlobalBounds().height/2 + 15);
+    backbutton.setPosition(mWindow.getSize().x/20, mWindow.getSize().y/20);
+
+    mWindow.draw(instructions);
+    mWindow.draw(backbutton);
+    mWindow.draw(titleimage);
+    mWindow.display();
+    while (!backtomenu){
+        while(mWindow.pollEvent(event)){
+            if (event.type == sf::Event::Closed)
+            mWindow.close();
+
+            if (updatebutton(event, backbutton)){
+                backtomenu = true;
+            }
+            mWindow.clear();
+            mWindow.draw(instructions);
+            mWindow.draw(backbutton);
+            mWindow.draw(titleimage);
+            mWindow.display();
+        }
+    }
+}
+
 Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
 {
     lives = 3;
