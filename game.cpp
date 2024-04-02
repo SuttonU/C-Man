@@ -16,29 +16,24 @@
 Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
 {
     lives = 3;
-    if(!plyrStillTexture.loadFromFile("player.png"))
-        {
-            std::cout << "Error opening file\n";
-            exit(1);
-        } 
-    if(!plyrMvTexture.loadFromFile("playermv.png"))
-        {
-            std::cout << "Error opening file\n";
-            exit(1);
-        }  
-    if (    
-        !plyrFrames[0].loadFromFile("pcmnOpn.png") ||
-        !plyrFrames[1].loadFromFile("playermv.png") ||
-        !plyrFrames[2].loadFromFile("player.png")
-        )
-    {
-       std::cout << "Error opening a player frame.\n";
-    }
-    sf::Vector2u imageSize = plyrStillTexture.getSize();
-    plyrSprite.setTexture(plyrStillTexture);  //Sets player texture to pacman
-    plyrSprite.setPosition(110,120);      
-    plyrSprite.scale(2,2);          
-    plyrSprite.setOrigin(imageSize.x/2, imageSize.y/2);  
+    mPlyr = new Player;
+}
+/**
+ * @brief Destroy the Game:: Game object and frees memory.
+ * 
+ */
+Game::~Game()
+{
+    delete mPlyr;
+    delete inky;
+    delete blinky; 
+    delete pinky;
+    delete clyde;
+    mPlyr = nullptr;
+    inky = nullptr;
+    blinky = nullptr;
+    pinky = nullptr;
+    clyde = nullptr;
 }
 /**
  * @brief Checks to see if the game is over
@@ -76,8 +71,8 @@ void Game::closeWindow()
  */
 void Game::update()
 {
-    movePlyr();
-    plyrAnim();
+    mPlyr->move();
+    mPlyr->animate();
     //move ghosts
 }
 /**
@@ -88,7 +83,8 @@ void Game::render()
 {
     mWindow.clear(sf::Color::Black);
     //Draw player
-    mWindow.draw(plyrSprite);
+    //mWindow.draw(plyrSprite);
+    mWindow.draw(mPlyr->mSprite);
     //draw ghosts
     mWindow.display();
 }
@@ -111,53 +107,6 @@ int Game::getLives()const
     return lives;
 }
 /**
- * @brief Recieves control from player and moves the character in that direction
- * 
- */
-void Game::movePlyr()
-{
-//Gets direction
-    plyrSprite.setTexture(plyrMvTexture);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-    {
-        plyrDir = up;
-    }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-    {
-        plyrDir = down;
-    }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-    {
-        plyrDir = right;
-    }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-    {
-        plyrDir = left;
-    }
-
-//Moves character
-    if (plyrDir == up)
-    {
-        plyrSprite.setRotation(270);
-        plyrSprite.setPosition(plyrSprite.getPosition().x, plyrSprite.getPosition().y - plyrMvSpeed);
-    }
-    else if (plyrDir == down)
-    {
-        plyrSprite.setRotation(90);
-        plyrSprite.setPosition(plyrSprite.getPosition().x, plyrSprite.getPosition().y + plyrMvSpeed);
-    }
-    else if (plyrDir == right)
-    {
-        plyrSprite.setRotation(0);
-        plyrSprite.setPosition(plyrSprite.getPosition().x + plyrMvSpeed, plyrSprite.getPosition().y);
-    }
-    else if (plyrDir == left)
-    {
-        plyrSprite.setRotation(180);
-        plyrSprite.setPosition(plyrSprite.getPosition().x - plyrMvSpeed, plyrSprite.getPosition().y);
-    }
-}
-/**
  * @brief Destroys player and takes away 1 life
  * 
  * @param plyr player obj
@@ -169,27 +118,74 @@ void Game::destroyPlyr(Player plyr)
 }
 Game::Player::Player()
 {
+    if(!mTextureFile.loadFromFile("spritesheet.png"))
+    {
+        std::cout << "Error loading player sprite sheet\n";
+        exit(101);
+    }
+
+    mSprite.setTexture(mTextureFile);
+    mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
+    mSprite.setOrigin(8, 8);
+    mSprite.setScale(2,2);
+    mSprite.setPosition(110,120);        
     //Set position to start of maze
     //plyrSprite.setPosition();
+}
+void Game::Player::move()
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {
+        mDir = up;
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {
+        mDir = down;
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        mDir = right;
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    {
+        mDir = left;
+    }
+
+//Moves character
+    if (mDir == up)
+    {
+        mSprite.setRotation(270);
+        mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y - mvSpeed);
+    }
+    else if (mDir == down)
+    {
+        mSprite.setRotation(90);
+        mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y + mvSpeed);
+    }
+    else if (mDir == right)
+    {
+        mSprite.setRotation(0);
+        mSprite.setPosition(mSprite.getPosition().x + mvSpeed, mSprite.getPosition().y);
+    }
+    else if (mDir == left)
+    {
+        mSprite.setRotation(180);
+        mSprite.setPosition(mSprite.getPosition().x - mvSpeed, mSprite.getPosition().y);
+    }
+}
+void Game::Player::animate()
+{
+    mSprite.setTextureRect(sf::IntRect(frames[framecount/4], 0, 16, 16));
+    if (framecount == 16)
+    {
+        framecount = 0;
+    }
+    else
+    {
+        framecount++;
+    }
 }
 void Game::reset(Player plyr)
 {
     //Creates newPlyr on reset
-    Player * newPlyr;
-    newPlyr = new Player;
-    destroyPlyr(plyr);
-    lives++;
-}
-void Game::plyrAnim()
-{
-    plyrSprite.setTexture(plyrFrames[playerFrame]);
-    if (playerFrame == 2)
-    {
-        playerFrame = 0;
-    }
-    else
-    {
-        playerFrame++;
-    }
-    
 }

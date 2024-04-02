@@ -23,21 +23,15 @@ private:
     sf::RenderWindow mWindow;
     //Player data
     sf::Texture plyrFrames[3];
-    sf::Texture plyrStillTexture;
-    sf::Texture plyrMvTexture;
-    sf::Sprite plyrSprite;
-    sf::Vector2f plyrPosition;
     sf::FloatRect plyrHitbox;
-    direction plyrDir = left;
     int playerFrame = 2;
     int lives;
-    float plyrMvSpeed = 2;
-    float plyrScale = 1;
     //Ghost data
     
 public: 
     //Game functions
     Game();
+    ~Game();
     void closeWindow();
     void update();
     void render();
@@ -47,17 +41,38 @@ public:
     {
         sf::Sprite mSprite;
         sf::Vector2f mPos;
-        sf::Texture mTexture[3];
+        sf::Texture mTextureFile;
         sf::Texture mDeath[10];
         sf::FloatRect mHB;
+        float mvSpeed = 2;
+        int frames[5] = {32, 16, 0, 16, 32};
+        int framecount = 0;
         direction mDir = left;
         Player();
+        ~Player();
+        void animate();
+        void move();
     };
+    Player * mPlyr = nullptr;
+    struct Ghosts
+    {
+        sf::Sprite mSprite;
+        sf::Vector2f mPos;
+        sf::Texture mTextureFile;
+        sf::FloatRect mHB;
+        float mvSpeed = 2;
+        direction mDir = left;
+        Ghosts(sf::Color color);
+        void move();
+    };
+    Ghosts * inky = nullptr;
+    Ghosts * blinky = nullptr;
+    Ghosts * pinky = nullptr;
+    Ghosts * clyde = nullptr;
     void destroyPlyr(Player plyr);
     void reset(Player plyr);
     void setLives(int num);
     int getLives()const;
-    void movePlyr();
     void plyrAnim();
 };
 #endif
