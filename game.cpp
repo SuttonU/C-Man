@@ -83,7 +83,6 @@ void Game::render()
 {
     mWindow.clear(sf::Color::Black);
     //Draw player
-    //mWindow.draw(plyrSprite);
     mWindow.draw(mPlyr->mSprite);
     //draw ghosts
     mWindow.display();
@@ -116,6 +115,10 @@ void Game::destroyPlyr(Player plyr)
     lives--;
     plyr.~Player();
 }
+/**
+ * @brief Constructs a new Player object
+ * 
+ */
 Game::Player::Player()
 {
     if(!mTextureFile.loadFromFile("spritesheet.png"))
@@ -132,6 +135,10 @@ Game::Player::Player()
     //Set position to start of maze
     //plyrSprite.setPosition();
 }
+/**
+ * @brief Moves player through taking in user input
+ * 
+ */
 void Game::Player::move()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
