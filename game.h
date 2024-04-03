@@ -28,6 +28,12 @@ private:
     int playerFrame = 2;
     int lives;
     //Ghost data
+    //Title menu data
+    sf::Sprite titleimage;
+    sf::Texture texture;
+    sf::Font font;
+    sf::Text playbutton;
+    sf::Text infobutton;
     
 public: 
     //Game functions
@@ -84,5 +90,9 @@ public:
     Ghosts * clyde = nullptr;
 
     void destroyPlyr(Player plyr);
+    void displaymenu();
+    bool updatemenu();
+    bool updatebutton(sf::Event &event, sf::Text &button);
+    void displayinstructions();
 };
 #endif
