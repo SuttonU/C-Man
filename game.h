@@ -12,6 +12,7 @@
 #define GAME_H
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <unistd.h>
 //#include "ghosts.h"
 //#include "map.h"
 enum direction
@@ -36,12 +37,16 @@ public:
     void update();
     void render();
     bool isDone() const;
+    void reset();
+    void setLives(int num);
+    int getLives()const;
+    sf::Texture mTextureFile;
+    void deathAnimation();
     //Player functions
     struct Player
     {
         sf::Sprite mSprite;
         sf::Vector2f mPos;
-        sf::Texture mTextureFile;
         sf::Texture mDeath[10];
         sf::FloatRect mHB;
         float mvSpeed = 2;
@@ -49,30 +54,35 @@ public:
         int framecount = 0;
         direction mDir = left;
         Player();
-        ~Player();
         void animate();
         void move();
     };
-    Player * mPlyr = nullptr;
     struct Ghosts
     {
-        sf::Sprite mSprite;
+        sf::Sprite mBody;
+        sf::Sprite mEyes;
+        sf::Sprite mFeet;
         sf::Vector2f mPos;
-        sf::Texture mTextureFile;
         sf::FloatRect mHB;
         float mvSpeed = 2;
         direction mDir = left;
         Ghosts(sf::Color color);
         void move();
     };
+    struct Pellets
+    {
+        sf::Sprite mSprite;
+        sf::Vector2f mPos;
+        sf::FloatRect mHB;
+        int amount;
+    };
+
+    Player * mPlyr = nullptr;
     Ghosts * inky = nullptr;
     Ghosts * blinky = nullptr;
     Ghosts * pinky = nullptr;
     Ghosts * clyde = nullptr;
+
     void destroyPlyr(Player plyr);
-    void reset(Player plyr);
-    void setLives(int num);
-    int getLives()const;
-    void plyrAnim();
 };
 #endif

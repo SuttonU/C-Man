@@ -18,7 +18,6 @@ int main()
     const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    Game::Player player;
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();

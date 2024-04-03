@@ -15,8 +15,22 @@
  */
 Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
 {
+    if(!mTextureFile.loadFromFile("spritesheet.png"))
+    {
+        std::cout << "Error loading game sprite sheet\n";
+        exit(101);
+    }
     lives = 3;
+    blinky = new Ghosts(sf::Color::Red);
+    blinky->mBody.setTexture(mTextureFile);
+    //inky = new Ghosts(sf::Color::Blue);
+    //inky->mSprite.setTexture(mTextureFile);
+    //pinky = new Ghosts(sf::Color::Magenta);
+    //pinky->mSprite.setTexture(mTextureFile);
+    //clyde = new Ghosts(sf::Color::Red);
+    //clyde->mSprite.setTexture(mTextureFile);
     mPlyr = new Player;
+    mPlyr->mSprite.setTexture(mTextureFile);
 }
 /**
  * @brief Destroy the Game:: Game object and frees memory.
@@ -73,6 +87,25 @@ void Game::update()
 {
     mPlyr->move();
     mPlyr->animate();
+    blinky->move();
+    if (blinky->mBody.getPosition().x < 0)
+    {
+        blinky->mDir = right;
+    }
+    else if (blinky->mBody.getPosition().x > 1920)
+    {
+        blinky->mDir = left;
+    }
+    else if (blinky->mBody.getPosition().y > 1080)
+    {
+        blinky->mDir = up;
+    }
+    else if (blinky->mBody.getPosition().y < 0)
+    {
+        blinky->mDir = down;
+    }
+    
+    
     //move ghosts
 }
 /**
@@ -83,9 +116,17 @@ void Game::render()
 {
     mWindow.clear(sf::Color::Black);
     //Draw player
+    mWindow.draw(blinky->mBody);
     mWindow.draw(mPlyr->mSprite);
     //draw ghosts
     mWindow.display();
+}
+/**
+ * @brief Resets the sprites to their starting positions.
+ */
+void Game::reset()
+{
+    //Creates newPlyr on reset
 }
 /**
  * @brief Adds to the amount of lives
@@ -121,13 +162,6 @@ void Game::destroyPlyr(Player plyr)
  */
 Game::Player::Player()
 {
-    if(!mTextureFile.loadFromFile("spritesheet.png"))
-    {
-        std::cout << "Error loading player sprite sheet\n";
-        exit(101);
-    }
-
-    mSprite.setTexture(mTextureFile);
     mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
     mSprite.setOrigin(8, 8);
     mSprite.setScale(2,2);
@@ -192,7 +226,57 @@ void Game::Player::animate()
         framecount++;
     }
 }
-void Game::reset(Player plyr)
+/**
+ * @brief Animates player death
+ * 
+ */
+void Game::deathAnimation()
 {
-    //Creates newPlyr on reset
+    mPlyr->mSprite.setRotation(270);
+    for (int i = 0; i < 11; i++)
+    {
+        mWindow.clear();
+        mPlyr->mSprite.setTextureRect(sf::IntRect(48 + 16 * i, 0, 16, 16));
+        mWindow.draw(mPlyr->mSprite);
+        mWindow.display();
+        usleep(2000000.0/1100000.0);
+    }
+}
+/**
+ * @brief Constructs a new ghost object
+ * 
+ * @param color color of ghost
+ */
+Game::Ghosts::Ghosts(sf::Color color)
+{
+    mBody.setColor(color);
+    mBody.setTextureRect(sf::IntRect(16, 0, 16, 16));
+    mBody.setOrigin(8, 8);
+    mBody.setScale(2,2);
+    mBody.setPosition(110,120); 
+}
+/**
+ * @brief Moves ghost
+ * 
+ */
+void Game::Ghosts::move()
+{
+    if (mDir == up)
+        {
+            mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y - mvSpeed);
+        }
+        else if (mDir == down)
+        {
+            mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y + mvSpeed);
+        }
+        else if (mDir == right)
+        {
+            mBody.setPosition(mBody.getPosition().x + mvSpeed, mBody.getPosition().y);
+        }
+        else if (mDir == left)
+        {
+            mBody.setPosition(mBody.getPosition().x - mvSpeed, mBody.getPosition().y);
+        }
+    mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
+    mFeet.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
