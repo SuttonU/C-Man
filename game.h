@@ -22,11 +22,13 @@ class Game
 private:
     //Game data
     sf::RenderWindow mWindow;
+    bool play = false;
     //Player data
     sf::Texture plyrFrames[3];
     sf::FloatRect plyrHitbox;
     int playerFrame = 2;
     int lives;
+    int points;
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
@@ -62,6 +64,8 @@ public:
         Player();
         void animate();
         void move();
+        void setHb(const sf::FloatRect &hitbox);
+        sf::FloatRect getGlobalHb() const;
     };
     struct Ghosts
     {
@@ -72,11 +76,14 @@ public:
         sf::FloatRect mHB;
         float mvSpeed = 2;
         direction mDir = left;
-        Ghosts(sf::Color color);
+        Ghosts();
         void move();
+        void setHb(const sf::FloatRect &hitbox);
+        sf::FloatRect getGlobalHb() const;
     };
     struct Pellets
     {
+        Pellets();
         sf::Sprite mSprite;
         sf::Vector2f mPos;
         sf::FloatRect mHB;
@@ -88,7 +95,7 @@ public:
     Ghosts * blinky = nullptr;
     Ghosts * pinky = nullptr;
     Ghosts * clyde = nullptr;
-
+    Pellets * pellets[240];
     void destroyPlyr(Player plyr);
     void displaymenu();
     bool updatemenu();
