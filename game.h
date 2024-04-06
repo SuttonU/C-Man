@@ -28,7 +28,7 @@ private:
     sf::FloatRect plyrHitbox;
     int playerFrame = 2;
     int lives;
-    int points;
+    int points = 0;
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
@@ -50,7 +50,7 @@ public:
     int getLives()const;
     sf::Texture mTextureFile;
     void deathAnimation();
-    //Player functions
+
     struct Player
     {
         sf::Sprite mSprite;
@@ -67,6 +67,7 @@ public:
         void setHb(const sf::FloatRect &hitbox);
         sf::FloatRect getGlobalHb() const;
     };
+
     struct Ghosts
     {
         sf::Sprite mBody;
@@ -80,6 +81,7 @@ public:
         void setHb(const sf::FloatRect &hitbox);
         sf::FloatRect getGlobalHb() const;
     };
+    
     struct Pellets
     {
         Pellets();
