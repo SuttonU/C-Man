@@ -153,18 +153,19 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     lives = 3;
     blinky = new Ghosts();
     blinky->mBody.setTexture(mTextureFile);
+    blinky->mEyes.setTexture(mTextureFile);
     //inky = new Ghosts(sf::Color::Blue);
     //inky->mSprite.setTexture();
     //pinky = new Ghosts(sf::Color::Magenta);
     //pinky->mSprite.setTexture();
     //clyde = new Ghosts();
     //clyde->mSprite.setTexture(mTextureFile);
+    pellets[0] = new Pellets;
+    pellets[0]->mSprite.setTexture(mTextureFile);
     mPlyr = new Player;
     mPlyr->mSprite.setTexture(mTextureFile);
     mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
     blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
-    pellets[0] = new Pellets;
-    pellets[0]->mSprite.setTexture(mTextureFile);
 }
 /**
  * @brief Destroy the Game:: Game object and frees memory.
@@ -226,7 +227,7 @@ void Game::update()
     }
     mPlyr->move();
     mPlyr->animate();
-    //blinky->move();
+    blinky->move();
     if (blinky->mBody.getPosition().x < 0)
     {
         blinky->mDir = right;
@@ -243,23 +244,17 @@ void Game::update()
     {
         blinky->mDir = down;
     }
-    if (mPlyr->mSprite.getGlobalBounds().intersects(pellets[0]->mSprite.getGlobalBounds()))
+    if (mPlyr->getGlobalHb().intersects(pellets[0]->getGlobalHb()))
     {
         pellets[0]->mSprite.setPosition({0,0});
     }
-    else if (mPlyr->getGlobalHb().intersects(blinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(inky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(pinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(clyde->getGlobalHb()))
+    else if (mPlyr->getGlobalHb().intersects(blinky->getGlobalHb())/* || mPlyr->getGlobalHb().intersects(inky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(pinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(clyde->getGlobalHb())*/)
     {
         deathAnimation();
         usleep(5000000);
         mPlyr->mSprite.setPosition(110,120);
         lives--;
     }
-    
-    //if (mPlyr->mSprite.getGlobalBounds().intersects(blinky->mBody.getGlobalBounds()) || mPlyr->mSprite.getGlobalBounds().intersects(inky->mBody.getGlobalBounds()) || mPlyr->mSprite.getGlobalBounds().intersects(pinky->mBody.getGlobalBounds()) || mPlyr->mSprite.getGlobalBounds().intersects(clyde->mBody.getGlobalBounds()))
-    //{
-    //    deathAnimation();
-    //}
-    ////move ghosts
 }
 /**
  * @brief Clears, Draws, and displays the screen
@@ -269,11 +264,21 @@ void Game::render()
 {
     mWindow.clear(sf::Color::Black);
     //Draw player
-    mWindow.draw(blinky->mBody);
+    drawGhost(blinky);
     mWindow.draw(mPlyr->mSprite);
     mWindow.draw(pellets[0]->mSprite);
     //draw ghosts
     mWindow.display();
+}
+/**
+ * @brief Draws all the parts of the ghost
+ * 
+ * @param ghost ghost to draw
+ */
+void Game::drawGhost(Ghosts * ghost)
+{
+    mWindow.draw(ghost->mBody);
+    mWindow.draw(ghost->mEyes);
 }
 /**
  * @brief Resets the sprites to their starting positions.
@@ -407,12 +412,12 @@ void Game::deathAnimation()
     mPlyr->mSprite.setRotation(270);
     for (int i = 0; i < 11; i++)
     {
-        mWindow.clear();
         mPlyr->mSprite.setTextureRect(sf::IntRect(48 + 16 * i, 0, 16, 16));
-        mWindow.draw(mPlyr->mSprite);
-        mWindow.display();
+        render();
         usleep((1.0/12.0) * 1000000);
     }
+    mPlyr->mSprite.setTextureRect(sf::IntRect(16, 32, 16, 16));
+    render();
 }
 /**
  * @brief Constructs a new ghost object
@@ -421,10 +426,15 @@ void Game::deathAnimation()
  */
 Game::Ghosts::Ghosts()
 {
-    mBody.setTextureRect(sf::IntRect(16, 0, 16, 16));
+    setHb({ 8.f, 8.f, 16.f, 16.f });
+    mBody.setTextureRect(sf::IntRect(0,16,16,16));
     mBody.setOrigin(8, 8);
     mBody.setScale(2,2);
     mBody.setPosition(800,800); 
+    mEyes.setTextureRect(sf::IntRect(16*12,16,16,16));
+    mEyes.setScale(2,2);
+    mEyes.setOrigin(8,8);
+    mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
 /**
  * @brief Moves ghost
@@ -435,21 +445,24 @@ void Game::Ghosts::move()
     if (mDir == up)
         {
             mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y - mvSpeed);
+            mEyes.setTextureRect(sf::IntRect(14*16, 16, 16, 16));
         }
         else if (mDir == down)
         {
             mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y + mvSpeed);
+            mEyes.setTextureRect(sf::IntRect(15*16, 16, 16, 16));
         }
         else if (mDir == right)
         {
             mBody.setPosition(mBody.getPosition().x + mvSpeed, mBody.getPosition().y);
+            mEyes.setTextureRect(sf::IntRect(13*16, 16, 16, 16));
         }
         else if (mDir == left)
         {
             mBody.setPosition(mBody.getPosition().x - mvSpeed, mBody.getPosition().y);
+            mEyes.setTextureRect(sf::IntRect(12*16, 16, 16, 16));
         }
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
-    mFeet.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
 /**
  * @brief Sets the ghost hitbox
@@ -475,10 +488,19 @@ sf::FloatRect Game::Ghosts::getGlobalHb() const
  */
 Game::Pellets::Pellets()
 {
-    mSprite.setTextureRect({0, 16, 16, 16});
+    setHb({ 7.f, 7.f, 16.f, 16.f });
+    mSprite.setTextureRect({16*14, 0, 16, 16});
     mSprite.setOrigin(8, 8);
     mSprite.setScale(2,2);
     mSprite.setPosition(500,500);  
+}
+sf::FloatRect Game::Pellets::getGlobalHb() const
+{
+    return mSprite.getTransform().transformRect(mHB);
+}
+void Game::Pellets::setHb(const sf::FloatRect &hitbox)
+{
+    mHB = hitbox;
 }
 
 void Game::displaymap(){
