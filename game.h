@@ -2,7 +2,7 @@
  * @file game.h
  * @author Sutton Jones
  * @brief Header for Game class
- * @version 0.1
+git pul * @version 0.1
  * @date 2024-03-20
  * 
  * @copyright Copyright (c) 2024
@@ -28,7 +28,7 @@ private:
     sf::FloatRect plyrHitbox;
     int playerFrame = 2;
     int lives;
-    int points;
+    int points = 0;
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
@@ -50,7 +50,7 @@ public:
     int getLives()const;
     sf::Texture mTextureFile;
     void deathAnimation();
-    //Player functions
+
     struct Player
     {
         sf::Sprite mSprite;
@@ -67,11 +67,11 @@ public:
         void setHb(const sf::FloatRect &hitbox);
         sf::FloatRect getGlobalHb() const;
     };
+
     struct Ghosts
     {
         sf::Sprite mBody;
         sf::Sprite mEyes;
-        sf::Sprite mFeet;
         sf::Vector2f mPos;
         sf::FloatRect mHB;
         float mvSpeed = 2;
@@ -81,6 +81,7 @@ public:
         void setHb(const sf::FloatRect &hitbox);
         sf::FloatRect getGlobalHb() const;
     };
+    
     struct Pellets
     {
         Pellets();
@@ -88,6 +89,8 @@ public:
         sf::Vector2f mPos;
         sf::FloatRect mHB;
         int amount;
+        void setHb(const sf::FloatRect &hitbox);
+        sf::FloatRect getGlobalHb() const;
     };
 
     Player * mPlyr = nullptr;
@@ -101,5 +104,6 @@ public:
     bool updatemenu();
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
+    void drawGhost(Ghosts * ghost);
 };
 #endif
