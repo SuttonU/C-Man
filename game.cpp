@@ -267,6 +267,8 @@ void Game::render()
     drawGhost(blinky);
     mWindow.draw(mPlyr->mSprite);
     mWindow.draw(pellets[0]->mSprite);
+    //draw map
+    mWindow.draw(map);
     //draw ghosts
     mWindow.display();
 }
