@@ -19,6 +19,7 @@ int main()
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
     game.displaymenu();
+    game.displaymap();
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();

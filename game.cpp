@@ -267,6 +267,8 @@ void Game::render()
     drawGhost(blinky);
     mWindow.draw(mPlyr->mSprite);
     mWindow.draw(pellets[0]->mSprite);
+    //draw map
+    mWindow.draw(map);
     //draw ghosts
     mWindow.display();
 }
@@ -501,4 +503,14 @@ sf::FloatRect Game::Pellets::getGlobalHb() const
 void Game::Pellets::setHb(const sf::FloatRect &hitbox)
 {
     mHB = hitbox;
+}
+
+void Game::displaymap(){
+    maptexture.loadFromFile("map1.png");
+    map.setTexture(maptexture);
+    map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
+    map.setScale(4,4);
+    map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+    mWindow.draw(map);
+    mWindow.display();
 }

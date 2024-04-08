@@ -36,6 +36,9 @@ private:
     sf::Font font;
     sf::Text playbutton;
     sf::Text infobutton;
+    //map data
+    sf::Sprite map;
+    sf::Texture maptexture;
     
 public: 
     //Game functions
@@ -105,5 +108,8 @@ public:
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
     void drawGhost(Ghosts * ghost);
+
+    //map functions
+    void displaymap();
 };
 #endif
