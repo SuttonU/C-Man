@@ -20,6 +20,7 @@ int main()
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
     game.displaymenu();
     game.displaymap();
+    usleep(5000000);
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
