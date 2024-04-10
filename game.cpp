@@ -9,7 +9,9 @@
  * 
  */
 #include "game.h"
-void Game :: displaymenu(){
+Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
+{
+    //Menu initialization
     texture.loadFromFile("Pacmantitle.png");
     titleimage.setTexture(texture);
     titleimage.setOrigin(texture.getSize().x/2, texture.getSize().y/2);
@@ -28,6 +30,87 @@ void Game :: displaymenu(){
     infobutton.setCharacterSize(50);
     infobutton.setOrigin(infobutton.getGlobalBounds().width/2, infobutton.getGlobalBounds().height/2 + 15);
     infobutton.setPosition(mWindow.getSize().x/2, 700);
+
+    if(!mTextureFile.loadFromFile("spritesheet.png"))
+    {
+        std::cout << "Error loading game sprite sheet\n";
+        exit(101);
+    }
+    lives = 3;
+    //Set scale of game
+    scale = (mWindow.getSize().y * 1.0 )/248.0;
+    scale -= scale / 10.0;
+    //Create characters
+    blinky = new Ghosts();
+    //inky = new Ghosts();
+    //pinky = new Ghosts();
+    //clyde = new Ghosts();
+    mPlyr = new Player;
+    pellets[0] = new Pellets;
+    //Set textures
+    blinky->mBody.setTexture(mTextureFile);
+    blinky->mEyes.setTexture(mTextureFile);
+    //inky->mSprite.setTexture();
+    //pinky->mSprite.setTexture();
+    //clyde->mSprite.setTexture(mTextureFile);
+    pellets[0]->mSprite.setTexture(mTextureFile);
+    mPlyr->mSprite.setTexture(mTextureFile);
+    //mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
+    //blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
+    //Scale textures
+    map.setScale(scale, scale);
+    mPlyr->mSprite.setScale(scale, scale);
+    blinky->mBody.setScale(scale, scale);
+    blinky->mEyes.setScale(scale, scale);
+    //inky->mBody.setScale(scale, scale);
+    //inky->mEyes.setScale(scale, scale);
+    //pinky->mBody.setScale(scale, scale);
+    //pinky->mEyes.setScale(scale, scale);
+    //clyde->mBody.setScale(scale, scale);
+    //clyde->mEyes.setScale(scale, scale);
+    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
+}
+/**
+ * @brief Runs different routines depending on how the window is updated
+ * 
+ */
+void Game::windowEvents()
+{
+    sf::Event event;
+    while(mWindow.pollEvent(event))
+    {
+        if(event.type == sf::Event::Closed)
+        {
+            // Close window button clicked.
+            mWindow.close();
+        }
+        else if (event.type == sf::Event::Resized)
+        {
+            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+            mWindow.setView(sf::View(visibleArea));
+        }
+    }
+}
+/**
+ * @brief Destroy the Game:: Game object and frees memory.
+ * 
+ */
+Game::~Game()
+{
+    delete mPlyr;  
+    delete inky;  
+    delete blinky;
+    delete pinky; 
+    delete clyde; 
+    delete pellets[0]; 
+    mPlyr = nullptr; 
+    inky = nullptr;
+    blinky = nullptr;
+    pinky = nullptr; 
+    clyde = nullptr;
+    pellets[0] = nullptr;
+}
+void Game :: displaymenu(){
 
     mWindow.draw(titleimage);
     mWindow.draw(playbutton);
@@ -142,61 +225,6 @@ void Game :: displayinstructions(){
         }
     }
 }
-
-Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
-{
-    if(!mTextureFile.loadFromFile("spritesheet.png"))
-    {
-        std::cout << "Error loading game sprite sheet\n";
-        exit(101);
-    }
-    lives = 3;
-    //Set scale of game
-    scale = (mWindow.getSize().y * 1.0 )/248.0;
-    scale -= scale / 10.0;
-    //Create characters
-    blinky = new Ghosts();
-    //inky = new Ghosts();
-    //pinky = new Ghosts();
-    //clyde = new Ghosts();
-    mPlyr = new Player;
-    pellets[0] = new Pellets;
-    //Set textures
-    blinky->mBody.setTexture(mTextureFile);
-    blinky->mEyes.setTexture(mTextureFile);
-    //inky->mSprite.setTexture();
-    //pinky->mSprite.setTexture();
-    //clyde->mSprite.setTexture(mTextureFile);
-    pellets[0]->mSprite.setTexture(mTextureFile);
-    mPlyr->mSprite.setTexture(mTextureFile);
-    //mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
-    //blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
-    //Scale textures
-    map.setScale(scale, scale);
-    mPlyr->mSprite.setScale(scale, scale);
-    blinky->mBody.setScale(scale, scale);
-    blinky->mEyes.setScale(scale, scale);
-    //inky->mBody.setScale(scale, scale);
-    //inky->mEyes.setScale(scale, scale);
-    //pinky->mBody.setScale(scale, scale);
-    //pinky->mEyes.setScale(scale, scale);
-    //clyde->mBody.setScale(scale, scale);
-    //clyde->mEyes.setScale(scale, scale);
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
-}
-/**
- * @brief Destroy the Game:: Game object and frees memory.
- * 
- */
-Game::~Game()
-{
-    delete mPlyr;
-    delete inky;
-    delete blinky; 
-    delete pinky;
-    delete clyde;
-    delete pellets[0];    
-}
 /**
  * @brief Checks to see if the game is over
  * 
@@ -210,27 +238,6 @@ bool Game::isDone() const
         return true;
     }
     return false;
-}
-/**
- * @brief Closes the window if player presses the close button
- * 
- */
-void Game::windowEvents()
-{
-    sf::Event event;
-    while(mWindow.pollEvent(event))
-    {
-        if(event.type == sf::Event::Closed)
-        {
-            // Close window button clicked.
-            mWindow.close();
-        }
-        else if (event.type == sf::Event::Resized)
-        {
-            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-            mWindow.setView(sf::View(visibleArea));
-        }
-    }
 }
 /**
  * @brief Updates the sprites on the screen
