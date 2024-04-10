@@ -13,7 +13,7 @@ void Game :: displaymenu(){
     texture.loadFromFile("Pacmantitle.png");
     titleimage.setTexture(texture);
     titleimage.setOrigin(texture.getSize().x/2, texture.getSize().y/2);
-    titleimage.setScale(0.5,0.5);
+    titleimage.setScale(0.5 / scale,0.5 / scale);
     titleimage.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/3);
 
     font.loadFromFile("PixelFont.ttf");
@@ -143,7 +143,7 @@ void Game :: displayinstructions(){
     }
 }
 
-Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
+Game::Game() : mWindow(sf::VideoMode(1000 , 563), "C-Man")
 {
     if(!mTextureFile.loadFromFile("spritesheet.png"))
     {
@@ -238,6 +238,21 @@ void Game::closeWindow()
  */
 void Game::update()
 {
+    //Scale screen
+    scale = (mWindow.getSize().y * 1.0 )/248.0;
+    scale -= scale / 10.0;
+    map.setScale(scale, scale);
+    mPlyr->mSprite.setScale(scale, scale);
+    blinky->mBody.setScale(scale, scale);
+    blinky->mEyes.setScale(scale, scale);
+    //inky->mBody.setScale(scale, scale);
+    //inky->mEyes.setScale(scale, scale);
+    //pinky->mBody.setScale(scale, scale);
+    //pinky->mEyes.setScale(scale, scale);
+    //clyde->mBody.setScale(scale, scale);
+    //clyde->mEyes.setScale(scale, scale);
+
+    //Moving
     mPlyr->move();
     mPlyr->animate();
     blinky->move();
