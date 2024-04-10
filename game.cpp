@@ -509,8 +509,110 @@ void Game::displaymap(){
     maptexture.loadFromFile("map1.png");
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
-    map.setScale(4,4);
+    map.setScale(1.5,1.5);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
     mWindow.draw(map);
     mWindow.display();
+}
+/**
+ * @brief Initializes grid.
+ * w = wall
+ * t = portal
+ * p = pink ghost
+ * b = blue ghost
+ * o = orange ghost
+ * r = red ghost
+ * c = pacman
+ * f = fork
+ * 
+ */
+void Game::initializegrid(){
+    for (int i = 0; i < 31; i++){
+        for (int j = 0; j < 33; j++){
+            grid[j][i] = ' ';
+        }
+    }
+    //initialize outer walls
+    for (int i = 0; i < 33; i++){
+        grid[i][0] = 'w';
+        grid[i][30] = 'w';
+        if (i < 31){
+        grid[32][i] = 'w';
+        grid[0][i] = 'w';
+        }
+    }
+    grid[16][0] = 't';
+    grid[16][30] = 't';
+    setwall(7,7,2,2);
+    setwall(2,5,2,10);
+    setwall(2,5,2,16);
+    setwall(7,7,2,22);
+    setwall(4,11,5,10);
+    setwall(6,4,10,2);
+    setwall(8,17,10,7);
+    setwall(6,4,10,25);
+    setwall(6,4,17,2);
+    setwall(6,4,17,25);
+    setwall(4,17,19,7);
+    setwall(3,3,23,14);
+    setwall(7,7,24,2);
+    setwall(7,7,24,22);
+    setwall(8,3,24,10);
+    setwall(8,3,24,18);
+    setwall(4,3,27,14);
+
+    //Set forks
+    for (int i = 0; i < 33; i++){
+        for (int j = 0; j < 31; j++){
+            int openpaths = 0;
+            if(grid[i+1][j] == ' ')
+            openpaths++;
+            if(grid[i-1][j] == ' ')
+            openpaths++;
+            if(grid[i][j+1] == ' ')
+            openpaths++;
+            if(grid[i][j-1] == ' ')
+            openpaths++;
+            if (openpaths >= 3){
+                grid[i][j] = 'f';
+            }
+        }
+    }
+    for (int i = 12; i < 16; i++){
+        for (int j = 9; j < 22; j++){
+            grid[i][j] = ' ';
+        }
+    }
+    grid[18][15] = 'c';
+    grid[13][10] = 'r';
+    grid[13][13] = 'b';
+    grid[13][17] = 'p';
+    grid[13][20] = 'o';
+}
+/**
+ * @brief Function to initialize part of grid.
+ * 
+ * @param length 
+ * @param start 
+ * @param dir 
+ * @param type 
+ */
+void Game::setwall(int length, int width, int row, int col){
+    for (int i = row; i < length + row; i++){
+        for (int j = col; j < width + col; j++){
+            grid[i][j] = 'w';
+        }
+    }
+}
+/**
+ * @brief For testing the grid
+ * 
+ */
+void Game::displaygrid(){
+    for (int i = 0; i < 33; i++){
+        for (int j = 0; j < 31; j++){
+            std::cout << grid[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }

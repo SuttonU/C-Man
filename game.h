@@ -39,6 +39,8 @@ private:
     //map data
     sf::Sprite map;
     sf::Texture maptexture;
+    //grid data
+    char grid[33][31];
     
 public: 
     //Game functions
@@ -111,5 +113,10 @@ public:
 
     //map functions
     void displaymap();
+
+    //grid functions
+    void initializegrid();
+    void setwall(int length, int width, int row, int col);
+    void displaygrid();
 };
 #endif

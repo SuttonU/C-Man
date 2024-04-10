@@ -18,6 +18,8 @@ int main()
     const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
+    game.initializegrid();
+    //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
     game.displaymap();
     while (!game.isDone())
