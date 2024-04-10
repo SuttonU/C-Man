@@ -25,7 +25,7 @@ int main()
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
-        game.closeWindow();
+        game.windowEvents();
         while (timeSinceLastUpdate > TIME_PER_FRAME)
         {
             timeSinceLastUpdate -= TIME_PER_FRAME;

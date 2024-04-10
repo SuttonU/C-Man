@@ -13,7 +13,7 @@ void Game :: displaymenu(){
     texture.loadFromFile("Pacmantitle.png");
     titleimage.setTexture(texture);
     titleimage.setOrigin(texture.getSize().x/2, texture.getSize().y/2);
-    titleimage.setScale(0.5 / scale,0.5 / scale);
+    titleimage.setScale(0.5,0.5);
     titleimage.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/3);
 
     font.loadFromFile("PixelFont.ttf");
@@ -143,7 +143,7 @@ void Game :: displayinstructions(){
     }
 }
 
-Game::Game() : mWindow(sf::VideoMode(1000 , 563), "C-Man")
+Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
 {
     if(!mTextureFile.loadFromFile("spritesheet.png"))
     {
@@ -195,12 +195,7 @@ Game::~Game()
     delete blinky; 
     delete pinky;
     delete clyde;
-    delete pellets[0];
-    mPlyr = nullptr;
-    inky = nullptr;
-    blinky = nullptr;
-    pinky = nullptr;
-    clyde = nullptr;
+    delete pellets[0];    
 }
 /**
  * @brief Checks to see if the game is over
@@ -220,7 +215,7 @@ bool Game::isDone() const
  * @brief Closes the window if player presses the close button
  * 
  */
-void Game::closeWindow()
+void Game::windowEvents()
 {
     sf::Event event;
     while(mWindow.pollEvent(event))
@@ -230,6 +225,11 @@ void Game::closeWindow()
             // Close window button clicked.
             mWindow.close();
         }
+        else if (event.type == sf::Event::Resized)
+        {
+            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+            mWindow.setView(sf::View(visibleArea));
+        }
     }
 }
 /**
@@ -238,20 +238,6 @@ void Game::closeWindow()
  */
 void Game::update()
 {
-    //Scale screen
-    scale = (mWindow.getSize().y * 1.0 )/248.0;
-    scale -= scale / 10.0;
-    map.setScale(scale, scale);
-    mPlyr->mSprite.setScale(scale, scale);
-    blinky->mBody.setScale(scale, scale);
-    blinky->mEyes.setScale(scale, scale);
-    //inky->mBody.setScale(scale, scale);
-    //inky->mEyes.setScale(scale, scale);
-    //pinky->mBody.setScale(scale, scale);
-    //pinky->mEyes.setScale(scale, scale);
-    //clyde->mBody.setScale(scale, scale);
-    //clyde->mEyes.setScale(scale, scale);
-
     //Moving
     mPlyr->move();
     mPlyr->animate();
@@ -354,9 +340,7 @@ Game::Player::Player()
 {
     mvSpeed = mvSpeed * mSprite.getScale().x;
     mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
-    mSprite.setOrigin(8, 8);        
-    //Set position to start of maze
-    //plyrSprite.setPosition();
+    mSprite.setOrigin(8, 8);
 }
 /**
  * @brief Moves player through taking in user input

@@ -46,7 +46,7 @@ public:
     //Game functions
     Game();
     ~Game();
-    void closeWindow();
+    void windowEvents();
     void update();
     void render();
     bool isDone() const;
