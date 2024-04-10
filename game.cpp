@@ -166,6 +166,7 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     mPlyr->mSprite.setTexture(mTextureFile);
     mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
     blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
+    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
 }
 /**
  * @brief Destroy the Game:: Game object and frees memory.
@@ -253,6 +254,7 @@ void Game::update()
         deathAnimation();
         usleep(5000000);
         mPlyr->mSprite.setPosition(110,120);
+        render();
         lives--;
     }
 }
@@ -325,8 +327,7 @@ Game::Player::Player()
 {
     mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
     mSprite.setOrigin(8, 8);
-    mSprite.setScale(2,2);
-    mSprite.setPosition(110,120);        
+    mSprite.setScale(2,2);        
     //Set position to start of maze
     //plyrSprite.setPosition();
 }
@@ -494,7 +495,6 @@ Game::Pellets::Pellets()
     mSprite.setTextureRect({16*14, 0, 16, 16});
     mSprite.setOrigin(8, 8);
     mSprite.setScale(2,2);
-    mSprite.setPosition(500,500);  
 }
 sf::FloatRect Game::Pellets::getGlobalHb() const
 {
@@ -506,10 +506,10 @@ void Game::Pellets::setHb(const sf::FloatRect &hitbox)
 }
 
 void Game::displaymap(){
-    maptexture.loadFromFile("map1.png");
+    maptexture.loadFromFile("mapR.png");
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
-    map.setScale(1.5,1.5);
+    map.setScale(2,2);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
     mWindow.draw(map);
     mWindow.display();

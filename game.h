@@ -13,6 +13,7 @@ git pul * @version 0.1
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <unistd.h>
+#include <stack>
 //#include "ghosts.h"
 //#include "map.h"
 enum direction
@@ -58,19 +59,19 @@ public:
 
     struct Player
     {
-        sf::Sprite mSprite;
-        sf::Vector2f mPos;
-        sf::Texture mDeath[10];
-        sf::FloatRect mHB;
-        float mvSpeed = 2;
-        int frames[5] = {32, 16, 0, 16, 32};
-        int framecount = 0;
-        direction mDir = left;
-        Player();
-        void animate();
-        void move();
-        void setHb(const sf::FloatRect &hitbox);
-        sf::FloatRect getGlobalHb() const;
+        sf::Sprite mSprite;                     //Player sprite
+        sf::Vector2f mPos;                      //Player position
+        sf::FloatRect mHB;                      //Player hitbox
+        float mvSpeed = 2;                      //Player movment speed
+        int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
+        int framecount = 0;                     //Used to keep count of frames during animation
+        direction mDir = left;                  //Direction of player
+        std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
+        Player();                               //Creates player
+        void animate();                         //Player eating animation
+        void move();                            //Moves player sprite
+        void setHb(const sf::FloatRect &hitbox);//Sets the hitbox of the player
+        sf::FloatRect getGlobalHb() const;      //Gets the hitbox of the player
     };
 
     struct Ghosts

@@ -22,6 +22,7 @@ int main()
     //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
     game.displaymap();
+    usleep(5000000);
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
