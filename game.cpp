@@ -549,11 +549,11 @@ void Game::initializegrid(){
     setwall(7,7,2,22);
     setwall(4,11,5,10);
     setwall(6,4,10,2);
-    setwall(8,17,10,7);
+    setwall(9,17,10,7);
     setwall(6,4,10,25);
     setwall(6,4,17,2);
     setwall(6,4,17,25);
-    setwall(4,17,19,7);
+    setwall(3,17,20,7);
     setwall(3,3,23,14);
     setwall(7,7,24,2);
     setwall(7,7,24,22);
@@ -578,16 +578,16 @@ void Game::initializegrid(){
             }
         }
     }
-    for (int i = 12; i < 16; i++){
+    for (int i = 12; i < 17; i++){
         for (int j = 9; j < 22; j++){
             grid[i][j] = ' ';
         }
     }
-    grid[18][15] = 'c';
-    grid[13][10] = 'r';
-    grid[13][13] = 'b';
-    grid[13][17] = 'p';
-    grid[13][20] = 'o';
+    grid[19][15] = 'c';
+    grid[14][10] = 'r';
+    grid[14][13] = 'b';
+    grid[14][17] = 'p';
+    grid[14][20] = 'o';
 }
 /**
  * @brief Function to initialize part of grid.
