@@ -1,6 +1,6 @@
 /**
  * @file game.cpp
- * @author Sutton Jones
+ * @author Sutton Jones, Ryan Matteson, Ryan Costin
  * @brief Functions for game class.
  * @version 0.1
  * @date 2024-03-20
@@ -222,6 +222,8 @@ void Game::closeWindow()
  */
 void Game::update()
 {
+    //Move in array
+    //Move sprite 
     while (!play)
     {
         usleep(5000000);
@@ -376,6 +378,10 @@ void Game::Player::move()
         mSprite.setPosition(mSprite.getPosition().x - mvSpeed, mSprite.getPosition().y);
     }
 }
+/**
+ * @brief Animates the player
+ * 
+ */
 void Game::Player::animate()
 {
     mSprite.setTextureRect(sf::IntRect(frames[framecount/4], 0, 16, 16));
