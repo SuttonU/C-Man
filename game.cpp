@@ -151,21 +151,37 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
         exit(101);
     }
     lives = 3;
+    //Set scale of game
+    scale = (mWindow.getSize().y * 1.0 )/248.0;
+    scale -= scale / 10.0;
+    //Create characters
     blinky = new Ghosts();
+    //inky = new Ghosts();
+    //pinky = new Ghosts();
+    //clyde = new Ghosts();
+    mPlyr = new Player;
+    pellets[0] = new Pellets;
+    //Set textures
     blinky->mBody.setTexture(mTextureFile);
     blinky->mEyes.setTexture(mTextureFile);
-    //inky = new Ghosts(sf::Color::Blue);
     //inky->mSprite.setTexture();
-    //pinky = new Ghosts(sf::Color::Magenta);
     //pinky->mSprite.setTexture();
-    //clyde = new Ghosts();
     //clyde->mSprite.setTexture(mTextureFile);
-    pellets[0] = new Pellets;
     pellets[0]->mSprite.setTexture(mTextureFile);
-    mPlyr = new Player;
     mPlyr->mSprite.setTexture(mTextureFile);
-    mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
-    blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
+    //mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
+    //blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
+    //Scale textures
+    map.setScale(scale, scale);
+    mPlyr->mSprite.setScale(scale, scale);
+    blinky->mBody.setScale(scale, scale);
+    blinky->mEyes.setScale(scale, scale);
+    //inky->mBody.setScale(scale, scale);
+    //inky->mEyes.setScale(scale, scale);
+    //pinky->mBody.setScale(scale, scale);
+    //pinky->mEyes.setScale(scale, scale);
+    //clyde->mBody.setScale(scale, scale);
+    //clyde->mEyes.setScale(scale, scale);
     mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
 }
 /**
@@ -222,10 +238,6 @@ void Game::closeWindow()
  */
 void Game::update()
 {
-    while (!play)
-    {
-        usleep(5000000);
-    }
     mPlyr->move();
     mPlyr->animate();
     blinky->move();
@@ -245,18 +257,18 @@ void Game::update()
     {
         blinky->mDir = down;
     }
-    if (mPlyr->getGlobalHb().intersects(pellets[0]->getGlobalHb()))
-    {
-        pellets[0]->mSprite.setPosition({0,0});
-    }
-    else if (mPlyr->getGlobalHb().intersects(blinky->getGlobalHb())/* || mPlyr->getGlobalHb().intersects(inky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(pinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(clyde->getGlobalHb())*/)
-    {
-        deathAnimation();
-        usleep(5000000);
-        mPlyr->mSprite.setPosition(110,120);
-        render();
-        lives--;
-    }
+    //if (mPlyr->getGlobalHb().intersects(pellets[0]->getGlobalHb()))
+    //{
+    //    pellets[0]->mSprite.setPosition({0,0});
+    //}
+    //else if (mPlyr->getGlobalHb().intersects(blinky->getGlobalHb())/* || mPlyr->getGlobalHb().intersects(inky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(pinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(clyde->getGlobalHb())*/)
+    //{
+    //    deathAnimation();
+    //    usleep(5000000);
+    //    mPlyr->mSprite.setPosition(110,120);
+    //    render();
+    //    lives--;
+    //}
 }
 /**
  * @brief Clears, Draws, and displays the screen
@@ -325,9 +337,9 @@ void Game::destroyPlyr(Player plyr)
  */
 Game::Player::Player()
 {
+    mvSpeed = mvSpeed * mSprite.getScale().x;
     mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
-    mSprite.setOrigin(8, 8);
-    mSprite.setScale(2,2);        
+    mSprite.setOrigin(8, 8);        
     //Set position to start of maze
     //plyrSprite.setPosition();
 }
@@ -357,6 +369,7 @@ void Game::Player::move()
 //Moves character
     if (mDir == up)
     {
+        //Formula for graphic tile to tile on array
         mSprite.setRotation(270);
         mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y - mvSpeed);
     }
@@ -429,13 +442,11 @@ void Game::deathAnimation()
  */
 Game::Ghosts::Ghosts()
 {
-    setHb({ 8.f, 8.f, 16.f, 16.f });
+    //setHb({ 8.f, 8.f, 16.f, 16.f });
     mBody.setTextureRect(sf::IntRect(0,16,16,16));
     mBody.setOrigin(8, 8);
-    mBody.setScale(2,2);
     mBody.setPosition(800,800); 
     mEyes.setTextureRect(sf::IntRect(16*12,16,16,16));
-    mEyes.setScale(2,2);
     mEyes.setOrigin(8,8);
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
@@ -491,10 +502,9 @@ sf::FloatRect Game::Ghosts::getGlobalHb() const
  */
 Game::Pellets::Pellets()
 {
-    setHb({ 7.f, 7.f, 16.f, 16.f });
+    //setHb({ 7.f, 7.f, 16.f, 16.f });
     mSprite.setTextureRect({16*14, 0, 16, 16});
     mSprite.setOrigin(8, 8);
-    mSprite.setScale(2,2);
 }
 sf::FloatRect Game::Pellets::getGlobalHb() const
 {
@@ -509,7 +519,6 @@ void Game::displaymap(){
     maptexture.loadFromFile("mapR.png");
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
-    map.setScale(2,2);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
     mWindow.draw(map);
     mWindow.display();

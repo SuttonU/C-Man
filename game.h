@@ -25,11 +25,10 @@ private:
     sf::RenderWindow mWindow;
     bool play = false;
     //Player data
-    sf::Texture plyrFrames[3];
-    sf::FloatRect plyrHitbox;
     int playerFrame = 2;
     int lives;
     int points = 0;
+    float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
@@ -62,7 +61,7 @@ public:
         sf::Sprite mSprite;                     //Player sprite
         sf::Vector2f mPos;                      //Player position
         sf::FloatRect mHB;                      //Player hitbox
-        float mvSpeed = 2;                      //Player movment speed
+        float mvSpeed = 2.5;                    //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
         int framecount = 0;                     //Used to keep count of frames during animation
         direction mDir = left;                  //Direction of player
