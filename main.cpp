@@ -15,13 +15,19 @@
 int main()
 {
     Game game;
-    const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
-    sf::Clock clock;
-    sf::Time timeSinceLastUpdate = sf::Time::Zero;
     game.initializegrid();
     //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
+    while (!game.start() && !game.isDone())
+    {
+        game.windowEvents();
+    }
     game.displaymap();
+    game.render();
+    usleep(5000000);
+    const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
+    sf::Clock clock;
+    sf::Time timeSinceLastUpdate = sf::Time::Zero;
     while (!game.isDone())
     {
         timeSinceLastUpdate += clock.restart();
