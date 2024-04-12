@@ -38,8 +38,7 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     }
     lives = 3;
     //Set scale of game
-    scale = (mWindow.getSize().y * 1.0 )/248.0;
-    scale -= scale / 10.0;
+    scale = (mWindow.getSize().y * 1.0 )/312;
     //Create characters
     blinky = new Ghosts();
     inky = new Ghosts();
@@ -69,7 +68,7 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->mEyes.setScale(scale, scale);
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - (8.0 * scale));
 }
 /**
  * @brief Runs different routines depending on how the window is updated
@@ -87,13 +86,7 @@ void Game::windowEvents()
         }
         else if (event.type == sf::Event::Resized)
         {
-            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-            mWindow.setView(sf::View(visibleArea));
-
-
-
             scale = (mWindow.getSize().y * 1.0 )/312.0;
-
             mPlyr->mvSpeed = 1.0 * scale;
             blinky->mvSpeed = 1.0 * scale;
             map.setScale(scale, scale);
@@ -101,21 +94,22 @@ void Game::windowEvents()
             blinky->mBody.setScale(scale, scale);
             blinky->mEyes.setScale(scale, scale);
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
-            map.setOrigin(texture.getSize().x/2,texture.getSize().y/2);
+            mPlyr->mSprite.setPosition(map.getPosition());
+            std::cout<< scale;
 
-        }
-        else if (updatebutton(event, playbutton))
-        {
-            play = true;
-            mWindow.clear();
-            mWindow.display();
-            
-        }
-        else if (updatebutton(event, infobutton)){
-            displayinstructions();
         }
         if (!play)
         {
+            if (updatebutton(event, playbutton))
+            {
+                play = true;
+                mWindow.clear();
+                mWindow.display();
+
+            }
+            else if (updatebutton(event, infobutton)){
+                displayinstructions();
+            }
             mWindow.clear();
             mWindow.draw(titleimage);
             mWindow.draw(playbutton);
@@ -193,19 +187,19 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     if (event.type == sf::Event::MouseMoved){
         if (mouseinbutton){
             button.setFillColor(sf::Color::Yellow);
-            mWindow.draw(button);
+            //mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
-            mWindow.draw(button);
+            //mWindow.draw(button);
         }
     }
     if (event.type == sf::Event::MouseButtonPressed){
         if (event.mouseButton.button == sf::Mouse::Left && mouseinbutton){
             button.setFillColor(sf::Color(150,0,0));
-            mWindow.draw(button);
+            //mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
-            mWindow.draw(button);
+            //mWindow.draw(button);
         }
     }
     if (event.type == sf::Event::MouseButtonReleased){
