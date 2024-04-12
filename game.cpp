@@ -69,7 +69,7 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->mEyes.setScale(scale, scale);
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
+    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
 }
 /**
  * @brief Runs different routines depending on how the window is updated
@@ -94,13 +94,14 @@ void Game::windowEvents()
 
             scale = (mWindow.getSize().y * 1.0 )/312.0;
 
-            mPlyr->mvSpeed = 2.0 * scale;
-            blinky->mvSpeed = 2.0 * scale;
+            mPlyr->mvSpeed = 1.0 * scale;
+            blinky->mvSpeed = 1.0 * scale;
             map.setScale(scale, scale);
             mPlyr->mSprite.setScale(scale, scale);
             blinky->mBody.setScale(scale, scale);
             blinky->mEyes.setScale(scale, scale);
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
+            map.setOrigin(texture.getSize().x/2,texture.getSize().y/2);
 
         }
         else if (updatebutton(event, playbutton))
@@ -157,11 +158,6 @@ void Game :: displaymenu(){
     mWindow.draw(infobutton);
     mWindow.display();
     windowEvents();
-    //while(1){
-    //if (updatemenu()){
-    //    break;
-    //}
-    //}
 }
 
 bool Game :: updatemenu(){
@@ -196,7 +192,7 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
 
     if (event.type == sf::Event::MouseMoved){
         if (mouseinbutton){
-            button.setFillColor(sf::Color::Red);
+            button.setFillColor(sf::Color::Yellow);
             mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
@@ -386,7 +382,7 @@ Game::Player::Player()
  * 
  */
 void Game::Player::move()
-{
+{    
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
         if (!movement.empty() && movement.top() != up)

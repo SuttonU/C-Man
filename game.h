@@ -60,7 +60,7 @@ public:
     {
         char mToken;                            //Player token on grid
         sf::Sprite mSprite;                     //Player sprite
-        float mvSpeed = 2;                      //Player movment speed
+        float mvSpeed = 1.5;                      //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
         int framecount = 0;                     //Used to keep count of frames during animation
         direction mDir = left;                  //Direction of player
@@ -77,7 +77,7 @@ public:
         sf::Sprite mBody;
         sf::Sprite mEyes;
         sf::Vector2f mPos;
-        float mvSpeed = 2;
+        float mvSpeed = 1.5;
         direction mDir = left;
         Ghosts();
         void move();
