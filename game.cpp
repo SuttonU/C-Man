@@ -31,6 +31,11 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     infobutton.setOrigin(infobutton.getGlobalBounds().width/2, infobutton.getGlobalBounds().height/2 + 15);
     infobutton.setPosition(mWindow.getSize().x/2, 700);
 
+    maptexture.loadFromFile("mapR.png");
+    map.setTexture(maptexture);
+    map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
+    map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+
     if(!mTextureFile.loadFromFile("spritesheet.png"))
     {
         std::cout << "Error loading game sprite sheet\n";
@@ -69,12 +74,13 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->mEyes.setScale(scale, scale);
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+    setgridorigin();
+    mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
 
-    blinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
-    inky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + 16 * scale);
-    pinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 16 * scale);
-    clyde->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 32 * scale);
+    blinky->mBody.setPosition(getgridx(10), getgridy(14));
+    inky->mBody.setPosition(getgridx(17), getgridy(14));
+    pinky->mBody.setPosition(getgridx(13), getgridy(14));
+    clyde->mBody.setPosition(getgridx(20), getgridy(14));
     
     blinky->frames[0] = 0;
     blinky->frames[1] = 16;
@@ -125,7 +131,8 @@ void Game::windowEvents()
             clyde->mEyes.setScale(scale, scale);
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
             map.setOrigin(texture.getSize().x/2,texture.getSize().y/2);
-
+            setgridorigin();
+            mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
         }
         else if (updatebutton(event, playbutton))
         {
@@ -216,19 +223,15 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     if (event.type == sf::Event::MouseMoved){
         if (mouseinbutton){
             button.setFillColor(sf::Color::Yellow);
-            mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
-            mWindow.draw(button);
         }
     }
     if (event.type == sf::Event::MouseButtonPressed){
         if (event.mouseButton.button == sf::Mouse::Left && mouseinbutton){
             button.setFillColor(sf::Color(150,0,0));
-            mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
-            mWindow.draw(button);
         }
     }
     if (event.type == sf::Event::MouseButtonReleased){
@@ -694,4 +697,30 @@ void Game::displaygrid(){
         }
         std::cout << std::endl;
     }
+}
+/**
+ * @brief Sets the 0,0 origin for the map/grid.
+ * 
+ */
+void Game::setgridorigin(){
+    gridoriginx = (float)map.getPosition().x-((float)map.getGlobalBounds().width/2.0)+(4.0*scale);
+    gridoriginy = (float)map.getPosition().y-((float)map.getGlobalBounds().height/2.0)+(4.0*scale);
+}
+/**
+ * @brief Returns the y coordinates of a given row in the grid.
+ * 
+ * @param row 
+ * @return float 
+ */
+float Game::getgridy(int row){
+    return (8*scale)*(row) + gridoriginy;
+}
+/**
+ * @brief Returns the x coordinates of a given collumn in the grid.
+ * 
+ * @param col 
+ * @return float 
+ */
+float Game::getgridx(int col){
+    return (8*scale)*(col) + gridoriginx;
 }

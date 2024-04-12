@@ -40,6 +40,8 @@ private:
     sf::Texture maptexture;
     //grid data
     char grid[33][31];
+    float gridoriginx;
+    float gridoriginy;
     
 public: 
     //Game functions
@@ -114,5 +116,8 @@ public:
     void initializegrid();
     void setwall(int length, int width, int row, int col);
     void displaygrid();
+    float getgridy(int row);
+    float getgridx(int col);
+    void setgridorigin();
 };
 #endif
