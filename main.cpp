@@ -14,6 +14,7 @@
 
 int main()
 {
+    int ghostCount;
     Game game;
     int x = game.getgridx(1);
     game.initializegrid();
