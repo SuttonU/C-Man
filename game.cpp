@@ -75,12 +75,12 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
     setgridorigin();
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+    mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
 
-    blinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
-    inky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + 16 * scale);
-    pinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 16 * scale);
-    clyde->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 32 * scale);
+    blinky->mBody.setPosition(getgridx(10), getgridy(14));
+    inky->mBody.setPosition(getgridx(17), getgridy(14));
+    pinky->mBody.setPosition(getgridx(13), getgridy(14));
+    clyde->mBody.setPosition(getgridx(20), getgridy(14));
     
     blinky->frames[0] = 0;
     blinky->frames[1] = 16;
