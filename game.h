@@ -78,9 +78,12 @@ public:
         sf::Sprite mEyes;
         sf::Vector2f mPos;
         float mvSpeed = 1.5;
+        int frames[2] = {0, 16};
+        int framecount = 0;
         direction mDir = left;
         Ghosts();
         void move();
+        void animate();
     };
     
     struct Pellets
