@@ -70,6 +70,20 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
     mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+
+    blinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+    inky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + 16 * scale);
+    pinky->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 16 * scale);
+    clyde->mBody.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 - 32 * scale);
+    
+    blinky->frames[0] = 0;
+    blinky->frames[1] = 16;
+    inky->frames[0] = 32;
+    inky->frames[1] = 48;
+    pinky->frames[0] = 64;
+    pinky->frames[1] = 80;
+    clyde->frames[0] = 96;
+    clyde->frames[1] = 112;
 }
 /**
  * @brief Runs different routines depending on how the window is updated
@@ -96,10 +110,19 @@ void Game::windowEvents()
 
             mPlyr->mvSpeed = 1.0 * scale;
             blinky->mvSpeed = 1.0 * scale;
+            pinky->mvSpeed = 1.0 * scale;
+            inky->mvSpeed = 1.0 * scale;
+            clyde->mvSpeed = 1.0 * scale;
             map.setScale(scale, scale);
             mPlyr->mSprite.setScale(scale, scale);
             blinky->mBody.setScale(scale, scale);
             blinky->mEyes.setScale(scale, scale);
+            pinky->mBody.setScale(scale, scale);
+            pinky->mEyes.setScale(scale, scale);
+            inky->mBody.setScale(scale, scale);
+            inky->mEyes.setScale(scale, scale);
+            clyde->mBody.setScale(scale, scale);
+            clyde->mEyes.setScale(scale, scale);
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
             map.setOrigin(texture.getSize().x/2,texture.getSize().y/2);
 
@@ -286,6 +309,13 @@ void Game::update()
     mPlyr->move();
     mPlyr->animate();
     blinky->move();
+    blinky->animate();
+    pinky->move();
+    pinky->animate();
+    inky->move();
+    inky->animate();
+    clyde->move();
+    clyde->animate();
     if (blinky->mBody.getPosition().x < 0)
     {
         blinky->mDir = right;
@@ -534,6 +564,19 @@ void Game::Ghosts::move()
             mEyes.setTextureRect(sf::IntRect(12*16, 16, 16, 16));
         }
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
+}
+
+void Game::Ghosts::animate()
+{
+    mBody.setTextureRect(sf::IntRect(frames[framecount/6], 16, 16, 16));
+    if (framecount == 11)
+    {
+        framecount = 0;
+    }
+    else
+    {
+        framecount++;
+    }
 }
 Game::Pellets::Pellets()
 {

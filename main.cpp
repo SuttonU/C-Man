@@ -14,6 +14,7 @@
 
 int main()
 {
+    int ghostCount;
     Game game;
     game.initializegrid();
     game.displaygrid(); //Uncomment to test and display grid
