@@ -25,11 +25,9 @@ private:
     sf::RenderWindow mWindow;
     bool play = false;
     //Player data
-    sf::Texture plyrFrames[3];
-    sf::FloatRect plyrHitbox;
-    int playerFrame = 2;
     int lives;
     int points = 0;
+    float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
@@ -47,7 +45,8 @@ public:
     //Game functions
     Game();
     ~Game();
-    void closeWindow();
+    void windowEvents();
+    bool start();
     void update();
     void render();
     bool isDone() const;
@@ -59,33 +58,29 @@ public:
 
     struct Player
     {
+        char mToken;                            //Player token on grid
         sf::Sprite mSprite;                     //Player sprite
-        sf::Vector2f mPos;                      //Player position
-        sf::FloatRect mHB;                      //Player hitbox
-        float mvSpeed = 2;                      //Player movment speed
+        float mvSpeed = 1.5;                      //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
         int framecount = 0;                     //Used to keep count of frames during animation
         direction mDir = left;                  //Direction of player
+        direction bufferDir;                    //Direction put in buffer
         std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
         Player();                               //Creates player
         void animate();                         //Player eating animation
         void move();                            //Moves player sprite
-        void setHb(const sf::FloatRect &hitbox);//Sets the hitbox of the player
-        sf::FloatRect getGlobalHb() const;      //Gets the hitbox of the player
     };
 
     struct Ghosts
     {
+        char mToken;
         sf::Sprite mBody;
         sf::Sprite mEyes;
         sf::Vector2f mPos;
-        sf::FloatRect mHB;
-        float mvSpeed = 2;
+        float mvSpeed = 1.5;
         direction mDir = left;
         Ghosts();
         void move();
-        void setHb(const sf::FloatRect &hitbox);
-        sf::FloatRect getGlobalHb() const;
     };
     
     struct Pellets
@@ -93,10 +88,7 @@ public:
         Pellets();
         sf::Sprite mSprite;
         sf::Vector2f mPos;
-        sf::FloatRect mHB;
         int amount;
-        void setHb(const sf::FloatRect &hitbox);
-        sf::FloatRect getGlobalHb() const;
     };
 
     Player * mPlyr = nullptr;

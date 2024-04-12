@@ -9,11 +9,13 @@
  * 
  */
 #include "game.h"
-void Game :: displaymenu(){
+Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
+{
+    //Menu initialization
     texture.loadFromFile("Pacmantitle.png");
     titleimage.setTexture(texture);
     titleimage.setOrigin(texture.getSize().x/2, texture.getSize().y/2);
-    titleimage.setScale(0.5,0.5);
+    titleimage.setScale(0.5 / scale,0.5 / scale);
     titleimage.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/3);
 
     font.loadFromFile("PixelFont.ttf");
@@ -29,15 +31,133 @@ void Game :: displaymenu(){
     infobutton.setOrigin(infobutton.getGlobalBounds().width/2, infobutton.getGlobalBounds().height/2 + 15);
     infobutton.setPosition(mWindow.getSize().x/2, 700);
 
+    if(!mTextureFile.loadFromFile("spritesheet.png"))
+    {
+        std::cout << "Error loading game sprite sheet\n";
+        exit(101);
+    }
+    lives = 3;
+    //Set scale of game
+    scale = (mWindow.getSize().y * 1.0 )/248.0;
+    scale -= scale / 10.0;
+    //Create characters
+    blinky = new Ghosts();
+    inky = new Ghosts();
+    pinky = new Ghosts();
+    clyde = new Ghosts();
+    mPlyr = new Player;
+    pellets[0] = new Pellets;
+    //Set textures
+    blinky->mBody.setTexture(mTextureFile);
+    blinky->mEyes.setTexture(mTextureFile);
+    inky->mBody.setTexture(mTextureFile);
+    inky->mEyes.setTexture(mTextureFile);
+    pinky->mBody.setTexture(mTextureFile);
+    pinky->mEyes.setTexture(mTextureFile);
+    clyde->mBody.setTexture(mTextureFile);
+    clyde->mEyes.setTexture(mTextureFile);
+    pellets[0]->mSprite.setTexture(mTextureFile);
+    mPlyr->mSprite.setTexture(mTextureFile);
+    //Scale textures
+    map.setScale(scale, scale);
+    mPlyr->mSprite.setScale(scale, scale);
+    blinky->mBody.setScale(scale, scale);
+    blinky->mEyes.setScale(scale, scale);
+    inky->mBody.setScale(scale, scale);
+    inky->mEyes.setScale(scale, scale);
+    pinky->mBody.setScale(scale, scale);
+    pinky->mEyes.setScale(scale, scale);
+    clyde->mBody.setScale(scale, scale);
+    clyde->mEyes.setScale(scale, scale);
+    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
+}
+/**
+ * @brief Runs different routines depending on how the window is updated
+ * 
+ */
+void Game::windowEvents()
+{
+    sf::Event event;
+    while(mWindow.pollEvent(event))
+    {
+        if(event.type == sf::Event::Closed)
+        {
+            // Close window button clicked.
+            mWindow.close();
+        }
+        else if (event.type == sf::Event::Resized)
+        {
+            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+            mWindow.setView(sf::View(visibleArea));
+
+
+
+            scale = (mWindow.getSize().y * 1.0 )/312.0;
+
+            mPlyr->mvSpeed = 1.0 * scale;
+            blinky->mvSpeed = 1.0 * scale;
+            map.setScale(scale, scale);
+            mPlyr->mSprite.setScale(scale, scale);
+            blinky->mBody.setScale(scale, scale);
+            blinky->mEyes.setScale(scale, scale);
+            map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
+            map.setOrigin(texture.getSize().x/2,texture.getSize().y/2);
+
+        }
+        else if (updatebutton(event, playbutton))
+        {
+            play = true;
+            mWindow.clear();
+            mWindow.display();
+            
+        }
+        else if (updatebutton(event, infobutton)){
+            displayinstructions();
+        }
+        if (!play)
+        {
+            mWindow.clear();
+            mWindow.draw(titleimage);
+            mWindow.draw(playbutton);
+            mWindow.draw(infobutton);
+            mWindow.display();
+        }
+    }
+}
+/**
+ * @brief starts game when play is true
+ * 
+ */
+bool Game::start()
+{
+    return play;
+}
+/**
+ * @brief Destroy the Game:: Game object and frees memory.
+ * 
+ */
+Game::~Game()
+{
+    delete mPlyr;  
+    delete inky;  
+    delete blinky;
+    delete pinky; 
+    delete clyde; 
+    delete pellets[0]; 
+    mPlyr = nullptr; 
+    inky = nullptr;
+    blinky = nullptr;
+    pinky = nullptr; 
+    clyde = nullptr;
+    pellets[0] = nullptr;
+}
+void Game :: displaymenu(){
+
     mWindow.draw(titleimage);
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
-    while(1){
-    if (updatemenu()){
-        break;
-    }
-    }
+    windowEvents();
 }
 
 bool Game :: updatemenu(){
@@ -72,7 +192,7 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
 
     if (event.type == sf::Event::MouseMoved){
         if (mouseinbutton){
-            button.setFillColor(sf::Color::Red);
+            button.setFillColor(sf::Color::Yellow);
             mWindow.draw(button);
         } else {
             button.setFillColor(sf::Color::White);
@@ -142,50 +262,6 @@ void Game :: displayinstructions(){
         }
     }
 }
-
-Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
-{
-    if(!mTextureFile.loadFromFile("spritesheet.png"))
-    {
-        std::cout << "Error loading game sprite sheet\n";
-        exit(101);
-    }
-    lives = 3;
-    blinky = new Ghosts();
-    blinky->mBody.setTexture(mTextureFile);
-    blinky->mEyes.setTexture(mTextureFile);
-    //inky = new Ghosts(sf::Color::Blue);
-    //inky->mSprite.setTexture();
-    //pinky = new Ghosts(sf::Color::Magenta);
-    //pinky->mSprite.setTexture();
-    //clyde = new Ghosts();
-    //clyde->mSprite.setTexture(mTextureFile);
-    pellets[0] = new Pellets;
-    pellets[0]->mSprite.setTexture(mTextureFile);
-    mPlyr = new Player;
-    mPlyr->mSprite.setTexture(mTextureFile);
-    mPlyr->setHb({ 8.f, 8.f, 16.f, 16.f });
-    blinky->setHb({ 8.f, 8.f, 16.f, 16.f });
-    mPlyr->mSprite.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2 + mPlyr->mSprite.getScale().x * 16);
-}
-/**
- * @brief Destroy the Game:: Game object and frees memory.
- * 
- */
-Game::~Game()
-{
-    delete mPlyr;
-    delete inky;
-    delete blinky; 
-    delete pinky;
-    delete clyde;
-    delete pellets[0];
-    mPlyr = nullptr;
-    inky = nullptr;
-    blinky = nullptr;
-    pinky = nullptr;
-    clyde = nullptr;
-}
 /**
  * @brief Checks to see if the game is over
  * 
@@ -201,31 +277,12 @@ bool Game::isDone() const
     return false;
 }
 /**
- * @brief Closes the window if player presses the close button
- * 
- */
-void Game::closeWindow()
-{
-    sf::Event event;
-    while(mWindow.pollEvent(event))
-    {
-        if(event.type == sf::Event::Closed)
-        {
-            // Close window button clicked.
-            mWindow.close();
-        }
-    }
-}
-/**
  * @brief Updates the sprites on the screen
  * 
  */
 void Game::update()
 {
-    while (!play)
-    {
-        usleep(5000000);
-    }
+    //Moving
     mPlyr->move();
     mPlyr->animate();
     blinky->move();
@@ -245,18 +302,6 @@ void Game::update()
     {
         blinky->mDir = down;
     }
-    if (mPlyr->getGlobalHb().intersects(pellets[0]->getGlobalHb()))
-    {
-        pellets[0]->mSprite.setPosition({0,0});
-    }
-    else if (mPlyr->getGlobalHb().intersects(blinky->getGlobalHb())/* || mPlyr->getGlobalHb().intersects(inky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(pinky->getGlobalHb()) || mPlyr->getGlobalHb().intersects(clyde->getGlobalHb())*/)
-    {
-        deathAnimation();
-        usleep(5000000);
-        mPlyr->mSprite.setPosition(110,120);
-        render();
-        lives--;
-    }
 }
 /**
  * @brief Clears, Draws, and displays the screen
@@ -267,6 +312,9 @@ void Game::render()
     mWindow.clear(sf::Color::Black);
     //Draw player
     drawGhost(blinky);
+    drawGhost(inky);
+    drawGhost(pinky);
+    drawGhost(clyde);
     mWindow.draw(mPlyr->mSprite);
     mWindow.draw(pellets[0]->mSprite);
     //draw map
@@ -325,38 +373,78 @@ void Game::destroyPlyr(Player plyr)
  */
 Game::Player::Player()
 {
+    mvSpeed = mvSpeed * mSprite.getScale().x;
     mSprite.setTextureRect(sf::IntRect(16, 0, 16, 16));
     mSprite.setOrigin(8, 8);
-    mSprite.setScale(2,2);        
-    //Set position to start of maze
-    //plyrSprite.setPosition();
 }
 /**
  * @brief Moves player through taking in user input
  * 
  */
 void Game::Player::move()
-{
+{    
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        mDir = up;
+        if (!movement.empty() && movement.top() != up)
+        {
+            movement.pop();
+            movement.push(up);
+        }
+        else if (movement.empty())
+        {
+            movement.push(up);
+        }
+        
+        
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        mDir = down;
+        if (!movement.empty() && movement.top() != down)
+        {
+            movement.pop();
+            movement.push(down);
+        }
+        else if (movement.empty())
+        {
+            movement.push(down);
+        }
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        mDir = right;
+        if (!movement.empty() && movement.top() != right)
+        {
+            movement.pop();
+            movement.push(right);
+        }
+        else if (movement.empty())
+        {
+            movement.push(right);
+        }
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        mDir = left;
+        if (!movement.empty() && movement.top() != left)
+        {
+            movement.pop();
+            movement.push(left);
+        }
+        else if (movement.empty())
+        {
+            movement.push(left);
+        }
     }
-
+    
 //Moves character
+
+    //If statement to check if way is not blocked by wall
+    if (!movement.empty())
+    {
+        mDir = movement.top();
+        movement.pop();
+    }
     if (mDir == up)
     {
+        //Formula for graphic tile to tile on array
         mSprite.setRotation(270);
         mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y - mvSpeed);
     }
@@ -389,24 +477,6 @@ void Game::Player::animate()
     }
 }
 /**
- * @brief Sets the player hitbox
- * 
- * @param hitbox hitbox coordinates
- */
-void Game::Player::setHb(const sf::FloatRect &hitbox)
-{
-    mHB = hitbox;
-}
-/**
- * @brief Gets the hitbox of the player
- * 
- * @return sf::FloatRect bounds of hitbox
- */
-sf::FloatRect Game::Player::getGlobalHb() const
-{
-    return mSprite.getTransform().transformRect(mHB);
-}
-/**
  * @brief Animates player death
  * 
  */
@@ -429,13 +499,11 @@ void Game::deathAnimation()
  */
 Game::Ghosts::Ghosts()
 {
-    setHb({ 8.f, 8.f, 16.f, 16.f });
+    //setHb({ 8.f, 8.f, 16.f, 16.f });
     mBody.setTextureRect(sf::IntRect(0,16,16,16));
     mBody.setOrigin(8, 8);
-    mBody.setScale(2,2);
     mBody.setPosition(800,800); 
     mEyes.setTextureRect(sf::IntRect(16*12,16,16,16));
-    mEyes.setScale(2,2);
     mEyes.setOrigin(8,8);
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
@@ -467,49 +535,16 @@ void Game::Ghosts::move()
         }
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
-/**
- * @brief Sets the ghost hitbox
- * 
- * @param hitbox hitbox coordinates
- */
-void Game::Ghosts::setHb(const sf::FloatRect &hitbox)
-{
-    mHB = hitbox;
-}
-/**
- * @brief Gets the hitbox of the ghost
- * 
- * @return sf::FloatRect bounds of hitbox
- */
-sf::FloatRect Game::Ghosts::getGlobalHb() const
-{
-    return mBody.getTransform().transformRect(mHB);
-}
-/**
- * @brief Constructs a new pellet
- * 
- */
 Game::Pellets::Pellets()
 {
-    setHb({ 7.f, 7.f, 16.f, 16.f });
+    //setHb({ 7.f, 7.f, 16.f, 16.f });
     mSprite.setTextureRect({16*14, 0, 16, 16});
     mSprite.setOrigin(8, 8);
-    mSprite.setScale(2,2);
 }
-sf::FloatRect Game::Pellets::getGlobalHb() const
-{
-    return mSprite.getTransform().transformRect(mHB);
-}
-void Game::Pellets::setHb(const sf::FloatRect &hitbox)
-{
-    mHB = hitbox;
-}
-
 void Game::displaymap(){
     maptexture.loadFromFile("mapR.png");
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
-    map.setScale(2,2);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
     mWindow.draw(map);
     mWindow.display();
@@ -588,6 +623,7 @@ void Game::initializegrid(){
     grid[14][13] = 'b';
     grid[14][17] = 'p';
     grid[14][20] = 'o';
+    mPlyr->mToken = grid[19][15];
 }
 /**
  * @brief Function to initialize part of grid.
