@@ -119,5 +119,7 @@ public:
     float getgridy(int row);
     float getgridx(int col);
     void setgridorigin();
+    int returnrow(sf::Sprite s);
+    int returncol(sf::Sprite s);
 };
 #endif

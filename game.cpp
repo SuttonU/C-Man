@@ -724,3 +724,21 @@ float Game::getgridy(int row){
 float Game::getgridx(int col){
     return (8*scale)*(col) + gridoriginx;
 }
+/**
+ * @brief Returns the row that a sprite is in.
+ * 
+ * @param s 
+ * @return int 
+ */
+int Game::returnrow(sf::Sprite s){
+    return (s.getPosition().y - (mWindow.getSize().y/2 - map.getGlobalBounds().height/2)) / ((int)8*scale);
+}
+/**
+ * @brief Returns the collumn that a sprite is in.
+ * 
+ * @param s 
+ * @return int 
+ */
+int Game::returncol(sf::Sprite s){
+    return (s.getPosition().x - (mWindow.getSize().x/2 - map.getGlobalBounds().width/2)) / ((int)8*scale);
+}
