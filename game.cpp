@@ -309,32 +309,33 @@ bool Game::isDone() const
 void Game::update()
 {
     //Moving
-    mPlyr->move();
-    mPlyr->animate();
-    blinky->move();
-    blinky->animate();
-    pinky->move();
-    pinky->animate();
-    inky->move();
-    inky->animate();
-    clyde->move();
-    clyde->animate();
-    if (blinky->mBody.getPosition().x < 0)
+    mPlyr->controls();
+    if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
-        blinky->mDir = right;
+        mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));
+        mPlyr->animate();
     }
-    else if (blinky->mBody.getPosition().x > 1920)
+    if (isClear(blinky->mDir, blinky->mBody))
     {
-        blinky->mDir = left;
+        blinky->move();
+        blinky->animate();
     }
-    else if (blinky->mBody.getPosition().y > 1080)
+    if (isClear(pinky->mDir, pinky->mBody))
     {
-        blinky->mDir = up;
+        pinky->move();
+        pinky->animate();
     }
-    else if (blinky->mBody.getPosition().y < 0)
+    if (isClear(inky->mDir, inky->mBody))
     {
-        blinky->mDir = down;
+        inky->move();
+        inky->animate();
     }
+    if (isClear(clyde->mDir, clyde->mBody))
+    {
+        clyde->move();
+        clyde->animate();
+    }
+    moveTokens();
 }
 /**
  * @brief Clears, Draws, and displays the screen
@@ -354,6 +355,51 @@ void Game::render()
     mWindow.draw(map);
     //draw ghosts
     mWindow.display();
+}
+/**
+ * @brief Moves each of the tokens on the grid
+ * 
+ */
+void Game::moveTokens()
+{
+    for (int i = 0; i < 31; i++)
+    {
+        for (int j = 0; j < 33; j++)
+        {
+            if (grid[j][i] == 'c' || grid[j][i] == 'p' || grid[j][i] == 'r' || grid[j][i] == 'b' || grid[j][i] == 'o')
+            {
+                grid[j][i] = ' ';
+            }
+        }
+    }   
+    grid[returnrow(mPlyr->mSprite)][returncol(mPlyr->mSprite)] = 'c';
+    grid[returnrow(blinky->mBody)][returncol(blinky->mBody)] = 'r';
+    grid[returnrow(inky->mBody)][returncol(inky->mBody)] = 'b';
+    grid[returnrow(pinky->mBody)][returncol(pinky->mBody)] = 'p';
+    grid[returnrow(clyde->mBody)][returncol(clyde->mBody)] = 'o';
+}
+/**
+ * @brief Checks to see if there is a wall in the way
+ * 
+ * @param dir direction sprite is traveling in
+ * @return true there is no wall in the way
+ * @return false there is a wall in the way
+ */
+bool Game::isClear(direction dir, sf::Sprite sprite)
+{
+    int x = returncol(sprite);
+    int y = returnrow(sprite);
+    if (
+        (dir == up && grid[y - 1][x] == 'w')
+    || (dir == down && grid[y + 1][x] == 'w')  
+    || (dir == right && grid[y][x + 1] == 'w')  
+    || (dir == left && grid[y][x - 1] == 'w')
+    )
+    {
+        return false;
+    }
+    return true;
+    
 }
 /**
  * @brief Draws all the parts of the ghost
@@ -414,8 +460,35 @@ Game::Player::Player()
  * @brief Moves player through taking in user input
  * 
  */
-void Game::Player::move()
+void Game::Player::move(float col, float row)
 {    
+//Moves character
+
+    //If statement to check if way is not blocked by wall
+    if (mDir == up)
+    {
+        //Formula for graphic tile to tile on array
+        mSprite.setRotation(270);
+        mSprite.setPosition(col, mSprite.getPosition().y - mvSpeed);
+    }
+    else if (mDir == down)
+    {
+        mSprite.setRotation(90);
+        mSprite.setPosition(col, mSprite.getPosition().y + mvSpeed);
+    }
+    else if (mDir == right)
+    {
+        mSprite.setRotation(0);
+        mSprite.setPosition(mSprite.getPosition().x + mvSpeed, row);
+    }
+    else if (mDir == left)
+    {
+        mSprite.setRotation(180);
+        mSprite.setPosition(mSprite.getPosition().x - mvSpeed, row);
+    }
+}
+void Game::Player::controls()
+{
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
         if (!movement.empty() && movement.top() != up)
@@ -466,35 +539,10 @@ void Game::Player::move()
             movement.push(left);
         }
     }
-    
-//Moves character
-
-    //If statement to check if way is not blocked by wall
     if (!movement.empty())
     {
         mDir = movement.top();
         movement.pop();
-    }
-    if (mDir == up)
-    {
-        //Formula for graphic tile to tile on array
-        mSprite.setRotation(270);
-        mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y - mvSpeed);
-    }
-    else if (mDir == down)
-    {
-        mSprite.setRotation(90);
-        mSprite.setPosition(mSprite.getPosition().x, mSprite.getPosition().y + mvSpeed);
-    }
-    else if (mDir == right)
-    {
-        mSprite.setRotation(0);
-        mSprite.setPosition(mSprite.getPosition().x + mvSpeed, mSprite.getPosition().y);
-    }
-    else if (mDir == left)
-    {
-        mSprite.setRotation(180);
-        mSprite.setPosition(mSprite.getPosition().x - mvSpeed, mSprite.getPosition().y);
     }
 }
 void Game::Player::animate()
