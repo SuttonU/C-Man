@@ -51,18 +51,20 @@ public:
     bool start();
     void update();
     void render();
-    bool isDone() const;
     void reset();
     void setLives(int num);
-    int getLives()const;
-    sf::Texture mTextureFile;
+    void moveTokens();
     void deathAnimation();
+    int getLives()const;
+    bool isDone() const;
+    sf::Texture mTextureFile;
+    
 
     struct Player
     {
         char mToken;                            //Player token on grid
         sf::Sprite mSprite;                     //Player sprite
-        float mvSpeed = 1.5;                      //Player movment speed
+        float mvSpeed = 1.5;                    //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
         int framecount = 0;                     //Used to keep count of frames during animation
         direction mDir = left;                  //Direction of player
@@ -70,7 +72,8 @@ public:
         std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
         Player();                               //Creates player
         void animate();                         //Player eating animation
-        void move();                            //Moves player sprite
+        void move(float col, float row);        //Moves player sprite
+        void controls();                        //Changes sprites direction
     };
 
     struct Ghosts
@@ -96,6 +99,7 @@ public:
         int amount;
     };
 
+    //Game objects
     Player * mPlyr = nullptr;
     Ghosts * inky = nullptr;
     Ghosts * blinky = nullptr;
@@ -121,5 +125,6 @@ public:
     void setgridorigin();
     int returnrow(sf::Sprite s);
     int returncol(sf::Sprite s);
+    bool isClear(direction dir, sf::Sprite sprite);
 };
 #endif
