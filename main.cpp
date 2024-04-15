@@ -18,7 +18,7 @@ int main()
     Game game;
     int x = game.getgridx(1);
     game.initializegrid();
-    game.displaygrid(); //Uncomment to test and display grid
+    //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
     while (!game.start() && !game.isDone())
     {

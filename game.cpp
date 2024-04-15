@@ -310,6 +310,12 @@ void Game::update()
 {
     //Moving
     mPlyr->controls();
+    //If the next move is clear then it will set the next direction to the one store in movement buffer.
+    if (isClear(mPlyr->movement.top(), mPlyr->mSprite) && !mPlyr->movement.empty())
+    {
+        mPlyr->mDir = mPlyr->movement.top();
+        mPlyr->movement.pop();
+    }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));
@@ -487,6 +493,10 @@ void Game::Player::move(float col, float row)
         mSprite.setPosition(mSprite.getPosition().x - mvSpeed, row);
     }
 }
+/**
+ * @brief Changes players direction based on input
+ * 
+ */
 void Game::Player::controls()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -538,11 +548,6 @@ void Game::Player::controls()
         {
             movement.push(left);
         }
-    }
-    if (!movement.empty())
-    {
-        mDir = movement.top();
-        movement.pop();
     }
 }
 void Game::Player::animate()
