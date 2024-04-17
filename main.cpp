@@ -14,10 +14,7 @@
 
 int main()
 {
-    int ghostCount;
     Game game;
-    int x = game.getgridx(1);
-    game.initializegrid();
     //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
     while (!game.start() && !game.isDone())
@@ -26,20 +23,24 @@ int main()
     }
     game.displaymap();
     game.render();
-    usleep(5000000);
-    const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
-    sf::Clock clock;
-    sf::Time timeSinceLastUpdate = sf::Time::Zero;
     while (!game.isDone())
-    {
-        timeSinceLastUpdate += clock.restart();
-        game.windowEvents();
-        while (timeSinceLastUpdate > TIME_PER_FRAME)
+    {        
+        usleep(5000000);
+        const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
+        sf::Clock clock;
+        sf::Time timeSinceLastUpdate = sf::Time::Zero;
+        while (game.getDots() > 0 && !game.isDone())
         {
-            timeSinceLastUpdate -= TIME_PER_FRAME;
-            game.update();
+            timeSinceLastUpdate += clock.restart();
+            game.windowEvents();
+            while (timeSinceLastUpdate > TIME_PER_FRAME)
+            {
+                timeSinceLastUpdate -= TIME_PER_FRAME;
+                game.update();
+            }
+            game.render();
         }
-        game.render();
+        game.reset();
     }
 
     return 0;
