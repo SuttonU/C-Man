@@ -818,7 +818,6 @@ void Game::initializegrid(){
     grid[14][13] = 'b';
     grid[14][17] = 'p';
     grid[14][20] = 'o';
-    mPlyr->mToken = grid[19][15];
 }
 /**
  * @brief Function to initialize part of grid.

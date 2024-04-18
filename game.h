@@ -64,7 +64,6 @@ public:
 
     struct Player
     {
-        char mToken;                            //Player token on grid
         sf::Sprite mSprite;                     //Player sprite
         float mvSpeed = 1.5;                    //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
@@ -81,7 +80,6 @@ public:
 
     struct Ghosts
     {
-        char mToken;                            //Ghost token for grid
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
