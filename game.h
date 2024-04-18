@@ -14,10 +14,11 @@ git pul * @version 0.1
 #include <iostream>
 #include <unistd.h>
 #include <stack>
-//#include "ghosts.h"
-//#include "map.h"
+#include <vector>
 enum direction
 {up, down, left, right};
+const int GRID_SIZE_X = 31;
+const int GRID_SIZE_Y = 33;
 class Game
 {
 private:
@@ -27,6 +28,8 @@ private:
     //Player data
     int lives;
     int points = 0;
+    int dotSpaces = 0;
+    int dots = 0;
     float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
@@ -39,7 +42,7 @@ private:
     sf::Sprite map;
     sf::Texture maptexture;
     //grid data
-    char grid[33][31];
+    char grid[GRID_SIZE_Y][GRID_SIZE_X];    //Main grid used to check for portals
     float gridoriginx;
     float gridoriginy;
     
@@ -48,25 +51,24 @@ public:
     Game();
     ~Game();
     void windowEvents();
-    bool start();
     void update();
     void render();
     void reset();
-    void setLives(int num);
-    void moveTokens();
     void deathAnimation();
-    int getLives()const;
+    void setUpDots();
     bool isDone() const;
+    bool start();
+    int  getDots() const;
     sf::Texture mTextureFile;
     
 
     struct Player
     {
-        char mToken;                            //Player token on grid
         sf::Sprite mSprite;                     //Player sprite
         float mvSpeed = 1.5;                    //Player movment speed
         int frames[5] = {32, 16, 0, 16, 32};    //Order of frames for animation
         int framecount = 0;                     //Used to keep count of frames during animation
+        int gridPos[2][1];                      //Used to keep sprites position on grid
         direction mDir = left;                  //Direction of player
         direction bufferDir;                    //Direction put in buffer
         std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
@@ -78,25 +80,24 @@ public:
 
     struct Ghosts
     {
-        char mToken;
-        sf::Sprite mBody;
-        sf::Sprite mEyes;
-        sf::Vector2f mPos;
-        float mvSpeed = 1.5;
-        int frames[2] = {0, 16};
-        int framecount = 0;
-        direction mDir = left;
-        Ghosts();
-        void move();
-        void animate();
+        sf::Sprite mBody;                       //Ghost body
+        sf::Sprite mEyes;                       //Ghost eyes
+        float mvSpeed = 1.5;                    //Ghost movement speed
+        int frames[2] = {0, 16};                //Ghost's animation frames
+        int framecount = 0;                     //Count of the frame
+        int gridPos[2][1];                      //Used to keep sprites position on grid
+        direction mDir = left;                  //Ghost's direction
+        Ghosts();                               //Ghost constructor
+        void move();                            //Moves ghost
+        void animate();                         //Animates ghost
     };
     
     struct Pellets
     {
-        Pellets();
-        sf::Sprite mSprite;
-        sf::Vector2f mPos;
-        int amount;
+        Pellets();                  //Pellets constructor
+        sf::Sprite mSprite;         //Pellets sprite
+        bool eaten = false;         //If pellet is eaten it will be true
+        int gridPos[2][1];          //Used to keep sprites position on grid
     };
 
     //Game objects
@@ -105,7 +106,9 @@ public:
     Ghosts * blinky = nullptr;
     Ghosts * pinky = nullptr;
     Ghosts * clyde = nullptr;
-    Pellets * pellets[240];
+    std::vector<Pellets *> vPellets;              //vector of pellets
+    Pellets * pellets[265];
+    void eatPellet(Game::Pellets * pellet);       //Function for when a pellet is eaten
     void destroyPlyr(Player plyr);
     void displaymenu();
     bool updatemenu();
