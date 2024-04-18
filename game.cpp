@@ -403,16 +403,19 @@ void Game::update()
         clyde->move();
         clyde->animate();
     }
-    for (int i = 0; i < 265; i++)
+    if (dots > 0)
     {
-        bool notEaten = (!pellets[i]->eaten);   //Checks if pellet is not eaten
-        eatPellet(pellets[i]);  
-        bool eaten = (pellets[i]->eaten);       //Checks to see if pellet is eaten after function
-        if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
+        for (int i = 0; i < 265; i++)
         {
-            points += 10;
-        }      
-    }
+            bool notEaten = (!pellets[i]->eaten);   //Checks if pellet is not eaten
+            eatPellet(pellets[i]);  
+            bool eaten = (pellets[i]->eaten);       //Checks to see if pellet is eaten after function
+            if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
+            {
+                points += 10;
+            }      
+        }
+    }    
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
     mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
     blinky->gridPos[0][0] = returncol(blinky->mBody);
