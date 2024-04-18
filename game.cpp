@@ -487,6 +487,7 @@ void Game::drawGhost(Ghosts * ghost)
  */
 void Game::reset()
 {
+    dots = 0;
     setgridorigin();
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
@@ -497,7 +498,7 @@ void Game::reset()
     clyde->mBody.setPosition(getgridx(20), getgridy(14));
     for (int i = 0; i < 265; i++)
     {
-        pellets[i]->eaten = false;
+        (pellets[i])->eaten = false;
         dots++;
     }
     render();
