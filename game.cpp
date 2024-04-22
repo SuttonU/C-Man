@@ -46,11 +46,12 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     scale = (mWindow.getSize().y * 1.0 )/248.0;
     scale -= scale / 10.0;
     //Create characters
-    blinky = new Ghosts();
-    inky = new Ghosts();
-    pinky = new Ghosts();
-    clyde = new Ghosts();
+    blinky = new Ghosts;
+    inky = new Ghosts;
+    pinky = new Ghosts;
+    clyde = new Ghosts;
     mPlyr = new Player;
+    fruit = new Fruit;
     //Set textures
     blinky->mBody.setTexture(mTextureFile);
     blinky->mEyes.setTexture(mTextureFile);
@@ -61,8 +62,10 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     clyde->mBody.setTexture(mTextureFile);
     clyde->mEyes.setTexture(mTextureFile);
     mPlyr->mSprite.setTexture(mTextureFile);
+    fruit->mSprite.setTexture(mTextureFile);
     //Scale textures
     map.setScale(scale, scale);
+
     mPlyr->mSprite.setScale(scale, scale);
     blinky->mBody.setScale(scale, scale);
     blinky->mEyes.setScale(scale, scale);
@@ -72,12 +75,15 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->mEyes.setScale(scale, scale);
     clyde->mBody.setScale(scale, scale);
     clyde->mEyes.setScale(scale, scale);
+    fruit->mSprite.setScale(scale, scale);
     setgridorigin();
+    //Set positions
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     blinky->mBody.setPosition(getgridx(10), getgridy(14));
     inky->mBody.setPosition(getgridx(17), getgridy(14));
     pinky->mBody.setPosition(getgridx(13), getgridy(14));
     clyde->mBody.setPosition(getgridx(20), getgridy(14));
+    fruit->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->gridPos[0][0] = 15;
     mPlyr->gridPos[0][1] = 19;
     blinky->gridPos[0][0] = 10;
@@ -88,7 +94,9 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->gridPos[0][1] = 14;
     clyde->gridPos[0][0] = 20;
     clyde->gridPos[0][1] = 14;
-    
+    fruit->gridPos[0][0] = 15;
+    fruit->gridPos[0][1] = 19;
+    //Set frames
     blinky->frames[0] = 0;
     blinky->frames[1] = 16;
     inky->frames[0] = 32;
@@ -97,9 +105,26 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     pinky->frames[1] = 80;
     clyde->frames[0] = 96;
     clyde->frames[1] = 112;
-
+    //Set starting frames
+    pinky->mBody.setTextureRect(sf::IntRect(64, 16, 16, 16));
+    inky->mBody.setTextureRect(sf::IntRect(32, 16, 16, 16));
+    clyde->mBody.setTextureRect(sf::IntRect(96, 16, 16, 16));
+    mPlyr->mSprite.setTextureRect(sf::IntRect(32, 0, 16, 16));
+    //Set up grid and dots
     initializegrid();
     setUpDots();
+    //GUI Set up
+    if (!font.loadFromFile("PixelFont.ttf"))
+    {
+        std::cout << "Error loading font\n";
+        exit(1);
+    }
+    //Score set up
+    score.setFont(font);
+    score.setString(std::to_string(points) + "0");
+    score.setScale(scale, scale);
+    score.setOrigin(score.getGlobalBounds().width, 0);
+    score.setPosition(mWindow.getSize().x, 0);
 }
 /**
  * @brief Sets up the dots for pacman to eat
@@ -111,16 +136,36 @@ void Game::setUpDots()
     {
         for (int x = 0; x < GRID_SIZE_X; x++)
         {
-            if ((grid[y][x] == ' ' || grid[y][x] == 'f') && (y != 23 || x != 10) && (y != 23 || x != 22) && (y != 9 || x != 9) && (y != 9 || x != 27) && ((y < 12 || y > 18) || (x < 9 || x > 21)))
+            if ((grid[y][x] == ' ' 
+                || grid[y][x] == 'f') 
+                && (y != 23 || x != 9) 
+                && (y != 23 || x != 21) 
+                && (y != 9 || x != 9) 
+                && (y != 9 || x != 21) 
+                && ((y < 9 || y > 20) || (x < 6 || x > 24)))
             {
                 //Creates new dot at position and increments # of dots
-                pellets[dots] = new Pellets;
+                pellets[dots] = new Pellets(false);
                 pellets[dots]->mSprite.setTexture(mTextureFile);
                 pellets[dots]->mSprite.setScale(scale, scale);
                 pellets[dots]->mSprite.setPosition(getgridx(x) , getgridy(y));
                 pellets[dots]->gridPos[0][0] = x;
-                pellets[dots]->gridPos[0][0] = y;
+                pellets[dots]->gridPos[1][0] = y;
                 dots++;
+            }    
+            else if (((y == 23 && x == 9) 
+                || (y == 23 && x == 21) 
+                || (y == 9  && x == 9) 
+                || (y == 9  && x == 21)) 
+                && sDots < 4)
+            {
+                sPellets[sDots] = new Pellets(true);
+                sPellets[sDots]->mSprite.setTexture(mTextureFile);
+                sPellets[sDots]->mSprite.setScale(scale, scale);
+                sPellets[sDots]->mSprite.setPosition(getgridx(x) , getgridy(y));
+                sPellets[sDots]->gridPos[0][0] = x;
+                sPellets[sDots]->gridPos[1][0] = y;
+                sDots++;
             }
         }
     }
@@ -147,12 +192,13 @@ void Game::windowEvents()
 
 
             scale = (mWindow.getSize().y * 1.0 )/312.0;
-
-            mPlyr->mvSpeed = 1.0 * scale;
+            //Scale movement speed
+            mPlyr->mvSpeed = 1.25 * scale;
             blinky->mvSpeed = 1.0 * scale;
             pinky->mvSpeed = 1.0 * scale;
             inky->mvSpeed = 1.0 * scale;
             clyde->mvSpeed = 1.0 * scale;
+            //Scale sprites
             map.setScale(scale, scale);
             mPlyr->mSprite.setScale(scale, scale);
             blinky->mBody.setScale(scale, scale);
@@ -163,6 +209,8 @@ void Game::windowEvents()
             inky->mEyes.setScale(scale, scale);
             clyde->mBody.setScale(scale, scale);
             clyde->mEyes.setScale(scale, scale);
+            fruit->mSprite.setScale(scale, scale);
+            //Scale positions
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
             setgridorigin();
             mPlyr->mSprite.setPosition(getgridx(mPlyr->gridPos[0][0]), getgridy(mPlyr->gridPos[0][1]));
@@ -174,22 +222,43 @@ void Game::windowEvents()
             inky->mEyes.setPosition(getgridx(inky->gridPos[0][0]), getgridy(inky->gridPos[0][1]));
             pinky->mEyes.setPosition(getgridx(pinky->gridPos[0][0]), getgridy(pinky->gridPos[0][1]));
             clyde->mEyes.setPosition(getgridx(clyde->gridPos[0][0]), getgridy(clyde->gridPos[0][1]));
+            fruit->mSprite.setPosition(getgridx(fruit->gridPos[0][0]), getgridy(fruit->gridPos[0][1]));
+            //Scale dots
             if (dots > 0)
             {
                 int i = 0;
-                for (int y = 0; y < GRID_SIZE_Y && i < 265; y++)
+                int j = 0;
+                for (int y = 0; y < GRID_SIZE_Y; y++)
                 {
-                    for (int x = 0; x < GRID_SIZE_X && i < 265; x++)
+                    for (int x = 0; x < GRID_SIZE_X; x++)
                     {
-                        if ((grid[y][x] == ' ' || grid[y][x] == 'f') && (y != 23 || x != 9) && (y != 23 || x != 21) && (y != 9 || x != 9) && (y != 9 || x != 21) && ((y < 12 || y > 18) || (x < 9 || x > 21)))
+                        if ((grid[y][x] == ' ' 
+                            || grid[y][x] == 'f') 
+                            && (y != 23 || x != 9) 
+                            && (y != 23 || x != 21) 
+                            && (y != 9 || x != 9) 
+                            && (y != 9 || x != 21) 
+                            && ((y < 9 || y > 20) || (x < 6 || x > 24)))
                         {
                             pellets[i]->mSprite.setScale(scale, scale);
                             pellets[i]->mSprite.setPosition(getgridx(x) , getgridy(y));
                             i++;
-                        }
+                        }   
+                        else if (((y == 23 && x == 9) 
+                        || (y == 23 && x == 21) 
+                        || (y == 9  && x == 9) 
+                        || (y == 9  && x == 21)) 
+                        && j < sDots)
+                        {
+                            sPellets[j]->mSprite.setScale(scale, scale);
+                            sPellets[j]->mSprite.setPosition(getgridx(x) , getgridy(y));
+                            j++;
+                        }                     
                     }
                 }
             }
+            //Scale Gui
+            score.setScale(scale, scale);
         }
         else if (updatebutton(event, playbutton))
         {
@@ -240,6 +309,11 @@ Game::~Game()
     {
        delete pellets[i];
        pellets[i] = nullptr;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+       delete sPellets[i];
+       sPellets[i] = nullptr;
     }
 }
 void Game :: displaymenu(){
@@ -405,17 +479,65 @@ void Game::update()
     }
     if (dots > 0)
     {
-        for (int i = 0; i < 265; i++)
+        for (int i = 0; i < MAX_DOTS; i++)
         {
             bool notEaten = (!pellets[i]->eaten);   //Checks if pellet is not eaten
             eatPellet(pellets[i]);  
             bool eaten = (pellets[i]->eaten);       //Checks to see if pellet is eaten after function
             if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
             {
-                points += 10;
+                points += 1;
+                score.setString(std::to_string(points) + "0");
+                score.setOrigin(score.getGlobalBounds().width/2,score.getGlobalBounds().height/2);
+                score.setPosition(mWindow.getSize().x, mWindow.getSize().y);
             }      
         }
     }    
+    for (int i = 0; i < 4; i++)
+        {
+            bool notEaten = (!sPellets[i]->eaten);
+            eatPellet(sPellets[i]);
+            bool eaten = (!sPellets[i]->eaten);
+            if (eaten && notEaten)
+            {
+            }
+        }
+    for (int i = 0; i < 4; i++)
+    {
+        if (!sPellets[i]->eaten)
+        {
+            sPellets[i]->mSprite.setTextureRect({16 * 15, sPellets[i]->frames[sPellets[i]->frameCount / 16], 16, 16});
+                if (sPellets[i]->frameCount == 31)
+                {
+                    sPellets[i]->frameCount = 0;
+                }
+                else
+                {
+                    sPellets[i]->frameCount++;
+                }
+
+        }
+        
+        }
+    
+    if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
+    {
+        points += eatFruit(fruit);
+        score.setString(std::to_string(points) + "0");
+    }
+    
+    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
+    {
+        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
+        fruit->spawned = true;
+    }
+    //Adds extra life at 10k points
+    if (points == 1000)
+    {
+        lives++;
+    }
+    
+    //Update position
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
     mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
     blinky->gridPos[0][0] = returncol(blinky->mBody);
@@ -435,21 +557,35 @@ void Game::render()
 {
     mWindow.clear(sf::Color::Black);
     //Draw player
-    drawGhost(blinky);
-    drawGhost(inky);
-    drawGhost(pinky);
-    drawGhost(clyde);
-    mWindow.draw(mPlyr->mSprite);
-    for (int i = 0; i < 265; i++)
+    for (int i = 0; i < MAX_DOTS; i++)
     {
         if (!pellets[i]->eaten)
         {
             mWindow.draw(pellets[i]->mSprite);
         }        
     }
+    for (int i = 0; i < 4; i++)
+    {
+        if (!sPellets[i]->eaten)
+        {  
+            mWindow.draw(sPellets[i]->mSprite);
+        }
+    }
+    
+    if (fruit->spawned)
+    {
+        mWindow.draw(fruit->mSprite);
+    }
+    
+    drawGhost(blinky);
+    drawGhost(inky);
+    drawGhost(pinky);
+    drawGhost(clyde);
+    mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
-    //draw ghosts
+    //draw gui
+    mWindow.draw(score);
     mWindow.display();
 }
 /**
@@ -499,11 +635,24 @@ void Game::reset()
     inky->mBody.setPosition(getgridx(17), getgridy(14));
     pinky->mBody.setPosition(getgridx(13), getgridy(14));
     clyde->mBody.setPosition(getgridx(20), getgridy(14));
-    for (int i = 0; i < 265; i++)
+    blinky->mEyes.setPosition(getgridx(10), getgridy(14));
+    inky->mEyes.setPosition(getgridx(17), getgridy(14));
+    pinky->mEyes.setPosition(getgridx(13), getgridy(14));
+    clyde->mEyes.setPosition(getgridx(20), getgridy(14));
+    for (int i = 0; i < MAX_DOTS; i++)
     {
         (pellets[i])->eaten = false;
         dots++;
     }
+    for (int i = 0; i < 4; i++)
+    {
+        (sPellets[i])->eaten = false;
+        sPellets[i]->mSprite.setTextureRect({16 * 15, sPellets[i]->frames[0], 16, 16 });
+        sPellets[i]->frameCount = 0;
+        sDots++;
+    }
+    fruit->level++;
+    fruit->toDespawn();
     render();
     
 }
@@ -514,7 +663,7 @@ void Game::reset()
  */
 int Game::getDots()const
 {
-    return dots;
+    return dots + sDots;
 }
 /**
  * @brief Destroys player and takes away 1 life
@@ -719,10 +868,18 @@ void Game::Ghosts::animate()
 
 
 
-Game::Pellets::Pellets()
+Game::Pellets::Pellets(bool isSuper)
 {
-    //setHb({ 7.f, 7.f, 16.f, 16.f });
-    mSprite.setTextureRect({16*14, 0, 16, 16});
+    //if pellet is super pellet it will change sprite
+    if (isSuper)
+    {
+        mSprite.setTextureRect({16*15, 0, 16, 16});
+    }
+    else
+    {
+        mSprite.setTextureRect({16*14, 0, 16, 16});
+    }
+    super = isSuper;
     mSprite.setOrigin(8, 8);
 }
 void Game::eatPellet(Game::Pellets * pellet)
@@ -730,11 +887,40 @@ void Game::eatPellet(Game::Pellets * pellet)
     if (!pellet->eaten && (returnrow(pellet->mSprite) == returnrow(mPlyr->mSprite) && returncol(pellet->mSprite) == returncol(mPlyr->mSprite)))
     {
         pellet->eaten = true;
-        dots--;
+        if (pellet->super)
+        {
+            sDots--;
+        }
+        else
+        {        
+            dots--;
+        }
     }
     
 }
-
+/**
+ * @brief Creates a new fruit object
+ * 
+ */
+Game::Fruit::Fruit()
+{
+    mSprite.setOrigin(8,8);
+    mSprite.setTextureRect({16 * level, 32, 16,16});
+}
+/**
+ * @brief Eats fruit
+ * 
+ * @param fruit 
+ */
+int Game::eatFruit(Game::Fruit * fruit)
+{
+    fruit->spawned = false;
+    return (fruit)->values[(fruit)->level];
+}
+void Game::Fruit::toDespawn()
+{
+    spawned = false;
+}
 
 /****Map and grid functions****/
 
@@ -893,4 +1079,20 @@ int Game::returnrow(sf::Sprite s){
  */
 int Game::returncol(sf::Sprite s){
     return (s.getPosition().x - (mWindow.getSize().x/2 - map.getGlobalBounds().width/2)) / ((int)8*scale);
+}
+/**
+ * @brief Displays Gui
+ * 
+ */
+void Game::displayGUI()
+{
+
+}
+/**
+ * @brief Updates Gui
+ * 
+ */
+void Game::updateGUI()
+{
+    score.setString(std::to_string(points) + "0");
 }
