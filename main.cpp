@@ -27,7 +27,7 @@ int main()
     {        
         usleep(5000000);
         const sf::Time TIME_PER_FRAME = sf::seconds(1.f / 60.f);
-        sf::Clock clock;
+        sf::Clock clock;  
         sf::Time timeSinceLastUpdate = sf::Time::Zero;
         while (game.getDots() > 0 && !game.isDone())
         {
