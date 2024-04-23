@@ -125,8 +125,6 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setScale(scale, scale);
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
-    //Sets up direction
-    mPlyr->movement.push(left);
 }
 /**
  * @brief Sets up the dots for pacman to eat
@@ -447,12 +445,10 @@ void Game::update()
 {
     //Moving
     mPlyr->controls();
-    //direction nextDir = mPlyr->movement.top();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir/*!mPlyr->movement.empty()*/)
     {
         mPlyr->mDir = mPlyr->bufferDir;
-        //mPlyr->movement.pop();
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
@@ -732,55 +728,19 @@ void Game::Player::controls()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        if (!movement.empty() && movement.top() != up)
-        {
-            movement.pop();
-            movement.push(up);
-        }
-        else if (movement.empty())
-        {
-            movement.push(up);
-        }
         bufferDir = up;
         
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        if (!movement.empty() && movement.top() != down)
-        {
-            movement.pop();
-            movement.push(down);
-        }
-        else if (movement.empty())
-        {
-            movement.push(down);
-        }
         bufferDir = down;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        if (!movement.empty() && movement.top() != right)
-        {
-            movement.pop();
-            movement.push(right);
-        }
-        else if (movement.empty())
-        {
-            movement.push(right);
-        }
         bufferDir = right;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        if (!movement.empty() && movement.top() != left)
-        {
-            movement.pop();
-            movement.push(left);
-        }
-        else if (movement.empty())
-        {
-            movement.push(left);
-        }
         bufferDir = left;
     }
 }

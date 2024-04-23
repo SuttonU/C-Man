@@ -76,7 +76,6 @@ public:
         int gridPos[2][1];                      //Used to keep sprites position on grid
         direction mDir = left;                  //Direction of player
         direction bufferDir;
-        std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
         Player();                               //Creates player
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
