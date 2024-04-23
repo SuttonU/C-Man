@@ -125,6 +125,8 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setScale(scale, scale);
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
+    //Sets up direction
+    mPlyr->movement.push(left);
 }
 /**
  * @brief Sets up the dots for pacman to eat
