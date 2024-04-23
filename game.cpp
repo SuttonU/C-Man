@@ -486,9 +486,7 @@ void Game::update()
             if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
             {
                 points += 1;
-                score.setString(std::to_string(points) + "0");
-                score.setOrigin(score.getGlobalBounds().width/2,score.getGlobalBounds().height/2);
-                score.setPosition(mWindow.getSize().x, mWindow.getSize().y);
+                updateGUI();
             }      
         }
     }    
@@ -522,7 +520,7 @@ void Game::update()
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
         points += eatFruit(fruit);
-        score.setString(std::to_string(points) + "0");
+        updateGUI();
     }
     
     if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
