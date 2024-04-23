@@ -447,6 +447,10 @@ void Game::update()
 {
     //Moving
     mPlyr->controls();
+    findPath(blinky);
+    findPath(inky);
+    findPath(pinky);
+    findPath(clyde);
     //direction nextDir = mPlyr->movement.top();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir/*!mPlyr->movement.empty()*/)
@@ -858,6 +862,83 @@ void Game::Ghosts::move()
         }
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
+
+void Game::findPath(Ghosts * ghost)
+{
+    if (ghost->frames[0] == 0)
+    {
+        ghost->objPos[0][0] = returncol(mPlyr->mSprite);
+        ghost->objPos[0][1] = returnrow(mPlyr->mSprite);
+
+    } else if (ghost->frames[0] == 32)
+    {
+        if (mPlyr->mDir == up)
+        {
+            ghost->objPos[0][1] = returnrow(mPlyr->mSprite) - 2;
+        } else if (mPlyr->mDir == down)
+        {
+            ghost->objPos[0][1] = returnrow(mPlyr->mSprite) + 2;
+        } else if (mPlyr->mDir == left)
+        {
+            ghost->objPos[0][0] = returncol(mPlyr->mSprite) - 2;
+        } else
+        {
+            ghost->objPos[0][0] = returncol(mPlyr->mSprite) + 2;
+        }
+    } else if (ghost->frames[0] == 64)
+    {
+        int x = mPlyr->gridPos[0][0];
+        int y = mPlyr->gridPos[0][1];
+        
+        if (mPlyr->mDir == up)
+        {
+            y -= 2;
+        } else if (mPlyr->mDir == down)
+        {
+            y += 2;
+        } else if (mPlyr->mDir == left)
+        {
+            x -= 2;
+        } else
+        {
+            x += 2;
+        }
+
+        x = (x - blinky->gridPos[0][0]) * 2 + blinky->gridPos[0][0];
+        y = (y - blinky->gridPos[0][1]) * 2 + blinky->gridPos[0][1];
+        ghost->objPos[0][0] = x;
+        ghost->objPos[0][1] = y;
+
+    } else if (ghost->frames[0] == 96)
+    {
+        if (mPlyr->gridPos[0][0] - ghost->gridPos[0][0] > 8
+        || mPlyr->gridPos[0][0] - ghost->gridPos[0][0] < -8
+        || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] > 8
+        || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] < -8)
+        {
+            ghost->objPos[0][0] = mPlyr->gridPos[0][0];
+            ghost->objPos[0][1] = mPlyr->gridPos[0][1];
+        } else
+        {
+            //Add later
+        }
+    }
+    
+    if (ghost->gridPos[0][1] > ghost->objPos[0][1])
+        {
+            ghost->mDir = up;
+        } else if(ghost->gridPos[0][1] < ghost->objPos[0][1])
+        {
+            ghost->mDir = down;
+        } else if(ghost->gridPos[0][0] > ghost->objPos[0][0])
+        {
+            ghost->mDir = left;
+        } else
+        {
+            ghost->mDir = right;
+        }
+}
+
 
 void Game::Ghosts::animate()
 {

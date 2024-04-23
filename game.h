@@ -91,6 +91,7 @@ public:
         int frames[2] = {0, 16};                //Ghost's animation frames
         int framecount = 0;                     //Count of the frame
         int gridPos[2][1];                      //Used to keep sprites position on grid
+        int objPos[2][1];                       //Objective position
         direction mDir = left;                  //Ghost's direction
         Ghosts();                               //Ghost constructor
         void move();                            //Moves ghost
@@ -136,6 +137,7 @@ public:
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
     void drawGhost(Ghosts * ghost);
+    void findPath(Ghosts * ghost);
 
     //map functions
     void displaymap();
