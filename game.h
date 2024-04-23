@@ -106,7 +106,6 @@ public:
     Ghosts * blinky = nullptr;
     Ghosts * pinky = nullptr;
     Ghosts * clyde = nullptr;
-    std::vector<Pellets *> vPellets;              //vector of pellets
     Pellets * pellets[265];
     void eatPellet(Game::Pellets * pellet);       //Function for when a pellet is eaten
     void destroyPlyr(Player plyr);
