@@ -14,11 +14,12 @@ git pul * @version 0.1
 #include <iostream>
 #include <unistd.h>
 #include <stack>
-#include <vector>
+#include <cstring>
 enum direction
 {up, down, left, right};
 const int GRID_SIZE_X = 31;
 const int GRID_SIZE_Y = 33;
+const int MAX_DOTS = 210;
 class Game
 {
 private:
@@ -30,6 +31,7 @@ private:
     int points = 0;
     int dotSpaces = 0;
     int dots = 0;
+    int sDots = 0;
     float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
@@ -38,6 +40,7 @@ private:
     sf::Font font;
     sf::Text playbutton;
     sf::Text infobutton;
+    sf::Text score;
     //map data
     sf::Sprite map;
     sf::Texture maptexture;
@@ -56,6 +59,8 @@ public:
     void reset();
     void deathAnimation();
     void setUpDots();
+    void displayGUI();
+    void updateGUI();
     bool isDone() const;
     bool start();
     int  getDots() const;
@@ -70,8 +75,7 @@ public:
         int framecount = 0;                     //Used to keep count of frames during animation
         int gridPos[2][1];                      //Used to keep sprites position on grid
         direction mDir = left;                  //Direction of player
-        direction bufferDir;                    //Direction put in buffer
-        std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
+        direction bufferDir;
         Player();                               //Creates player
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
@@ -94,10 +98,24 @@ public:
     
     struct Pellets
     {
-        Pellets();                  //Pellets constructor
+        Pellets(bool isSuper);                  //Pellets constructor
         sf::Sprite mSprite;         //Pellets sprite
         bool eaten = false;         //If pellet is eaten it will be true
+        bool super = false;         //Determines which kind of pellet it is
+        int frames[2] = {0, 48};    //Frames of pellet to use to be animated
+        int frameCount = 0;
         int gridPos[2][1];          //Used to keep sprites position on grid
+    };
+    struct Fruit
+    {
+        Fruit();
+        sf::Sprite mSprite;
+        void toDespawn();
+        int level;
+        int gridPos[2][1];
+        int values[8] = {10, 30, 50, 70, 100, 200, 300, 500};
+        bool spawned = false;
+
     };
 
     //Game objects
@@ -106,8 +124,11 @@ public:
     Ghosts * blinky = nullptr;
     Ghosts * pinky = nullptr;
     Ghosts * clyde = nullptr;
-    Pellets * pellets[265];
+    Fruit * fruit = nullptr;
+    Pellets * pellets[MAX_DOTS];
+    Pellets * sPellets[4];
     void eatPellet(Game::Pellets * pellet);       //Function for when a pellet is eaten
+    int eatFruit(Game::Fruit * fruit);
     void destroyPlyr(Player plyr);
     void displaymenu();
     bool updatemenu();
