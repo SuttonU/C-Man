@@ -447,12 +447,12 @@ void Game::update()
 {
     //Moving
     mPlyr->controls();
-    direction nextDir = mPlyr->movement.top();
+    //direction nextDir = mPlyr->movement.top();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
-    if (isClear(nextDir, mPlyr->mSprite) && !mPlyr->movement.empty())
+    if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir/*!mPlyr->movement.empty()*/)
     {
-        mPlyr->mDir = mPlyr->movement.top();
-        mPlyr->movement.pop();
+        mPlyr->mDir = mPlyr->bufferDir;
+        //mPlyr->movement.pop();
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
@@ -741,7 +741,7 @@ void Game::Player::controls()
         {
             movement.push(up);
         }
-        
+        bufferDir = up;
         
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -755,6 +755,7 @@ void Game::Player::controls()
         {
             movement.push(down);
         }
+        bufferDir = down;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
@@ -767,6 +768,7 @@ void Game::Player::controls()
         {
             movement.push(right);
         }
+        bufferDir = right;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
@@ -779,6 +781,7 @@ void Game::Player::controls()
         {
             movement.push(left);
         }
+        bufferDir = left;
     }
 }
 void Game::Player::animate()
