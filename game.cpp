@@ -447,8 +447,9 @@ void Game::update()
 {
     //Moving
     mPlyr->controls();
+    direction nextDir = mPlyr->movement.top();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
-    if (isClear(mPlyr->movement.top(), mPlyr->mSprite) && !mPlyr->movement.empty())
+    if (isClear(nextDir, mPlyr->mSprite) && !mPlyr->movement.empty())
     {
         mPlyr->mDir = mPlyr->movement.top();
         mPlyr->movement.pop();
