@@ -17,6 +17,8 @@ git pul * @version 0.1
 #include <cstring>
 enum direction
 {up, down, left, right};
+enum ghostStates
+{scatter, chase, panic, dead};
 const int GRID_SIZE_X = 31;
 const int GRID_SIZE_Y = 33;
 const int MAX_DOTS = 210;
@@ -32,6 +34,7 @@ private:
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
+    int cornersPos[4][2] = {{1,1}, {30,1}, {1,34}, {30,34}};   //Positions of the 4 corners{x,y}
     float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
@@ -56,7 +59,7 @@ public:
     void windowEvents();
     void update();
     void render();
-    void reset();
+    void reset(bool dead);
     void deathAnimation();
     void setUpDots();
     void displayGUI();
@@ -75,8 +78,7 @@ public:
         int framecount = 0;                     //Used to keep count of frames during animation
         int gridPos[2][1];                      //Used to keep sprites position on grid
         direction mDir = left;                  //Direction of player
-        direction bufferDir;
-        std::stack<direction> movement;         //Stack used to buffer moves when player can not turn in chosen direction
+        direction bufferDir = left;
         Player();                               //Creates player
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
@@ -89,12 +91,16 @@ public:
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
         int frames[2] = {0, 16};                //Ghost's animation frames
+        int panicFrames[2] = {10*16, 11*16};
         int framecount = 0;                     //Count of the frame
+        int prevPos[2][1] = {0,0};              //Used to keep track of ghosts previous position
         int gridPos[2][1];                      //Used to keep sprites position on grid
         int objPos[2][1];                       //Objective position
-        direction mDir = left;                  //Ghost's direction
+        direction mDir = up;                    //Ghost's direction
+        direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
+        ghostStates state = chase;              //State ghost is in
         Ghosts();                               //Ghost constructor
-        void move();                            //Moves ghost
+        void move(float x, float y);            //Moves ghost
         void animate();                         //Animates ghost
     };
     
@@ -138,6 +144,7 @@ public:
     void displayinstructions();
     void drawGhost(Ghosts * ghost);
     void findPath(Ghosts * ghost);
+    void choosePath(Ghosts * ghost);
 
     //map functions
     void displaymap();

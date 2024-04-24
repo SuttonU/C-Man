@@ -125,8 +125,16 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setScale(scale, scale);
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
-    //Sets up direction
-    mPlyr->movement.push(left);
+    //testing comment when done
+    blinky->gridPos[0][0] = 15;
+    blinky->gridPos[0][1] = 9;
+    //inky->gridPos[0][0] = 15;
+    //inky->gridPos[0][1] = 9;
+    //pinky->gridPos[0][0] = 15;
+    //pinky->gridPos[0][1] = 9;
+    //clyde->gridPos[0][0] =15;
+    //clyde->gridPos[0][1] =9;
+
 }
 /**
  * @brief Sets up the dots for pacman to eat
@@ -196,10 +204,10 @@ void Game::windowEvents()
             scale = (mWindow.getSize().y * 1.0 )/312.0;
             //Scale movement speed
             mPlyr->mvSpeed = 1.25 * scale;
-            blinky->mvSpeed = 1.0 * scale;
-            pinky->mvSpeed = 1.0 * scale;
-            inky->mvSpeed = 1.0 * scale;
-            clyde->mvSpeed = 1.0 * scale;
+            blinky->mvSpeed = 1.25 * scale;
+            pinky->mvSpeed = 1.25 * scale;
+            inky->mvSpeed = 1.25 * scale;
+            clyde->mvSpeed = 1.25 * scale;
             //Scale sprites
             map.setScale(scale, scale);
             mPlyr->mSprite.setScale(scale, scale);
@@ -448,15 +456,17 @@ void Game::update()
     //Moving
     mPlyr->controls();
     findPath(blinky);
-    findPath(inky);
-    findPath(pinky);
-    findPath(clyde);
-    //direction nextDir = mPlyr->movement.top();
+    //findPath(inky);
+    //findPath(pinky);
+    //findPath(clyde);
+    choosePath(blinky);
+    //choosePath(inky);
+    //choosePath(pinky);
+    //choosePath(clyde);
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
-    if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir/*!mPlyr->movement.empty()*/)
+    if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir)
     {
         mPlyr->mDir = mPlyr->bufferDir;
-        //mPlyr->movement.pop();
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
@@ -466,24 +476,24 @@ void Game::update()
     }
     if (isClear(blinky->mDir, blinky->mBody))
     {
-        blinky->move();
+        blinky->move(getgridx(returncol(blinky->mBody)), getgridy(returnrow(blinky->mBody)));
         blinky->animate();
     }
-    if (isClear(pinky->mDir, pinky->mBody))
-    {
-        pinky->move();
-        pinky->animate();
-    }
-    if (isClear(inky->mDir, inky->mBody))
-    {
-        inky->move();
-        inky->animate();
-    }
-    if (isClear(clyde->mDir, clyde->mBody))
-    {
-        clyde->move();
-        clyde->animate();
-    }
+    //if (isClear(pinky->mDir, pinky->mBody))
+    //{
+    //    pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
+    //    pinky->animate();
+    //}
+    //if (isClear(inky->mDir, inky->mBody))
+    //{
+    //    inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
+    //    inky->animate();
+    //}
+    //if (isClear(clyde->mDir, clyde->mBody))
+    //{
+    //    clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
+    //    clyde->animate();
+    //}
     if (dots > 0)
     {
         for (int i = 0; i < MAX_DOTS; i++)
@@ -505,9 +515,13 @@ void Game::update()
             bool notEaten = (!sPellets[i]->eaten);
             eatPellet(sPellets[i]);
             bool eaten = (!sPellets[i]->eaten);
-            if (eaten && notEaten)
-            {
-            }
+            //if (eaten && notEaten)
+            //{
+            //    blinky->state = panic;
+            //    inky->state = panic;
+            //    pinky->state = panic;
+            //    clyde->state = panic;
+            //}
         }
     for (int i = 0; i < 4; i++)
     {
@@ -555,6 +569,17 @@ void Game::update()
     pinky->gridPos[0][1] = returnrow(pinky->mBody);
     clyde->gridPos[0][0] = returncol(clyde->mBody);
     clyde->gridPos[0][1] = returnrow(clyde->mBody);
+    //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
+    //if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && blinky->state != panic)
+    //||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state != panic)
+    //||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state != panic)
+    //||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state != panic))
+    //{
+    //    deathAnimation();
+    //    lives--;
+    //    reset(true);
+    //}
+    
 }
 /**
  * @brief Clears, Draws, and displays the screen
@@ -631,9 +656,8 @@ void Game::drawGhost(Ghosts * ghost)
 /**
  * @brief Resets the sprites to their starting positions.
  */
-void Game::reset()
+void Game::reset(bool dead)
 {
-    dots = 0;
     setgridorigin();
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
@@ -646,19 +670,24 @@ void Game::reset()
     inky->mEyes.setPosition(getgridx(17), getgridy(14));
     pinky->mEyes.setPosition(getgridx(13), getgridy(14));
     clyde->mEyes.setPosition(getgridx(20), getgridy(14));
-    for (int i = 0; i < MAX_DOTS; i++)
+    //If player died the dots will not reset
+    if (!dead)
     {
-        (pellets[i])->eaten = false;
-        dots++;
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        (sPellets[i])->eaten = false;
-        sPellets[i]->mSprite.setTextureRect({16 * 15, sPellets[i]->frames[0], 16, 16 });
-        sPellets[i]->frameCount = 0;
-        sDots++;
-    }
+        dots = 0;
+        for (int i = 0; i < MAX_DOTS; i++)
+        {
+            (pellets[i])->eaten = false;
+            dots++;
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            (sPellets[i])->eaten = false;
+            sPellets[i]->mSprite.setTextureRect({16 * 15, sPellets[i]->frames[0], 16, 16 });
+            sPellets[i]->frameCount = 0;
+            sDots++;
+        }
     fruit->level++;
+    }
     fruit->toDespawn();
     render();
     
@@ -736,55 +765,19 @@ void Game::Player::controls()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        if (!movement.empty() && movement.top() != up)
-        {
-            movement.pop();
-            movement.push(up);
-        }
-        else if (movement.empty())
-        {
-            movement.push(up);
-        }
         bufferDir = up;
         
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        if (!movement.empty() && movement.top() != down)
-        {
-            movement.pop();
-            movement.push(down);
-        }
-        else if (movement.empty())
-        {
-            movement.push(down);
-        }
         bufferDir = down;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        if (!movement.empty() && movement.top() != right)
-        {
-            movement.pop();
-            movement.push(right);
-        }
-        else if (movement.empty())
-        {
-            movement.push(right);
-        }
         bufferDir = right;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        if (!movement.empty() && movement.top() != left)
-        {
-            movement.pop();
-            movement.push(left);
-        }
-        else if (movement.empty())
-        {
-            movement.push(left);
-        }
         bufferDir = left;
     }
 }
@@ -826,7 +819,6 @@ void Game::deathAnimation()
  */
 Game::Ghosts::Ghosts()
 {
-    //setHb({ 8.f, 8.f, 16.f, 16.f });
     mBody.setTextureRect(sf::IntRect(0,16,16,16));
     mBody.setOrigin(8, 8);
     mBody.setPosition(800,800); 
@@ -838,123 +830,284 @@ Game::Ghosts::Ghosts()
  * @brief Moves ghost
  * 
  */
-void Game::Ghosts::move()
+void Game::Ghosts::move(float x, float y)
 {
+    prevPos[0][0] = gridPos[0][0];
+    prevPos[0][1] = gridPos[0][1];
     if (mDir == up)
         {
-            mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y - mvSpeed);
+            mBody.setPosition(x, mBody.getPosition().y - mvSpeed);
             mEyes.setTextureRect(sf::IntRect(14*16, 16, 16, 16));
+            prevPos[0][1] -= 1;
         }
         else if (mDir == down)
         {
-            mBody.setPosition(mBody.getPosition().x, mBody.getPosition().y + mvSpeed);
+            mBody.setPosition(x, mBody.getPosition().y + mvSpeed);
             mEyes.setTextureRect(sf::IntRect(15*16, 16, 16, 16));
+            prevPos[0][1] += 1;
         }
         else if (mDir == right)
         {
-            mBody.setPosition(mBody.getPosition().x + mvSpeed, mBody.getPosition().y);
+            mBody.setPosition(mBody.getPosition().x + mvSpeed, y);
             mEyes.setTextureRect(sf::IntRect(13*16, 16, 16, 16));
+            prevPos[0][0] += 1;
         }
         else if (mDir == left)
         {
-            mBody.setPosition(mBody.getPosition().x - mvSpeed, mBody.getPosition().y);
+            mBody.setPosition(mBody.getPosition().x - mvSpeed, y);
             mEyes.setTextureRect(sf::IntRect(12*16, 16, 16, 16));
+            prevPos[0][0] -= 1;
         }
     mEyes.setPosition(mBody.getPosition().x, mBody.getPosition().y);
 }
 
 void Game::findPath(Ghosts * ghost)
 {
-    if (ghost->frames[0] == 0)
+    if (ghost->state == chase)
     {
-        ghost->objPos[0][0] = returncol(mPlyr->mSprite);
-        ghost->objPos[0][1] = returnrow(mPlyr->mSprite);
+        if (ghost->frames[0] == 0)
+        {
+            ghost->objPos[0][0] = returncol(mPlyr->mSprite);
+            ghost->objPos[0][1] = returnrow(mPlyr->mSprite);
 
-    } else if (ghost->frames[0] == 32)
-    {
-        if (mPlyr->mDir == up)
+        } else if (ghost->frames[0] == 32)
         {
-            ghost->objPos[0][1] = returnrow(mPlyr->mSprite) - 2;
-        } else if (mPlyr->mDir == down)
+            if (mPlyr->mDir == up)
+            {
+                ghost->objPos[0][1] = returnrow(mPlyr->mSprite) - 2;
+            } else if (mPlyr->mDir == down)
+            {
+                ghost->objPos[0][1] = returnrow(mPlyr->mSprite) + 2;
+            } else if (mPlyr->mDir == left)
+            {
+                ghost->objPos[0][0] = returncol(mPlyr->mSprite) - 2;
+            } else
+            {
+                ghost->objPos[0][0] = returncol(mPlyr->mSprite) + 2;
+            }
+        } else if (ghost->frames[0] == 64)
         {
-            ghost->objPos[0][1] = returnrow(mPlyr->mSprite) + 2;
-        } else if (mPlyr->mDir == left)
-        {
-            ghost->objPos[0][0] = returncol(mPlyr->mSprite) - 2;
-        } else
-        {
-            ghost->objPos[0][0] = returncol(mPlyr->mSprite) + 2;
-        }
-    } else if (ghost->frames[0] == 64)
-    {
-        int x = mPlyr->gridPos[0][0];
-        int y = mPlyr->gridPos[0][1];
-        
-        if (mPlyr->mDir == up)
-        {
-            y -= 2;
-        } else if (mPlyr->mDir == down)
-        {
-            y += 2;
-        } else if (mPlyr->mDir == left)
-        {
-            x -= 2;
-        } else
-        {
-            x += 2;
-        }
+            int x = mPlyr->gridPos[0][0];
+            int y = mPlyr->gridPos[0][1];
 
-        x = (x - blinky->gridPos[0][0]) * 2 + blinky->gridPos[0][0];
-        y = (y - blinky->gridPos[0][1]) * 2 + blinky->gridPos[0][1];
-        ghost->objPos[0][0] = x;
-        ghost->objPos[0][1] = y;
+            if (mPlyr->mDir == up)
+            {
+                y -= 2;
+            } else if (mPlyr->mDir == down)
+            {
+                y += 2;
+            } else if (mPlyr->mDir == left)
+            {
+                x -= 2;
+            } else
+            {
+                x += 2;
+            }
 
-    } else if (ghost->frames[0] == 96)
-    {
-        if (mPlyr->gridPos[0][0] - ghost->gridPos[0][0] > 8
-        || mPlyr->gridPos[0][0] - ghost->gridPos[0][0] < -8
-        || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] > 8
-        || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] < -8)
+            x = (x - blinky->gridPos[0][0]) * 2 + blinky->gridPos[0][0];
+            y = (y - blinky->gridPos[0][1]) * 2 + blinky->gridPos[0][1];
+            ghost->objPos[0][0] = x;
+            ghost->objPos[0][1] = y;
+
+        } else if (ghost->frames[0] == 96)
         {
-            ghost->objPos[0][0] = mPlyr->gridPos[0][0];
-            ghost->objPos[0][1] = mPlyr->gridPos[0][1];
-        } else
-        {
-            //Add later
+            if (mPlyr->gridPos[0][0] - ghost->gridPos[0][0] > 8
+            || mPlyr->gridPos[0][0] - ghost->gridPos[0][0] < -8
+            || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] > 8
+            || mPlyr->gridPos[0][1] - ghost->gridPos[0][1] < -8)
+            {
+                ghost->objPos[0][0] = mPlyr->gridPos[0][0];
+                ghost->objPos[0][1] = mPlyr->gridPos[0][1];
+            } else
+            {
+                //Clydes corner  
+                ghost->objPos[0][0] = cornersPos[(ghost->frames[0] / 32 + 1)][0];
+                ghost->objPos[0][1] = cornersPos[(ghost->frames[0] / 32 + 1)][1];
+            }
         }
     }
-    
-    if (ghost->gridPos[0][1] > ghost->objPos[0][1])
-        {
-            ghost->mDir = up;
-        } else if(ghost->gridPos[0][1] < ghost->objPos[0][1])
-        {
-            ghost->mDir = down;
-        } else if(ghost->gridPos[0][0] > ghost->objPos[0][0])
-        {
-            ghost->mDir = left;
-        } else
-        {
-            ghost->mDir = right;
-        }
+    else if (ghost->state == scatter)
+    {
+        //Set to each corner   Ghost number
+        ghost->objPos[0][0] = cornersPos[(ghost->frames[0] / 32 + 1)][0];
+        ghost->objPos[0][1] = cornersPos[(ghost->frames[0] / 32 + 1)][1];
+    }
+    else if (ghost->state == panic)
+    {
+        //Slow down and randomize direction
+    }
+    else if (ghost->state == dead)
+    {
+        ghost->objPos[0][0] = gridoriginx;
+        ghost->objPos[0][1] = gridoriginy;
+    }    
 }
-
+/**
+ * @brief Chooses the direction for the ghost to travel in
+ * 
+ * @param ghost pointer to ghost object
+ */
+void Game::choosePath(Ghosts * ghost)
+{
+    int x = returncol(ghost->mBody);  //Ghost x coordinate
+    int y = returnrow(ghost->mBody);  //Ghost y coordinate
+    //Get the next tile depending on which direction ghost is facing
+    switch (ghost->mDir)
+    {
+    case up:
+        y - 1;
+        break;
+    case down:
+        y + 1;
+        break;
+    case left:
+        x - 1;
+        break;
+    default:
+        x + 1;
+        break;
+    }
+    int differenceX = x - ghost->objPos[0][0];
+    int differenceY = y - ghost->objPos[0][1];
+    //If the next tile is a fork
+    if (grid[y][x] == 'f')
+    {
+        //If the difference in the y is smaller than the difference in x then
+        if (abs(differenceY) < abs(differenceX))
+        {
+            if (grid[y - 1][x] != 'w' && ghost->mDir != down)
+            {
+                ghost->nextDir = up;
+            }
+            else if (grid[y + 1][x] != 'w' && ghost->mDir != up)
+            {
+                ghost->nextDir = down;
+            }
+            else if (grid[y][x - 1] != 'w' && ghost->mDir != right)
+            {
+                ghost->nextDir = left;
+            }
+            else if (grid[y][x + 1] != 'w' && ghost->mDir != left)
+            {
+                ghost->nextDir = right;
+            }
+            //It should go up or down
+        }
+        else //It should go left or right
+        {
+            if (grid[y][x - 1] != 'w' && ghost->mDir != right)
+            {
+                ghost->nextDir = left;
+            }
+            else if (grid[y][x + 1] != 'w' && ghost->mDir != left)
+            {
+                ghost->nextDir = right;
+            }
+            else if (grid[y - 1][x] != 'w' && ghost->mDir != down)
+            {
+                ghost->nextDir = up;
+            }
+            else if (grid[y + 1][x] != 'w' && ghost->mDir != up)
+            {
+                ghost->nextDir = down;
+            }
+        }
+    }
+    ////If objective is up and ghost is not going down
+    //if (ghost->objPos[0][1] < ghost->gridPos[0][1] 
+    //    && isClear(up, ghost->mBody) 
+    //    && (ghost->prevPos[0][1] != ghost->gridPos[0][1] - 1 || ghost->prevPos[0][0] != ghost->gridPos[0][0]))
+    //{
+    //    ghost->mDir = up;
+    //}
+    ////If down and ghost is not going up
+    //else if (ghost->objPos[0][1] > ghost->gridPos[0][1] 
+    //        && isClear(down, ghost->mBody) 
+    //        && (ghost->prevPos[0][1] != ghost->gridPos[0][1] + 1 || ghost->prevPos[0][0] != ghost->gridPos[0][0]))
+    //{
+    //    ghost->mDir = down;
+    //}
+    ////If left and ghost isnt currently going right
+    //else if (ghost->objPos[0][0] < ghost->gridPos[0][0] 
+    //        && isClear(left, ghost->mBody) 
+    //        && (ghost->prevPos[0][0] != ghost->gridPos[0][0] - 1 || ghost->prevPos[0][1] != ghost->gridPos[0][1]))
+    //{
+    //    ghost->mDir = left;
+    //}
+    ////If right and ghost isnt currently going left
+    //else if (ghost->objPos[0][0] > ghost->gridPos[0][0] 
+    //        && isClear(right, ghost->mBody) 
+    //        && (ghost->prevPos[0][0] != ghost->gridPos[0][0] + 1 || ghost->prevPos[0][1] != ghost->gridPos[0][1])
+    //        /*&& ghost->mDir != left*/)
+    //{
+    //    ghost->mDir = right;
+    //}
+    ////If it cant go down and it is going down and the objective is above the ghost
+    //else if ((ghost->prevPos[0][1] == ghost->gridPos[0][1] + 1
+    //            && !isClear(down, ghost->mBody)) 
+    //        || (ghost->prevPos[0][1] == ghost->gridPos[0][1] - 1
+    //            && !isClear(up, ghost->mBody)))
+    //{
+    //    //If it can go left it will go left
+    //    if (isClear(left, ghost->mBody))
+    //    {
+    //        ghost->mDir = left;
+    //    }
+    //    //If it can go right itll go right
+    //    else if (isClear(right, ghost->mBody))
+    //    {
+    //        ghost->mDir = right;
+    //    }
+    //}
+    //else if ((ghost->prevPos[0][0] == ghost->gridPos[0][0] - 1
+    //            && !isClear(right, ghost->mBody)) 
+    //        || (ghost->prevPos[0][0] == ghost->gridPos[0][0] + 1
+    //            && !isClear(left, ghost->mBody)))
+    //{
+    //    if (isClear(up, ghost->mBody))
+    //    {
+    //        ghost->mDir = up;
+    //    }
+    //    else if (isClear(down, ghost->mBody))
+    //    {
+    //        ghost->mDir = down;
+    //    }
+    //}
+}
 
 void Game::Ghosts::animate()
 {
-    mBody.setTextureRect(sf::IntRect(frames[framecount/6], 16, 16, 16));
-    if (framecount == 11)
+    if (state != panic)
     {
-        framecount = 0;
+        mBody.setTextureRect(sf::IntRect(frames[framecount/6], 16, 16, 16));
+        if (framecount == 11)
+        {
+            framecount = 0;
+        }
+        else
+        {
+            framecount++;
+        }
     }
     else
     {
-        framecount++;
+        mBody.setTextureRect(sf::IntRect(panicFrames[framecount/6], 16, 16, 16));
+        if (framecount == 11)
+        {
+            framecount = 0;
+        }
+        else
+        {
+            framecount++;
+        }
     }
+    
 }
-
-
-
+/**
+ * @brief Construct a new Game:: Pellets:: Pellets object
+ * 
+ * @param isSuper 
+ */
 Game::Pellets::Pellets(bool isSuper)
 {
     //if pellet is super pellet it will change sprite

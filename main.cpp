@@ -15,7 +15,7 @@
 int main()
 {
     Game game;
-    //game.displaygrid(); //Uncomment to test and display grid
+    game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
     while (!game.start() && !game.isDone())
     {
@@ -40,7 +40,7 @@ int main()
             }
             game.render();
         }
-        game.reset();
+        game.reset(false);
     }
 
     return 0;
