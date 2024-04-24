@@ -535,6 +535,13 @@ void Game::update()
     {
         lives++;
     }
+
+    //Check for teleportation
+    teleport(mPlyr->mSprite);
+    teleport(blinky->mBody);
+    teleport(inky->mBody);
+    teleport(pinky->mBody);
+    teleport(clyde->mBody);
     
     //Update position
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
@@ -1061,4 +1068,18 @@ void Game::displayGUI()
 void Game::updateGUI()
 {
     score.setString(std::to_string(points) + "0");
+}
+/**
+ * @brief Checks if a sprite is able to teleport to other side of map. Sets positions of sprite to destination.
+ * 
+ * @param s 
+ */
+void Game::teleport(sf::Sprite &s){
+    if (returnrow(s) == 16 && returncol(s) == 0){
+        s.setPosition(getgridx(29), getgridy(16));
+        mPlyr->mDir = left;
+    } else if (returnrow(s) == 16 && returncol(s) == 30){
+        s.setPosition(getgridx(1), getgridy(16));
+        mPlyr->mDir = right;
+    }
 }
