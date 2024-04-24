@@ -177,7 +177,7 @@ void Game::setUpDots()
 void Game::windowEvents()
 {
     sf::Event event;
-    while(mWindow.pollEvent(event))
+    if(mWindow.pollEvent(event))
     {
         if(event.type == sf::Event::Closed)
         {
@@ -322,31 +322,31 @@ void Game :: displaymenu(){
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
-    windowEvents();
+    //windowEvents();
 }
 
-bool Game :: updatemenu(){
-    sf::Event event;
-    while(mWindow.pollEvent(event)){
-        if (event.type == sf::Event::Closed)
-        mWindow.close();
+// bool Game :: updatemenu(){
+//     sf::Event event;
+//     while(mWindow.pollEvent(event)){
+//         if (event.type == sf::Event::Closed)
+//         mWindow.close();
 
-        if (updatebutton(event, playbutton))
-        {
-            play = true;
-            return true;
-        }
-        if (updatebutton(event, infobutton)){
-            displayinstructions();
-        }
-        mWindow.clear();
-        mWindow.draw(titleimage);
-        mWindow.draw(playbutton);
-        mWindow.draw(infobutton);
-        mWindow.display();
-    }
-    return false;
-}
+//         if (updatebutton(event, playbutton))
+//         {
+//             play = true;
+//             return true;
+//         }
+//         if (updatebutton(event, infobutton)){
+//             displayinstructions();
+//         }
+//         mWindow.clear();
+//         mWindow.draw(titleimage);
+//         mWindow.draw(playbutton);
+//         mWindow.draw(infobutton);
+//         mWindow.display();
+//     }
+//     return false;
+// }
 
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
@@ -408,7 +408,7 @@ void Game :: displayinstructions(){
     mWindow.draw(titleimage);
     mWindow.display();
     while (!backtomenu){
-        while(mWindow.pollEvent(event)){
+        if(mWindow.pollEvent(event)){
             if (event.type == sf::Event::Closed)
             mWindow.close();
 
