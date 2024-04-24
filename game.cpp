@@ -264,8 +264,6 @@ void Game::windowEvents()
         {
             play = true;
             mWindow.clear();
-            mWindow.display();
-            
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -897,8 +895,6 @@ void Game::displaymap(){
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
-    mWindow.draw(map);
-    mWindow.display();
 }
 /**
  * @brief Initializes grid.
