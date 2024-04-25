@@ -16,7 +16,7 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 enum direction
-{up, down, left, right};
+{up, left, down, right};
 enum ghostStates
 {scatter, chase, panic, dead};
 const int GRID_SIZE_X = 31;
@@ -34,6 +34,7 @@ private:
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
+    int ghostMult = 1;
     int cornersPos[4][2] = {{1,1}, {30,1}, {1,34}, {30,34}};   //Positions of the 4 corners{x,y}
     float scale = 1.0;      //Scale of game
     //Ghost data

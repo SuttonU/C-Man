@@ -133,12 +133,12 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     //testing comment when done
     blinky->gridPos[0][0] = 15;
     blinky->gridPos[0][1] = 9;
-    //inky->gridPos[0][0] = 15;
-    //inky->gridPos[0][1] = 9;
-    //pinky->gridPos[0][0] = 15;
-    //pinky->gridPos[0][1] = 9;
-    //clyde->gridPos[0][0] =15;
-    //clyde->gridPos[0][1] =9;
+    inky->gridPos[0][0] = 15;
+    inky->gridPos[0][1] = 9;
+    pinky->gridPos[0][0] = 15;
+    pinky->gridPos[0][1] = 9;
+    clyde->gridPos[0][0] =15;
+    clyde->gridPos[0][1] =9;
     //Initialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
@@ -472,13 +472,13 @@ void Game::update()
     //Moving
     mPlyr->controls();
     findPath(blinky);
-    //findPath(inky);
-    //findPath(pinky);
-    //findPath(clyde);
+    findPath(inky);
+    findPath(pinky);
+    findPath(clyde);
     choosePath(blinky);
-    //choosePath(inky);
-    //choosePath(pinky);
-    //choosePath(clyde);
+    choosePath(inky);
+    choosePath(pinky);
+    choosePath(clyde);
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir)
     {
@@ -490,26 +490,26 @@ void Game::update()
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
     }
-    if (isClear(blinky->mDir, blinky->mBody))
+    if (isClear(blinky->mDir, blinky->mBody) || blinky->state == dead)
     {
         blinky->move(getgridx(returncol(blinky->mBody)), getgridy(returnrow(blinky->mBody)));
         blinky->animate();
     }
-    //if (isClear(pinky->mDir, pinky->mBody))
-    //{
-    //    pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
-    //    pinky->animate();
-    //}
-    //if (isClear(inky->mDir, inky->mBody))
-    //{
-    //    inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
-    //    inky->animate();
-    //}
-    //if (isClear(clyde->mDir, clyde->mBody))
-    //{
-    //    clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
-    //    clyde->animate();
-    //}
+    if (isClear(pinky->mDir, pinky->mBody) || pinky->state == dead)
+    {
+        pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
+        pinky->animate();
+    }
+    if (isClear(inky->mDir, inky->mBody) || inky->state == dead)
+    {
+        inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
+        inky->animate();
+    }
+    if (isClear(clyde->mDir, clyde->mBody) || clyde->state == dead)
+    {
+        clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
+        clyde->animate();
+    }
     if (dots > 0)
     {
         for (int i = 0; i < MAX_DOTS; i++)
@@ -537,18 +537,18 @@ void Game::update()
                 inky->prevState = inky->state;
                 pinky->prevState = pinky->state;
                 clyde->prevState = clyde->state; 
-                //blinky->state = panic;
-                //inky->state = panic;
-                //pinky->state = panic;
-                //clyde->state = panic;
-                //blinky->framecount = 0;
-                //inky->framecount = 0;
-                //pinky->framecount = 0;
-                //clyde->framecount = 0;
-                //blinky->panicTime = ;
-                //pinky->panicTime = ;
-                //inky->panicTime = ;
-                //clyde->panicTime = ;
+                blinky->state = panic;
+                inky->state = panic;
+                pinky->state = panic;
+                clyde->state = panic;
+                blinky->framecount = 0;
+                inky->framecount = 0;
+                pinky->framecount = 0;
+                clyde->framecount = 0;
+                blinky->panicTime = 7.0;
+                pinky->panicTime = 7.0;
+                inky->panicTime = 7.0;
+                clyde->panicTime = 7.0;
             }
         }
     for (int i = 0; i < 4; i++)
@@ -598,19 +598,40 @@ void Game::update()
     clyde->gridPos[0][0] = returncol(clyde->mBody);
     clyde->gridPos[0][1] = returnrow(clyde->mBody);
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
-    if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && blinky->state != panic)
-    ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state != panic)
-    ||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state != panic)
-    ||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state != panic))
+    if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && (blinky->state != panic && blinky->state != dead))
+    ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && (inky->state != panic && inky->state != dead))
+    ||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && (pinky->state != panic && pinky->state != dead))
+    ||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && (clyde->state != panic && clyde->state != dead)))
     {
         deathAnimation();
         lives--;
         return;
     }
-    //else if (/* ghost is in panic */)
-    //{
-    //    /* eat ghost set status to dead */
-    //}
+    else if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && blinky->state == panic))
+    {
+        blinky->state = dead;
+        points += 400 * ghostMult;
+        ghostMult++;
+    }
+    else if (mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state == panic)
+    {
+        inky->state = dead;
+        points += 400 * ghostMult;
+        ghostMult++;
+    }
+    else if(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state == panic)
+    {
+        pinky->state = dead;
+        points += 400 * ghostMult;
+        ghostMult++;
+    }
+    else if (mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state == panic)
+    {
+        clyde->state = dead;
+        points += 400 * ghostMult;
+        ghostMult++;
+    }
+    
     
     
 }
@@ -909,9 +930,6 @@ Game::Ghosts::Ghosts()
  */
 void Game::Ghosts::move(float x, float y)
 {
-    
-    //prevPos[0][0] = gridPos[0][0];
-    //prevPos[0][1] = gridPos[0][1];
     if (mDir == up)
         {
             mBody.setPosition(x, mBody.getPosition().y - mvSpeed);
@@ -947,6 +965,7 @@ void Game::Ghosts::displayMap()
 }
 void Game::findPath(Ghosts * ghost)
 {
+    ghost-> mvSpeed = 1.0 * scale;
     if (ghost->state == chase)
     {
         if (ghost->frames[0] == 0)
@@ -1023,8 +1042,9 @@ void Game::findPath(Ghosts * ghost)
     }
     else if (ghost->state == dead)
     {
+        ghost->mvSpeed = 2.5 * scale;
         ghost->objPos[0][0] = 15;
-        ghost->objPos[0][1] = 10;
+        ghost->objPos[0][1] = 13;
     }    
 }
 
@@ -1034,37 +1054,114 @@ void Game::choosePath(Ghosts * ghost)
     int y = returnrow(ghost->mBody);
     int targetX = ghost->objPos[0][0];
     int targetY = ghost->objPos[0][1];
+    direction prevDir = ghost->mDir;
     if (grid[y][x] == 'f' && (y != ghost->prevFork[0][1] || x != ghost->prevFork[0][0]))
-    { 
+    {        
         ghost->prevFork[0][1] = y;
         ghost->prevFork[0][0] = x;
-        //Finds a new path to target
-        for (int i = 0; i < GRID_SIZE_Y; i++)
-        {
-            for (int j = 0; j < GRID_SIZE_X; j++)
-            {
-                ghost->map[i][j] = ' ';
-            }
-        }
         fillPath(y, x, ghost, targetX, targetY);
     }
     ghost->map[y][x] = ' ';
-    if (ghost->map[y - 1][x] == ghost->mapToken && y > targetY)
+    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead)
+    {
+        if (isClear(up, ghost->mBody) && ghost->mDir != down 
+        && y >= targetY
+        )
+        {
+            ghost->mDir = up;
+        }
+        else if (isClear(down, ghost->mBody) && ghost->mDir != up 
+        && y <= targetY
+        )
+        {
+            ghost->mDir = down;
+        }
+        else if (isClear(left, ghost->mBody) && ghost->mDir != right 
+        && x >= targetX
+        )
+        {
+            ghost->mDir = left;
+        }
+        else if (isClear(right, ghost->mBody) && ghost->mDir != left 
+        && x <= targetX
+        )
+        {
+            ghost->mDir = right;
+        }
+        else
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (isClear(direction(i), ghost->mBody))
+                {
+                    ghost->mDir = direction(i);
+                    break;
+                }
+            }
+            
+        }        
+    }
+    else if (ghost->state == dead)
+    {
+        if (y > targetY)
+        {
+            ghost->mDir = up;
+        }
+        else if (y < targetY)
+        {
+            ghost->mDir = down;
+        }
+        else if (x > targetX)
+        {
+            ghost->mDir = left;
+        }
+        else 
+        {
+            ghost->mDir = right;
+        }
+    }
+    else if (ghost->map[y - 1][x] == ghost->mapToken 
+    && y > targetY
+    )
     {
         ghost->mDir = up;
     }
-    else if (ghost->map[y + 1][x] == ghost->mapToken && y < targetY)
+    else if (ghost->map[y + 1][x] == ghost->mapToken 
+    && y < targetY
+    )
     {
         ghost->mDir = down;
     }
-    else if (ghost->map[y][x - 1] == ghost->mapToken && x > targetX)
+    else if (ghost->map[y][x - 1] == ghost->mapToken 
+    && x > targetX
+    )
     {
         ghost->mDir = left;
     }
-    else if (ghost->map[y][x + 1] == ghost->mapToken && x < targetX)
+    else if (ghost->map[y][x + 1] == ghost->mapToken 
+    && x < targetX
+    )
     {
         ghost->mDir = right;
     }
+    else
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (isClear(direction(i), ghost->mBody)
+            &&!(direction(i) == down && prevDir == up)
+            &&!(direction(i) == up && prevDir == down)
+            &&!(direction(i) == right && prevDir == left)
+            &&!(direction(i) == left && prevDir == right))
+            {
+                ghost->mDir = direction(i);
+                break;
+            }
+            
+        }
+        
+    }
+    
 }
 bool Game::fillPath(int row, int col, Ghosts * ghost, int targetX, int targetY)
 {
@@ -1084,14 +1181,7 @@ bool Game::fillPath(int row, int col, Ghosts * ghost, int targetX, int targetY)
     }
     else
     {
-        ghost->map[row][col] = ghost->mapToken;//Marks the current path it is takingif (
-        if(fillPath(row - 1, col, ghost, targetX, targetY)
-        || fillPath(row + 1, col, ghost, targetX, targetY) 
-        || fillPath(row, col - 1, ghost, targetX, targetY) 
-        || fillPath(row, col + 1, ghost, targetX, targetY))
-        {
-            return true;
-        }
+        ghost->map[row][col] = ghost->mapToken;//Marks the current path it is taking
         if (abs(row - targetY) < abs(col - targetX))
         {
             if (
@@ -1114,50 +1204,6 @@ bool Game::fillPath(int row, int col, Ghosts * ghost, int targetX, int targetY)
                 return true;
             }
         }
-        //if (row > targetY)
-        //{
-        //    if (
-        //    fillPath(row - 1, col, ghost, targetX, targetY)
-        //    || fillPath(row + 1, col, ghost, targetX, targetY) 
-        //    || fillPath(row, col - 1, ghost, targetX, targetY) 
-        //    || fillPath(row, col + 1, ghost, targetX, targetY))
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else if (row < targetY)
-        //{
-        //    if (
-        //    fillPath(row + 1, col, ghost, targetX, targetY)
-        //    || fillPath(row - 1, col, ghost, targetX, targetY) 
-        //    || fillPath(row, col - 1, ghost, targetX, targetY) 
-        //    || fillPath(row, col + 1, ghost, targetX, targetY))
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else if (col > targetX)
-        //{
-        //    if (
-        //    fillPath(row, col - 1, ghost, targetX, targetY)
-        //    || fillPath(row, col + 1, ghost, targetX, targetY) 
-        //    || fillPath(row - 1, col, ghost, targetX, targetY) 
-        //    || fillPath(row + 1, col, ghost, targetX, targetY))
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else if (col < targetX)        
-        //{
-        //    if (
-        //    fillPath(row, col + 1, ghost, targetX, targetY)
-        //    || fillPath(row, col - 1, ghost, targetX, targetY) 
-        //    || fillPath(row - 1, col, ghost, targetX, targetY) 
-        //    || fillPath(row + 1, col, ghost, targetX, targetY))
-        //    {
-        //        return true;
-        //    }
-        //}
         else
         {
             ghost->map[row][col] = ' '; //Else it will retrace its steps
@@ -1165,20 +1211,10 @@ bool Game::fillPath(int row, int col, Ghosts * ghost, int targetX, int targetY)
         return false;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @brief animates ghosts
+ * 
+ */
 void Game::Ghosts::animate()
 {
     if (state != panic)
@@ -1440,334 +1476,3 @@ void Game::updateGUI()
 {
     score.setString(std::to_string(points) + "0");
 }
-
-
-
-
-
-
-//*******************************DUMPED CODE*********************************
-/*
-/**
- * @brief Chooses the direction for the ghost to travel in
- * 
- * @param ghost pointer to ghost object
- *
-void Game::choosePath(Ghosts * ghost)
-{
-    int posX = ghost->gridPos[0][0];
-    int posY = ghost->gridPos[0][1];
-    int targetX = ghost->objPos[0][0];
-    int targetY = ghost->objPos[0][1];
-    int nextPosX = posX;
-    int nextPosY = posY;
-    int differenceX = targetX - posX;
-    int differenceY = targetY - posY;
-    ghost->nextDir = ghost->mDir;
-    if (ghost->mDir == up)
-    {
-        nextPosY -=1;
-    }
-    else if (ghost->mDir == down)
-    {
-        nextPosY +=1;
-    }
-    else if (ghost->mDir == left)
-    {
-        nextPosX -=1;
-    }
-    else
-    {
-        nextPosX +=1;
-    }    
-    //If the ghost cant move further it will pick the next direction it can move in
-    if (!isClear(ghost->mDir, ghost->mBody))
-    {
-        if (isClear(up, ghost->mBody) && ghost->mDir != down 
-        && posY >= targetY
-        //&& abs(differenceY) < abs(differenceX)
-        )
-        {
-            ghost->mDir = up;
-        }
-        else if (isClear(down, ghost->mBody) && ghost->mDir != up 
-        && posY <= targetY
-        //&& abs(differenceY) < abs(differenceX)
-        )
-        {
-            ghost->mDir = down;
-        }
-        else if (isClear(left, ghost->mBody) && ghost->mDir != right 
-        && posX >= targetX
-        //&& abs(differenceY) > abs(differenceX)
-        )
-        {
-            ghost->mDir = left;
-        }
-        else if (isClear(right, ghost->mBody) && ghost->mDir != left 
-        && posX <= targetX
-        //&& abs(differenceY) > abs(differenceX)
-        )
-        {
-            ghost->mDir = right;
-        }
-        else
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (isClear(direction(i), ghost->mBody))
-                {
-                    ghost->mDir = direction(i);
-                    break;
-                }
-            }
-            
-        }        
-    }
-    //If the next position is a fork it will find which direction to turn
-    else if (grid[posY][posX] == 'f')
-    {
-        //Finds fastest route
-        if (differenceX > differenceY)
-        {
-            if(posY > targetY 
-            && ghost->mDir != down 
-            && grid[posY - 1][posX] != 'w' 
-            //&& abs(differenceY) < abs(differenceX)
-            //&& ((ghost->gridPos[0][1] - 1 != ghost->prevPos[0][1] || ghost->gridPos[0][0] != ghost->prevPos[0][0]))
-            )
-            {
-                ghost->mDir = up;
-            }
-            else if (posY < targetY 
-            && ghost->mDir != up 
-            && grid[posY + 1][posX] != 'w'
-            //&& abs(differenceY) < abs(differenceX)
-            //&& (ghost->gridPos[0][1] + 1 != ghost->prevPos[0][1] || ghost->gridPos[0][0] != ghost->prevPos[0][0])
-            )
-            {
-                ghost->mDir = down;
-            }
-        }
-        else
-        {
-            if (posX > targetX
-            && ghost->mDir != right 
-            && grid[posY][posX - 1] != 'w'
-            //&& abs(differenceY) > abs(differenceX)
-            //&& (ghost->gridPos[0][1] != ghost->prevPos[0][1] || ghost->gridPos[0][0] - 1 != ghost->prevPos[0][0])
-            )
-            {
-                ghost->mDir = left;
-            }
-            else if (posX < targetX
-            && ghost->mDir != left 
-            && grid[posY][posX + 1] != 'w'
-            //&& abs(differenceY) > abs(differenceX)
-            //&& (ghost->gridPos[0][1] != ghost->prevPos[0][1] || ghost->gridPos[0][0] + 1 != ghost->prevPos[0][0])
-            )
-            {
-                ghost->mDir = right;
-            }
-        }     
-        
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    if (isClear(direction(i), ghost->mBody))
-        //    {  
-        //        if (direction(i) == up)
-        //        {
-        //            if (/*targetX + targetY -(options[0][0] + options[0][1]) > targetX + targetY - (nextPosX + nextPosY - 1) && ghost->mDir != down)
-        //            {
-        //                options[0][0] = nextPosX;
-        //                options[0][1] = nextPosY - 1;
-        //                ghost->nextDir = up;
-        //            }
-        //        }
-        //        else if (direction(i) == down)
-        //        {
-        //            if (/*targetX + targetY -(options[0][0] + options[0][1]) > targetX + targetY - (nextPosX + nextPosY + 1) && ghost->mDir != up)
-        //            {
-        //                options[0][0] = nextPosX;
-        //                options[0][1] = nextPosY + 1;
-        //                ghost->nextDir = down;
-        //            }
-        //        }
-        //        else if (direction(i) == right)
-        //        {
-        //            if (targetX + targetY -(options[0][0] + options[0][1]) > targetX + targetY - (nextPosX + nextPosY + 1) && ghost->mDir != left)
-        //            {
-        //                options[0][0] = nextPosX + 1;
-        //                options[0][1] = nextPosY;
-        //                ghost->nextDir = right;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (targetX + targetY -(options[0][0] + options[0][1]) > targetX + targetY - (nextPosX + nextPosY - 1) && ghost->mDir != right)
-        //            {
-        //                options[0][0] = nextPosX - 1;
-        //                options[0][1] = nextPosY;
-        //                ghost->nextDir = left;
-        //            }
-        //        }           
-        //    }   
-        //}
-    }
-    //If ghost is in spawn go left
-    else if (posX == 15 && posY == 9 && mPlyr->mSprite.getTextureRect().left == 0)
-    {
-        ghost->mDir = left;
-    }
-    
-    //Finds lesser option
-    
-    
-    
-    
-    
-    
-    
-
-
-
-    //ghost->nextDir = ghost->mDir;
-    //int x = returncol(ghost->mBody);  //Ghost x coordinate
-    //int y = returnrow(ghost->mBody);  //Ghost y coordinate
-    ////Get the next tile depending on which direction ghost is facing
-    //switch (ghost->mDir)
-    //{
-    //case up:
-    //    y -= 1;
-    //    break;
-    //case down:
-    //    y += 1;
-    //    break;
-    //case left:
-    //    x -= 1;
-    //    break;
-    //default:
-    //    x += 1;
-    //    break;
-    //}
-    //int differenceX = x - ghost->objPos[0][0];
-    //int differenceY = y - ghost->objPos[0][1];
-    ////If the next tile is a fork
-    //if (grid[y][x] == 'f')
-    //{
-    //    //If the difference in the y is smaller than the difference in x then
-    //    if (abs(differenceY) < abs(differenceX))
-    //    {
-    //        if (grid[y - 1][x] != 'w' && ghost->mDir != down)
-    //        {
-    //            ghost->nextDir = up;
-    //        }
-    //        else if (grid[y + 1][x] != 'w' && ghost->mDir != up)
-    //        {
-    //            ghost->nextDir = down;
-    //        }
-    //        else if (grid[y][x - 1] != 'w' && ghost->mDir != right)
-    //        {
-    //            ghost->nextDir = left;
-    //        }
-    //        else if (grid[y][x + 1] != 'w' && ghost->mDir != left)
-    //        {
-    //            ghost->nextDir = right;
-    //        }
-    //        //It should go up or down
-    //    }
-    //    else //It should go left or right
-    //    {
-    //        if (grid[y][x - 1] != 'w' && ghost->mDir != right)
-    //        {
-    //            ghost->nextDir = left;
-    //        }
-    //        else if (grid[y][x + 1] != 'w' && ghost->mDir != left)
-    //        {
-    //            ghost->nextDir = right;
-    //        }
-    //        else if (grid[y - 1][x] != 'w' && ghost->mDir != down)
-    //        {
-    //            ghost->nextDir = up;
-    //        }
-    //        else if (grid[y + 1][x] != 'w' && ghost->mDir != up)
-    //        {
-    //            ghost->nextDir = down;
-    //        }
-    //    }
-    //}
-    //else if (ghost-> gridPos[0][0] == 15 && ghost->gridPos[0][1] == 9)
-    //{
-    //    ghost->mDir = left;
-    //}
-    //if (grid[ghost->gridPos[0][1]][ghost->gridPos[0][0]] == 'f')
-    //{
-    //    ghost->mDir = ghost->nextDir;
-    //}
-    
-    ////If objective is up and ghost is not going down
-    //if (ghost->objPos[0][1] < ghost->gridPos[0][1] 
-    //    && isClear(up, ghost->mBody) 
-    //    && (ghost->prevPos[0][1] != ghost->gridPos[0][1] - 1 || ghost->prevPos[0][0] != ghost->gridPos[0][0]))
-    //{
-    //    ghost->mDir = up;
-    //}
-    ////If down and ghost is not going up
-    //else if (ghost->objPos[0][1] > ghost->gridPos[0][1] 
-    //        && isClear(down, ghost->mBody) 
-    //        && (ghost->prevPos[0][1] != ghost->gridPos[0][1] + 1 || ghost->prevPos[0][0] != ghost->gridPos[0][0]))
-    //{
-    //    ghost->mDir = down;
-    //}
-    ////If left and ghost isnt currently going right
-    //else if (ghost->objPos[0][0] < ghost->gridPos[0][0] 
-    //        && isClear(left, ghost->mBody) 
-    //        && (ghost->prevPos[0][0] != ghost->gridPos[0][0] - 1 || ghost->prevPos[0][1] != ghost->gridPos[0][1]))
-    //{
-    //    ghost->mDir = left;
-    //}
-    ////If right and ghost isnt currently going left
-    //else if (ghost->objPos[0][0] > ghost->gridPos[0][0] 
-    //        && isClear(right, ghost->mBody) 
-    //        && (ghost->prevPos[0][0] != ghost->gridPos[0][0] + 1 || ghost->prevPos[0][1] != ghost->gridPos[0][1])
-    //        /*&& ghost->mDir != left)
-    //{
-    //    ghost->mDir = right;
-    //}
-    ////If it cant go down and it is going down and the objective is above the ghost
-    //else if ((ghost->prevPos[0][1] == ghost->gridPos[0][1] + 1
-    //            && !isClear(down, ghost->mBody)) 
-    //        || (ghost->prevPos[0][1] == ghost->gridPos[0][1] - 1
-    //            && !isClear(up, ghost->mBody)))
-    //{
-    //    //If it can go left it will go left
-    //    if (isClear(left, ghost->mBody))
-    //    {
-    //        ghost->mDir = left;
-    //    }
-    //    //If it can go right itll go right
-    //    else if (isClear(right, ghost->mBody))
-    //    {
-    //        ghost->mDir = right;
-    //    }
-    //}
-    //else if ((ghost->prevPos[0][0] == ghost->gridPos[0][0] - 1
-    //            && !isClear(right, ghost->mBody)) 
-    //        || (ghost->prevPos[0][0] == ghost->gridPos[0][0] + 1
-    //            && !isClear(left, ghost->mBody)))
-    //{
-    //    if (isClear(up, ghost->mBody))
-    //    {
-    //        ghost->mDir = up;
-    //    }
-    //    else if (isClear(down, ghost->mBody))
-    //    {
-    //        ghost->mDir = down;
-    //    }
-    //}
-}
-
-
-
-
-*/
