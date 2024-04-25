@@ -33,12 +33,13 @@ int main()
         {
             timeSinceLastUpdate += clock.restart();
             game.windowEvents();
-            while (timeSinceLastUpdate > TIME_PER_FRAME)
+            while (timeSinceLastUpdate > TIME_PER_FRAME && lives == game.getLives())
             {
                 timeSinceLastUpdate -= TIME_PER_FRAME;
                 game.update();
             }
             game.render();
+            game.blinky->displayMap();
         }
         game.reset((lives != game.getLives()));
         if (lives > game.getLives())

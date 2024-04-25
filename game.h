@@ -88,6 +88,8 @@ public:
 
     struct Ghosts
     {
+        char map[GRID_SIZE_Y][GRID_SIZE_X];
+        char mapToken;
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
@@ -96,14 +98,17 @@ public:
         int panicFrames[2] = {10*16, 11*16};
         int framecount = 0;                     //Count of the frame
         int gridPos[2][1];                      //Used to keep sprites position on grid
+        int prevFork[2][1];
         //int prevPos[2][1];                      //Used to prevent ghost from going backwards
         int objPos[2][1];                       //Objective position
-        direction mDir = up;                    //Ghost's direction
+        direction mDir = left;                    //Ghost's direction
         direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
         ghostStates state = chase;              //State ghost is in
+        ghostStates prevState;
         Ghosts();                               //Ghost constructor
         void move(float x, float y);            //Moves ghost
         void animate();                         //Animates ghost
+        void displayMap();
     };
     
     struct Pellets
@@ -161,5 +166,6 @@ public:
     int returnrow(sf::Sprite s);
     int returncol(sf::Sprite s);
     bool isClear(direction dir, sf::Sprite sprite);
+    bool fillPath(int col, int row, Ghosts * ghost, int targetX, int targetY);
 };
 #endif
