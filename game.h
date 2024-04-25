@@ -67,6 +67,7 @@ public:
     bool isDone() const;
     bool start();
     int  getDots() const;
+    int getLives() const;
     sf::Texture mTextureFile;
     
 
@@ -90,11 +91,12 @@ public:
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
+        float panicTime;
         int frames[2] = {0, 16};                //Ghost's animation frames
         int panicFrames[2] = {10*16, 11*16};
         int framecount = 0;                     //Count of the frame
-        int prevPos[2][1] = {0,0};              //Used to keep track of ghosts previous position
         int gridPos[2][1];                      //Used to keep sprites position on grid
+        //int prevPos[2][1];                      //Used to prevent ghost from going backwards
         int objPos[2][1];                       //Objective position
         direction mDir = up;                    //Ghost's direction
         direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
