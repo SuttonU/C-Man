@@ -64,6 +64,7 @@ public:
     bool isDone() const;
     bool start();
     int  getDots() const;
+    void teleport(sf::Sprite &s);                        //Check if teleporting and set position
     sf::Texture mTextureFile;
     
 
