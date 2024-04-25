@@ -177,7 +177,7 @@ void Game::setUpDots()
 void Game::windowEvents()
 {
     sf::Event event;
-    while(mWindow.pollEvent(event))
+    if(mWindow.pollEvent(event))
     {
         if(event.type == sf::Event::Closed)
         {
@@ -322,31 +322,31 @@ void Game :: displaymenu(){
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
-    windowEvents();
+    //windowEvents();
 }
 
-bool Game :: updatemenu(){
-    sf::Event event;
-    while(mWindow.pollEvent(event)){
-        if (event.type == sf::Event::Closed)
-        mWindow.close();
+// bool Game :: updatemenu(){
+//     sf::Event event;
+//     while(mWindow.pollEvent(event)){
+//         if (event.type == sf::Event::Closed)
+//         mWindow.close();
 
-        if (updatebutton(event, playbutton))
-        {
-            play = true;
-            return true;
-        }
-        if (updatebutton(event, infobutton)){
-            displayinstructions();
-        }
-        mWindow.clear();
-        mWindow.draw(titleimage);
-        mWindow.draw(playbutton);
-        mWindow.draw(infobutton);
-        mWindow.display();
-    }
-    return false;
-}
+//         if (updatebutton(event, playbutton))
+//         {
+//             play = true;
+//             return true;
+//         }
+//         if (updatebutton(event, infobutton)){
+//             displayinstructions();
+//         }
+//         mWindow.clear();
+//         mWindow.draw(titleimage);
+//         mWindow.draw(playbutton);
+//         mWindow.draw(infobutton);
+//         mWindow.display();
+//     }
+//     return false;
+// }
 
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
@@ -408,7 +408,7 @@ void Game :: displayinstructions(){
     mWindow.draw(titleimage);
     mWindow.display();
     while (!backtomenu){
-        while(mWindow.pollEvent(event)){
+        if(mWindow.pollEvent(event)){
             if (event.type == sf::Event::Closed)
             mWindow.close();
 
@@ -535,6 +535,13 @@ void Game::update()
     {
         lives++;
     }
+
+    //Check for teleportation
+    teleport(mPlyr->mSprite);
+    teleport(blinky->mBody);
+    teleport(inky->mBody);
+    teleport(pinky->mBody);
+    teleport(clyde->mBody);
     
     //Update position
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
@@ -1061,4 +1068,18 @@ void Game::displayGUI()
 void Game::updateGUI()
 {
     score.setString(std::to_string(points) + "0");
+}
+/**
+ * @brief Checks if a sprite is able to teleport to other side of map. Sets positions of sprite to destination.
+ * 
+ * @param s 
+ */
+void Game::teleport(sf::Sprite &s){
+    if (returnrow(s) == 16 && returncol(s) == 0){
+        s.setPosition(getgridx(29), getgridy(16));
+        mPlyr->mDir = left;
+    } else if (returnrow(s) == 16 && returncol(s) == 30){
+        s.setPosition(getgridx(1), getgridy(16));
+        mPlyr->mDir = right;
+    }
 }
