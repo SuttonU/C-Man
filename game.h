@@ -41,6 +41,8 @@ private:
     sf::Text playbutton;
     sf::Text infobutton;
     sf::Text score;
+    sf::Text backbutton;
+    sf::Text instructions;
     //map data
     sf::Sprite map;
     sf::Texture maptexture;
