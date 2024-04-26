@@ -17,11 +17,11 @@ int main()
     Game game;
     //game.displaygrid(); //Uncomment to test and display grid
     game.displaymenu();
+    game.displaymap();
     while (!game.start() && !game.isDone())
     {
         game.windowEvents();
     }
-    game.displaymap();
     game.render();
     while (!game.isDone())
     {        
