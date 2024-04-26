@@ -522,7 +522,7 @@ void Game::update()
                 points += 1;
                 score.setString(std::to_string(points) + "0");
                 score.setOrigin(score.getGlobalBounds().width/2,score.getGlobalBounds().height/2);
-                score.setPosition(mWindow.getSize().x, mWindow.getSize().y);
+                score.setPosition(mWindow.getSize().x / 4, mWindow.getSize().y / 4);
             }      
         }
     }    
@@ -572,7 +572,6 @@ void Game::update()
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
         points += eatFruit(fruit);
-        score.setString(std::to_string(points) + "0");
     }
     
     if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
@@ -581,9 +580,10 @@ void Game::update()
         fruit->spawned = true;
     }
     //Adds extra life at 10k points
-    if (points == 1000)
+    if (points >= 1000 && xtraLive == 0)
     {
         lives++;
+        xtraLive = 1;
     }
     
     //Update position
@@ -610,30 +610,54 @@ void Game::update()
     else if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && blinky->state == panic))
     {
         blinky->state = dead;
-        points += 400 * ghostMult;
+        points += 40 * ghostMult;
         ghostMult++;
     }
     else if (mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state == panic)
     {
         inky->state = dead;
-        points += 400 * ghostMult;
+        points += 40 * ghostMult;
         ghostMult++;
     }
     else if(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state == panic)
     {
         pinky->state = dead;
-        points += 400 * ghostMult;
+        points += 40 * ghostMult;
         ghostMult++;
     }
     else if (mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state == panic)
     {
         clyde->state = dead;
-        points += 400 * ghostMult;
+        points += 40 * ghostMult;
         ghostMult++;
     }
     
-    
-    
+    //Revive dead ghosts
+    if (blinky->state == dead 
+    && blinky->gridPos[0][0] == blinky->objPos[0][0] 
+    && blinky->gridPos[0][1] == blinky->objPos[0][1])
+    {
+        blinky->state = blinky->prevState;
+    }
+    else if (pinky->state == dead 
+    && pinky->gridPos[0][0] == pinky->objPos[0][0] 
+    && pinky->gridPos[0][1] == pinky->objPos[0][1])
+    {
+        pinky->state = pinky->prevState;
+    }
+    else if (inky->state == dead 
+    && inky->gridPos[0][0] == inky->objPos[0][0] 
+    && inky->gridPos[0][1] == inky->objPos[0][1])
+    {
+        inky->state = inky->prevState;
+    }
+    else if (clyde->state == dead 
+    && clyde->gridPos[0][0] == clyde->objPos[0][0] 
+    && clyde->gridPos[0][1] == clyde->objPos[0][1])
+    {
+        clyde->state = clyde->prevState;
+    }
+    updateGUI();
 }
 int Game::getLives() const
 {

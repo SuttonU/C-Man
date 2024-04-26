@@ -37,9 +37,13 @@ int main()
             {
                 timeSinceLastUpdate -= TIME_PER_FRAME;
                 game.update();
+                if (game.getLives() > lives)
+                {
+                    lives = game.getLives();
+                }
+                
             }
             game.render();
-            game.blinky->displayMap();
         }
         game.reset((lives != game.getLives()));
         if (lives > game.getLives())

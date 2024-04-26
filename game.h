@@ -30,6 +30,7 @@ private:
     bool play = false;
     //Player data
     int lives;
+    int xtraLive;
     int points = 0;
     int dotSpaces = 0;
     int dots = 0;
