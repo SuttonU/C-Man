@@ -125,6 +125,18 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setScale(scale, scale);
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
+
+    instructions.setFont(font);
+    instructions.setString("Instructions: \n\nUse WASD keys or the arrow keys to move.\n\nDon't get killed by the ghosts.\n\nCollect the dots.");
+    instructions.setCharacterSize(40);
+    instructions.setOrigin(instructions.getGlobalBounds().width/2, instructions.getGlobalBounds().height/2 + 15);
+    instructions.setPosition(mWindow.getSize().x/2, 700);
+
+    backbutton.setFont(font);
+    backbutton.setString("back");
+    backbutton.setCharacterSize(50);
+    backbutton.setOrigin(backbutton.getGlobalBounds().width/2, backbutton.getGlobalBounds().height/2 + 15);
+    backbutton.setPosition(mWindow.getSize().x/20, mWindow.getSize().y/20);
 }
 /**
  * @brief Sets up the dots for pacman to eat
@@ -177,7 +189,7 @@ void Game::setUpDots()
 void Game::windowEvents()
 {
     sf::Event event;
-    if(mWindow.pollEvent(event))
+    while(mWindow.pollEvent(event))
     {
         if(event.type == sf::Event::Closed)
         {
@@ -263,7 +275,6 @@ void Game::windowEvents()
         else if (updatebutton(event, playbutton))
         {
             play = true;
-            mWindow.clear();
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -387,19 +398,6 @@ void Game :: displayinstructions(){
     mWindow.clear();
     sf::Event event;
     bool backtomenu = false;
-    sf::Text instructions;
-    instructions.setFont(font);
-    instructions.setString("Instructions: \n\nUse WASD keys or the arrow keys to move.\n\nDon't get killed by the ghosts.\n\nCollect the dots.");
-    instructions.setCharacterSize(40);
-    instructions.setOrigin(instructions.getGlobalBounds().width/2, instructions.getGlobalBounds().height/2 + 15);
-    instructions.setPosition(mWindow.getSize().x/2, 700);
-
-    sf::Text backbutton;
-    backbutton.setFont(font);
-    backbutton.setString("back");
-    backbutton.setCharacterSize(50);
-    backbutton.setOrigin(backbutton.getGlobalBounds().width/2, backbutton.getGlobalBounds().height/2 + 15);
-    backbutton.setPosition(mWindow.getSize().x/20, mWindow.getSize().y/20);
 
     mWindow.draw(instructions);
     mWindow.draw(backbutton);
@@ -413,11 +411,13 @@ void Game :: displayinstructions(){
             if (updatebutton(event, backbutton)){
                 backtomenu = true;
             }
+            if (!backtomenu){
             mWindow.clear();
             mWindow.draw(instructions);
             mWindow.draw(backbutton);
             mWindow.draw(titleimage);
             mWindow.display();
+            }
         }
     }
 }
