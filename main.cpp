@@ -18,11 +18,11 @@ int main()
     //game.displaygrid(); //Uncomment to test and display grid
     //Displays menu and pauses game
     game.displaymenu();
+    game.displaymap();
     while (!game.start() && !game.isDone())
     {
         game.windowEvents();
     }
-
     //Starts game
     game.displaymap();
     game.render();

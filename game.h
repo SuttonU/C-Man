@@ -46,6 +46,8 @@ private:
     sf::Text playbutton;
     sf::Text infobutton;
     sf::Text score;
+    sf::Text backbutton;
+    sf::Text instructions;
     //map data
     sf::Sprite map;
     sf::Texture maptexture;
@@ -70,6 +72,7 @@ public:
     bool start();
     int  getDots() const;
     int getLives() const;
+    void teleport(sf::Sprite &s);                        //Check if teleporting and set position
     sf::Texture mTextureFile;
     
 

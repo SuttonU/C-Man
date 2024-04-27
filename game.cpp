@@ -151,7 +151,17 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
             clyde->map[i][j] = ' ';
         }
     }
+    instructions.setFont(font);
+    instructions.setString("Instructions: \n\nUse WASD keys or the arrow keys to move.\n\nDon't get killed by the ghosts.\n\nCollect the dots.");
+    instructions.setCharacterSize(40);
+    instructions.setOrigin(instructions.getGlobalBounds().width/2, instructions.getGlobalBounds().height/2 + 15);
+    instructions.setPosition(mWindow.getSize().x/2, 700);
 
+    backbutton.setFont(font);
+    backbutton.setString("back");
+    backbutton.setCharacterSize(50);
+    backbutton.setOrigin(backbutton.getGlobalBounds().width/2, backbutton.getGlobalBounds().height/2 + 15);
+    backbutton.setPosition(mWindow.getSize().x/20, mWindow.getSize().y/20);
 }
 /**
  * @brief Sets up the dots for pacman to eat
@@ -291,9 +301,6 @@ void Game::windowEvents()
         else if (updatebutton(event, playbutton))
         {
             play = true;
-            mWindow.clear();
-            mWindow.display();
-            
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -350,31 +357,31 @@ void Game :: displaymenu(){
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
-    windowEvents();
+    //windowEvents();
 }
 
-bool Game :: updatemenu(){
-    sf::Event event;
-    while(mWindow.pollEvent(event)){
-        if (event.type == sf::Event::Closed)
-        mWindow.close();
+// bool Game :: updatemenu(){
+//     sf::Event event;
+//     while(mWindow.pollEvent(event)){
+//         if (event.type == sf::Event::Closed)
+//         mWindow.close();
 
-        if (updatebutton(event, playbutton))
-        {
-            play = true;
-            return true;
-        }
-        if (updatebutton(event, infobutton)){
-            displayinstructions();
-        }
-        mWindow.clear();
-        mWindow.draw(titleimage);
-        mWindow.draw(playbutton);
-        mWindow.draw(infobutton);
-        mWindow.display();
-    }
-    return false;
-}
+//         if (updatebutton(event, playbutton))
+//         {
+//             play = true;
+//             return true;
+//         }
+//         if (updatebutton(event, infobutton)){
+//             displayinstructions();
+//         }
+//         mWindow.clear();
+//         mWindow.draw(titleimage);
+//         mWindow.draw(playbutton);
+//         mWindow.draw(infobutton);
+//         mWindow.display();
+//     }
+//     return false;
+// }
 
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
@@ -417,37 +424,26 @@ void Game :: displayinstructions(){
     mWindow.clear();
     sf::Event event;
     bool backtomenu = false;
-    sf::Text instructions;
-    instructions.setFont(font);
-    instructions.setString("Instructions: \n\nUse WASD keys or the arrow keys to move.\n\nDon't get killed by the ghosts.\n\nCollect the dots.");
-    instructions.setCharacterSize(40);
-    instructions.setOrigin(instructions.getGlobalBounds().width/2, instructions.getGlobalBounds().height/2 + 15);
-    instructions.setPosition(mWindow.getSize().x/2, 700);
-
-    sf::Text backbutton;
-    backbutton.setFont(font);
-    backbutton.setString("back");
-    backbutton.setCharacterSize(50);
-    backbutton.setOrigin(backbutton.getGlobalBounds().width/2, backbutton.getGlobalBounds().height/2 + 15);
-    backbutton.setPosition(mWindow.getSize().x/20, mWindow.getSize().y/20);
 
     mWindow.draw(instructions);
     mWindow.draw(backbutton);
     mWindow.draw(titleimage);
     mWindow.display();
     while (!backtomenu){
-        while(mWindow.pollEvent(event)){
+        if(mWindow.pollEvent(event)){
             if (event.type == sf::Event::Closed)
             mWindow.close();
 
             if (updatebutton(event, backbutton)){
                 backtomenu = true;
             }
+            if (!backtomenu){
             mWindow.clear();
             mWindow.draw(instructions);
             mWindow.draw(backbutton);
             mWindow.draw(titleimage);
             mWindow.display();
+            }
         }
     }
 }
@@ -587,6 +583,13 @@ void Game::update()
         lives++;
         xtraLive = 1;
     }
+
+    //Check for teleportation
+    teleport(mPlyr->mSprite);
+    teleport(blinky->mBody);
+    teleport(inky->mBody);
+    teleport(pinky->mBody);
+    teleport(clyde->mBody);
     
     //Update position
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
@@ -1418,8 +1421,6 @@ void Game::displaymap(){
     map.setTexture(maptexture);
     map.setOrigin(maptexture.getSize().x/2, maptexture.getSize().y/2);
     map.setPosition(mWindow.getSize().x/2, mWindow.getSize().y/2);
-    mWindow.draw(map);
-    mWindow.display();
 }
 /**
  * @brief Initializes grid.
@@ -1583,4 +1584,18 @@ void Game::updateGUI()
 {
     score.setString(std::to_string(points) + "0");
     score.setPosition(mWindow.getSize().x / 4, mWindow.getSize().y / 4);
+}
+/**
+ * @brief Checks if a sprite is able to teleport to other side of map. Sets positions of sprite to destination.
+ * 
+ * @param s 
+ */
+void Game::teleport(sf::Sprite &s){
+    if (returnrow(s) == 16 && returncol(s) == 0){
+        s.setPosition(getgridx(29), getgridy(16));
+        mPlyr->mDir = left;
+    } else if (returnrow(s) == 16 && returncol(s) == 30){
+        s.setPosition(getgridx(1), getgridy(16));
+        mPlyr->mDir = right;
+    }
 }
