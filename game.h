@@ -16,7 +16,9 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 enum direction
-{up, down, left, right};
+{up, left, down, right};
+enum ghostStates
+{scatter, chase, panic, dead};
 const int GRID_SIZE_X = 31;
 const int GRID_SIZE_Y = 33;
 const int MAX_DOTS = 210;
@@ -28,10 +30,13 @@ private:
     bool play = false;
     //Player data
     int lives;
+    int xtraLive;
     int points = 0;
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
+    int ghostMult = 1;
+    int cornersPos[4][2] = {{1,1}, {30,1}, {1,34}, {30,34}};   //Positions of the 4 corners{x,y}
     float scale = 1.0;      //Scale of game
     //Ghost data
     //Title menu data
@@ -58,7 +63,7 @@ public:
     void windowEvents();
     void update();
     void render();
-    void reset();
+    void reset(bool dead);
     void deathAnimation();
     void setUpDots();
     void displayGUI();
@@ -66,6 +71,7 @@ public:
     bool isDone() const;
     bool start();
     int  getDots() const;
+    int getLives() const;
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
     sf::Texture mTextureFile;
     
@@ -78,7 +84,7 @@ public:
         int framecount = 0;                     //Used to keep count of frames during animation
         int gridPos[2][1];                      //Used to keep sprites position on grid
         direction mDir = left;                  //Direction of player
-        direction bufferDir;
+        direction bufferDir = left;             //Direction in buffer
         Player();                               //Creates player
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
@@ -87,27 +93,38 @@ public:
 
     struct Ghosts
     {
+        char map[GRID_SIZE_Y][GRID_SIZE_X];
+        char mapToken;
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
+        float panicTime;                        //Time for ghost to be in panic mode
         int frames[2] = {0, 16};                //Ghost's animation frames
+        int panicFrames[2] = {10*16, 11*16};    //Frames for ghost panic
         int framecount = 0;                     //Count of the frame
         int gridPos[2][1];                      //Used to keep sprites position on grid
+        int prevFork[2][1];                     //Used to prevent ghost from activating the same fork before moving out of it
+        //int prevPos[2][1];                    //Used to prevent ghost from going backwards
+        int objPos[2][1];                       //Objective position
         direction mDir = left;                  //Ghost's direction
+        direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
+        ghostStates state = chase;              //State ghost is in
+        ghostStates prevState;                  //Previous state ghost was in
         Ghosts();                               //Ghost constructor
-        void move();                            //Moves ghost
+        void move(float x, float y);            //Moves ghost
         void animate();                         //Animates ghost
+        void displayMap();                      //Used to keep track of the ghosts path
     };
     
     struct Pellets
     {
         Pellets(bool isSuper);                  //Pellets constructor
-        sf::Sprite mSprite;         //Pellets sprite
-        bool eaten = false;         //If pellet is eaten it will be true
-        bool super = false;         //Determines which kind of pellet it is
-        int frames[2] = {0, 48};    //Frames of pellet to use to be animated
-        int frameCount = 0;
-        int gridPos[2][1];          //Used to keep sprites position on grid
+        sf::Sprite mSprite;                     //Pellets sprite
+        bool eaten = false;                     //If pellet is eaten it will be true
+        bool super = false;                     //Determines which kind of pellet it is
+        int frames[2] = {0, 48};                //Frames of pellet to use to be animated
+        int frameCount = 0;                     //frame count for super pellets
+        int gridPos[2][1];                      //Used to keep sprites position on grid
     };
     struct Fruit
     {
@@ -122,14 +139,14 @@ public:
     };
 
     //Game objects
-    Player * mPlyr = nullptr;
-    Ghosts * inky = nullptr;
-    Ghosts * blinky = nullptr;
-    Ghosts * pinky = nullptr;
-    Ghosts * clyde = nullptr;
-    Fruit * fruit = nullptr;
-    Pellets * pellets[MAX_DOTS];
-    Pellets * sPellets[4];
+    Player * mPlyr = nullptr;   //Player
+    Ghosts * inky = nullptr;    //blue ghost
+    Ghosts * blinky = nullptr;  //red ghost
+    Ghosts * pinky = nullptr;   //pink ghost
+    Ghosts * clyde = nullptr;   //orange ghost
+    Fruit * fruit = nullptr;    //fruit
+    Pellets * pellets[MAX_DOTS];//Array of pellets
+    Pellets * sPellets[4];      //Array of super pellets
     void eatPellet(Game::Pellets * pellet);       //Function for when a pellet is eaten
     int eatFruit(Game::Fruit * fruit);
     void destroyPlyr(Player plyr);
@@ -138,6 +155,9 @@ public:
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
     void drawGhost(Ghosts * ghost);
+    void findPath(Ghosts * ghost);
+    void choosePath(Ghosts * ghost);
+    void respawnGhost(Ghosts * ghost);                         //Used to respawn the ghost once it reaches the cage
 
     //map functions
     void displaymap();
@@ -152,5 +172,6 @@ public:
     int returnrow(sf::Sprite s);
     int returncol(sf::Sprite s);
     bool isClear(direction dir, sf::Sprite sprite);
+    bool fillPath(int col, int row, Ghosts * ghost, int targetX, int targetY);
 };
 #endif
