@@ -467,6 +467,17 @@ bool Game::isDone() const
  */
 void Game::update()
 {
+    //Update position
+    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
+    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
+    blinky->gridPos[0][0] = returncol(blinky->mBody);
+    blinky->gridPos[0][1] = returnrow(blinky->mBody);
+    inky->gridPos[0][0] = returncol(inky->mBody);
+    inky->gridPos[0][1] = returnrow(inky->mBody);
+    pinky->gridPos[0][0] = returncol(pinky->mBody);
+    pinky->gridPos[0][1] = returnrow(pinky->mBody);
+    clyde->gridPos[0][0] = returncol(clyde->mBody);
+    clyde->gridPos[0][1] = returnrow(clyde->mBody);
     //Moving
     mPlyr->controls();
     findPath(blinky);
@@ -530,22 +541,42 @@ void Game::update()
             if (eaten && notEaten)
             {
                 ghostMult = 1;
-                blinky->prevState = blinky->state;
-                inky->prevState = inky->state;
-                pinky->prevState = pinky->state;
-                clyde->prevState = clyde->state; 
-                blinky->state = panic;
-                inky->state = panic;
-                pinky->state = panic;
-                clyde->state = panic;
-                blinky->framecount = 0;
-                inky->framecount = 0;
-                pinky->framecount = 0;
-                clyde->framecount = 0;
-                blinky->panicTime = 7.0;
-                pinky->panicTime = 7.0;
-                inky->panicTime = 7.0;
-                clyde->panicTime = 7.0;
+                //Prevents a panicked ghost having 2 panic states or a dead one having a panicked state
+                if (blinky->state != panic && blinky->state != dead)
+                {
+                    blinky->prevState = blinky->state;
+                    blinky->prevTime = blinky->stateTime;
+                    blinky->state = panic;
+                    blinky->framecount = 0;
+                    blinky->stateTime = 7.0;
+                
+                }
+                if (inky->state != panic && inky->state != dead)
+                {
+                    inky->prevState = inky->state;
+                    inky->prevTime = inky->stateTime;
+                    inky->state = panic;
+                    inky->framecount = 0;
+                    inky->stateTime = 7.0;
+
+                }
+                if (pinky->state != panic && pinky->state != dead)
+                {
+                    pinky->prevState = pinky->state;
+                    pinky->prevTime = pinky->stateTime;
+                    pinky->state = panic;
+                    pinky->framecount = 0;
+                    pinky->stateTime = 7.0;
+
+                }
+                if (clyde->state != panic && clyde->state != dead)
+                {
+                    clyde->prevState = clyde->state;
+                    clyde->prevTime = clyde->stateTime;
+                    clyde->state = panic;
+                    clyde->framecount = 0;
+                    clyde->stateTime = 7.0;
+                }
             }
         }
     //Animates the super dots so they flash
@@ -554,18 +585,18 @@ void Game::update()
         if (!sPellets[i]->eaten)
         {
             sPellets[i]->mSprite.setTextureRect({16 * 15, sPellets[i]->frames[sPellets[i]->frameCount / 16], 16, 16});
-                if (sPellets[i]->frameCount == 31)
-                {
-                    sPellets[i]->frameCount = 0;
-                }
-                else
-                {
-                    sPellets[i]->frameCount++;
-                }
+            if (sPellets[i]->frameCount == 31)
+            {
+                sPellets[i]->frameCount = 0;
+            }
+            else
+            {
+                sPellets[i]->frameCount++;
+            }
 
         }
         
-        }
+    }
     //eats the fruit
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
@@ -591,17 +622,6 @@ void Game::update()
     teleport(pinky->mBody);
     teleport(clyde->mBody);
     
-    //Update position
-    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
-    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
-    blinky->gridPos[0][0] = returncol(blinky->mBody);
-    blinky->gridPos[0][1] = returnrow(blinky->mBody);
-    inky->gridPos[0][0] = returncol(inky->mBody);
-    inky->gridPos[0][1] = returnrow(inky->mBody);
-    pinky->gridPos[0][0] = returncol(pinky->mBody);
-    pinky->gridPos[0][1] = returnrow(pinky->mBody);
-    clyde->gridPos[0][0] = returncol(clyde->mBody);
-    clyde->gridPos[0][1] = returnrow(clyde->mBody);
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
     if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && (blinky->state != panic && blinky->state != dead))
     ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && (inky->state != panic && inky->state != dead))
@@ -637,6 +657,12 @@ void Game::update()
         points += 40 * ghostMult;
         ghostMult++;
     }
+
+    //Counts down states
+    blinky->stateCountDown();
+    inky->stateCountDown();
+    pinky->stateCountDown();
+    clyde->stateCountDown();
     
     //Revive dead ghosts
     //If a ghost is dead and its position is in the ghost house it will be set to the previous state
@@ -770,6 +796,10 @@ void Game::reset(bool dead)
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
     mPlyr->mSprite.setTextureRect(sf::IntRect(32, 0, 16 ,16));
+    blinky->mBody.setTextureRect(sf::IntRect(blinky->frames[0], 16, 16 ,16));
+    pinky->mBody.setTextureRect(sf::IntRect(pinky->frames[0], 16, 16 ,16));
+    inky->mBody.setTextureRect(sf::IntRect(inky->frames[0], 16, 16 ,16));
+    clyde->mBody.setTextureRect(sf::IntRect(clyde->frames[0], 16, 16 ,16));
     blinky->mBody.setPosition(getgridx(15), getgridy(9));
     inky->mBody.setPosition(getgridx(17), getgridy(14));
     pinky->mBody.setPosition(getgridx(13), getgridy(14));
@@ -795,6 +825,10 @@ void Game::reset(bool dead)
     pinky->state = scatter;
     inky->state = scatter;
     clyde->state = scatter;
+    blinky->stateTime = 4.0;
+    pinky->stateTime = 4.0;
+    inky->stateTime = 4.0;
+    clyde->stateTime = 4.0;
     //reset mdir
     mPlyr->mDir = left;
     mPlyr->bufferDir = left;
@@ -1016,6 +1050,43 @@ void Game::Ghosts::displayMap()
     }
 }
 /**
+ * @brief counts down and changes each state
+ * 
+ */
+void Game::Ghosts::stateCountDown()
+{
+    if (stateTime <= 0)
+    {
+        //Resets map
+        for (int x = 0; x < GRID_SIZE_X; x++)
+        {
+            for (int y = 0; y < GRID_SIZE_Y; y++)
+            {
+                map[y][x] = ' ';
+            }
+            
+        }
+        if (state == panic)
+        {
+            state = prevState;
+            stateTime = prevTime;
+        }
+        else if (state == chase)
+        {
+            state = scatter;
+            stateTime = 4.0;
+        }
+        else if (state == scatter)
+        {
+            state = chase;
+            stateTime = 20.0;
+        }
+    }
+    {
+        stateTime -= 1.0/60.0;
+    }
+}
+/**
  * @brief respawns the ghost
  * 
  * @param ghost ghost to spawn
@@ -1039,10 +1110,11 @@ void Game::respawnGhost(Ghosts * ghost)
  */
 void Game::findPath(Ghosts * ghost)
 {
-    ghost-> mvSpeed = 1.0 * scale;
+    ghost-> mvSpeed = 1.25 * scale;
     if (ghost->state == chase)
     {
         //These if statements find which ghost it is
+        ghost-> mvSpeed = 1.25 * scale;
         if (ghost->frames[0] == 0)
         {
             ghost->objPos[0][0] = returncol(mPlyr->mSprite);
@@ -1102,17 +1174,18 @@ void Game::findPath(Ghosts * ghost)
             } else
             {
                 //Clydes corner  
-                ghost->objPos[0][0] = cornersPos[(ghost->frames[0] / 32 + 1)][0];
-                ghost->objPos[0][1] = cornersPos[(ghost->frames[0] / 32 + 1)][1];
+                ghost->objPos[0][0] = 30;
+                ghost->objPos[0][1] = 1;
             }
         }
     }
     //If the state is scatter the ghosts will go to their corners
     else if (ghost->state == scatter)
     {
+        ghost->mvSpeed = 1.25 * scale;
         //Set to each corner   Ghost number
-        ghost->objPos[0][0] = cornersPos[(ghost->frames[0] / 32 + 1)][0];
-        ghost->objPos[0][1] = cornersPos[(ghost->frames[0] / 32 + 1)][1];
+        ghost->objPos[0][0] = cornersPos[(ghost->frames[0] / 32)][0];
+        ghost->objPos[0][1] = cornersPos[(ghost->frames[0] / 32)][1];
     }
     //If its panic they will move random directions
     else if (ghost->state == panic)
@@ -1149,7 +1222,7 @@ void Game::choosePath(Ghosts * ghost)
     }
     ghost->map[y][x] = ' ';
     //If the ghost can not move he will move in which ever direction is the easiest
-    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead)
+    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead && ghost->state != panic)
     {
         if (isClear(up, ghost->mBody) && ghost->mDir != down 
         && y >= targetY
@@ -1212,6 +1285,27 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
+    else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f')
+    {
+        int i = rand() % 4 + 1;
+        if (ghost->mDir != down && direction(i) == up)
+        {
+            ghost->mDir = up;
+        }
+        else if (ghost->mDir != right && direction(i) == left)
+        {
+            ghost->mDir = left;
+        }
+        else if (ghost->mDir != up && direction(i) == down)
+        {
+            ghost->mDir = down;
+        }
+        else
+        {
+            ghost->mDir = right;
+        }
+    }
+    
     //determines default direction for ghost to turn in
     else if (ghost->map[y - 1][x] == ghost->mapToken 
     && y > targetY
@@ -1336,7 +1430,15 @@ void Game::Ghosts::animate()
     }
     else
     {
-        mBody.setTextureRect(sf::IntRect(panicFrames[framecount/8], 16, 16, 16));
+        if (stateTime > 3 && state == panic)
+        {
+            mBody.setTextureRect(sf::IntRect(panicFrames[framecount/8], 16, 16, 16));
+        }
+        else
+        {
+            mBody.setTextureRect(sf::IntRect(panicFrames[framecount/4], 16, 16, 16));
+        }
+        
         if (framecount == 15)
         {
             framecount = 0;
