@@ -15,6 +15,7 @@ int main()
 {
     int lives = 3;          //Used to keep track of when lives change
     Game game;
+    srand(time(NULL));
     //game.displaygrid(); //Uncomment to test and display grid
     //Displays menu and pauses game
     game.displaymenu();
