@@ -100,15 +100,15 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     //Set frames
     blinky->frames[0] = 0;
     blinky->frames[1] = 16;
-    inky->frames[0] = 32;
-    inky->frames[1] = 48;
-    pinky->frames[0] = 64;
-    pinky->frames[1] = 80;
+    pinky->frames[0] = 32;
+    pinky->frames[1] = 48;
+    inky->frames[0] = 64;
+    inky->frames[1] = 80;
     clyde->frames[0] = 96;
     clyde->frames[1] = 112;
     //Set starting frames
-    pinky->mBody.setTextureRect(sf::IntRect(64, 16, 16, 16));
-    inky->mBody.setTextureRect(sf::IntRect(32, 16, 16, 16));
+    pinky->mBody.setTextureRect(sf::IntRect(32, 16, 16, 16));
+    inky->mBody.setTextureRect(sf::IntRect(64, 16, 16, 16));
     clyde->mBody.setTextureRect(sf::IntRect(96, 16, 16, 16));
     mPlyr->mSprite.setTextureRect(sf::IntRect(32, 0, 16, 16));
     //Set up grid and dots
@@ -551,40 +551,52 @@ void Game::update()
             {
                 ghostMult = 1;
                 //Prevents a panicked ghost having 2 panic states or a dead one having a panicked state
-                if (blinky->state != panic && blinky->state != dead)
+                if (blinky->state != dead && !inghosthouse(blinky->mBody))
                 {
-                    blinky->prevState = blinky->state;
-                    blinky->prevTime = blinky->stateTime;
+                    if(blinky->state != panic)
+                    {
+                        blinky->prevState = blinky->state;
+                        blinky->prevTime = blinky->stateTime;
+                    }
                     blinky->state = panic;
                     blinky->framecount = 0;
-                    blinky->stateTime = 7.0;
+                    blinky->stateTime = 10.0;
                 
                 }
-                if (inky->state != panic && inky->state != dead)
+                if (inky->state != dead && !inghosthouse(inky->mBody))
                 {
-                    inky->prevState = inky->state;
-                    inky->prevTime = inky->stateTime;
+                    if (inky->state != panic)
+                    {
+                        inky->prevState = inky->state;
+                        inky->prevTime = inky->stateTime;
+                    }
                     inky->state = panic;
                     inky->framecount = 0;
-                    inky->stateTime = 7.0;
+                    inky->stateTime = 10.0;
 
                 }
-                if (pinky->state != panic && pinky->state != dead)
+                if (pinky->state != dead && !inghosthouse(pinky->mBody))
                 {
-                    pinky->prevState = pinky->state;
-                    pinky->prevTime = pinky->stateTime;
+                    if (pinky->state != panic)
+                    {
+                        pinky->prevState = pinky->state;
+                        pinky->prevTime = pinky->stateTime;
+                    }
                     pinky->state = panic;
                     pinky->framecount = 0;
-                    pinky->stateTime = 7.0;
+                    pinky->stateTime = 10.0;
 
                 }
-                if (clyde->state != panic && clyde->state != dead)
+                if (clyde->state != dead && !inghosthouse(clyde->mBody))
                 {
-                    clyde->prevState = clyde->state;
-                    clyde->prevTime = clyde->stateTime;
+                    if (clyde->state != panic)
+                    {
+                        clyde->prevState = clyde->state;
+                        clyde->prevTime = clyde->stateTime;
+                    }
                     clyde->state = panic;
                     clyde->framecount = 0;
-                    clyde->stateTime = 7.0;
+                    clyde->stateTime = 10.0;
                 }
             }
         }
@@ -687,7 +699,7 @@ void Game::update()
         blinky->objPos[0][1] = 9;
         respawnGhost(blinky);
     }
-    else if (pinky->state == dead 
+    if (pinky->state == dead 
     && pinky->gridPos[0][0] == pinky->objPos[0][0] 
     && pinky->gridPos[0][1] == pinky->objPos[0][1])
     {
@@ -695,7 +707,7 @@ void Game::update()
         blinky->objPos[0][1] = 9;
         respawnGhost(pinky);
     }
-    else if (inky->state == dead 
+    if (inky->state == dead 
     && inky->gridPos[0][0] == inky->objPos[0][0] 
     && inky->gridPos[0][1] == inky->objPos[0][1])
     {
@@ -703,7 +715,7 @@ void Game::update()
         blinky->objPos[0][1] = 9;
         respawnGhost(inky);
     }
-    else if (clyde->state == dead 
+    if (clyde->state == dead 
     && clyde->gridPos[0][0] == clyde->objPos[0][0] 
     && clyde->gridPos[0][1] == clyde->objPos[0][1])
     {
@@ -840,10 +852,10 @@ void Game::reset(bool dead)
     pinky->state = scatter;
     inky->state = scatter;
     clyde->state = scatter;
-    blinky->stateTime = 4.0;
-    pinky->stateTime = 4.0;
-    inky->stateTime = 4.0;
-    clyde->stateTime = 4.0;
+    blinky->stateTime = 7.0;
+    pinky->stateTime = 7.0;
+    inky->stateTime = 7.0;
+    clyde->stateTime = 7.0;
     //reset mdir
     mPlyr->mDir = left;
     mPlyr->bufferDir = left;
@@ -851,6 +863,10 @@ void Game::reset(bool dead)
     pinky->mDir = left;
     inky->mDir = left;
     clyde->mDir = left;
+    //Reset spawned
+    inky->spawned = false;
+    pinky->spawned = false;
+    clyde->spawned = false;
     //Reinitialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
@@ -1089,7 +1105,7 @@ void Game::Ghosts::stateCountDown()
         else if (state == chase)
         {
             state = scatter;
-            stateTime = 4.0;
+            stateTime = 7.0;
         }
         else if (state == scatter)
         {
@@ -1097,6 +1113,7 @@ void Game::Ghosts::stateCountDown()
             stateTime = 20.0;
         }
     }
+    if (gridPos[0][1] < 18 && gridPos[0][1] > 10 && gridPos[0][0] < 24 && gridPos[0][0] > 7)
     {
         stateTime -= 1.0/60.0;
     }
@@ -1293,8 +1310,10 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
-    else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f')
+    else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f' && (y != ghost->prevFork[0][1] || x != ghost->prevFork[0][0]))
     {
+        ghost->prevFork[0][1] = y;
+        ghost->prevFork[0][0] = x;
         int i = rand() % 4 + 1;
         if (ghost->mDir != down && direction(i) == up)
         {
@@ -1719,21 +1738,19 @@ void Game::teleport(sf::Sprite &s){
  * 
  */
 void Game::spawn(){
-    if (!inky->spawned){
-        movetospawn(inky);
-        inky->spawned = true;
-    }
-    if ((dots <= MAX_DOTS * .7) && !blinky->spawned){
+    if (!blinky->spawned){
         movetospawn(blinky);
         blinky->spawned = true;
     }
-
-    if (blinky->spawned && !pinky->spawned && !(inghosthouse(blinky->mBody))){
+    else if (blinky->spawned && !pinky->spawned && !(inghosthouse(blinky->mBody))){
         movetospawn(pinky);
         pinky->spawned = true;
     }
-
-    if (!clyde->spawned && dots <= MAX_DOTS * 0.3){
+    else if ((dots <= MAX_DOTS * .7 || fruit->level >= 4) && !inky->spawned && !(inghosthouse(blinky->mBody) || inghosthouse(pinky->mBody))){
+        movetospawn(inky);
+        inky->spawned = true;
+    }
+    else if (!clyde->spawned && (dots <= MAX_DOTS * 0.3  || fruit->level >= 4) && !(inghosthouse(blinky->mBody) || inghosthouse(pinky->mBody) || inghosthouse(inky->mBody))){
         movetospawn(clyde);
         clyde->spawned = true;
     }
@@ -1744,6 +1761,7 @@ void Game::spawn(){
  * @param ghost 
  */
 void Game::movetospawn(Ghosts *ghost){
+    ghost->mvSpeed = scale * 0.75;
     ghost->objPos[0][0] = 15;
     ghost->objPos[0][1] = 14;
     choosePath(ghost);
