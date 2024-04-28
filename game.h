@@ -15,7 +15,7 @@ git pul * @version 0.1
 #include <unistd.h>
 #include <stack>
 #include <cstring>
-#include <queue>
+#include <time.h>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -99,9 +99,10 @@ public:
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
-        float panicTime;                        //Time for ghost to be in panic mode
+        float stateTime = 4.0;                        //Time for ghost to be in panic mode
+        float prevTime;                         //Previous timer for ghost state
         int frames[2] = {0, 16};                //Ghost's animation frames
-        int panicFrames[2] = {10*16, 11*16};    //Frames for ghost panic
+        int panicFrames[4] = {10*16, 11*16, 8*16, 9 * 16};    //Frames for ghost panic
         int framecount = 0;                     //Count of the frame
         int gridPos[2][1];                      //Used to keep sprites position on grid
         int prevFork[2][1];                     //Used to prevent ghost from activating the same fork before moving out of it
@@ -109,12 +110,13 @@ public:
         int objPos[2][1];                       //Objective position
         direction mDir;                         //Ghost's direction
         direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
-        ghostStates state = chase;              //State ghost is in
+        ghostStates state = scatter;              //State ghost is in
         ghostStates prevState;                  //Previous state ghost was in
         Ghosts();                               //Ghost constructor
         void move(float x, float y);            //Moves ghost
         void animate();                         //Animates ghost
         void displayMap();                      //Used to keep track of the ghosts path
+        void stateCountDown();                  //Changes states after each count down
         bool spawned = false;                   //Test if ghost is already spawned
     };
     
@@ -133,6 +135,7 @@ public:
         Fruit();
         sf::Sprite mSprite;
         void toDespawn();
+        float despawnTime;
         int level;
         int gridPos[2][1];
         int values[8] = {10, 30, 50, 70, 100, 200, 300, 500};
