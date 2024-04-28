@@ -478,6 +478,11 @@ void Game::update()
     pinky->gridPos[0][1] = returnrow(pinky->mBody);
     clyde->gridPos[0][0] = returncol(clyde->mBody);
     clyde->gridPos[0][1] = returnrow(clyde->mBody);
+    //Counts down states
+    blinky->stateCountDown();
+    inky->stateCountDown();
+    pinky->stateCountDown();
+    clyde->stateCountDown();
     //Moving
     mPlyr->controls();
     if (!inghosthouse(blinky->mBody)){
@@ -507,26 +512,27 @@ void Game::update()
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
     }
+    //Checks if ghosts can move
     if ((isClear(blinky->mDir, blinky->mBody) || blinky->state == dead) && blinky->spawned)
     {
         blinky->move(getgridx(returncol(blinky->mBody)), getgridy(returnrow(blinky->mBody)));
-        blinky->animate();
     }
     if ((isClear(pinky->mDir, pinky->mBody) || pinky->state == dead) && pinky->spawned)
     {
         pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
-        pinky->animate();
     }
     if ((isClear(inky->mDir, inky->mBody) || inky->state == dead) && inky->spawned)
     {
         inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
-        inky->animate();
     }
     if ((isClear(clyde->mDir, clyde->mBody) || clyde->state == dead) && clyde->spawned)
     {
         clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
-        clyde->animate();
     }
+    blinky->animate();
+    pinky->animate();
+    inky->animate();
+    clyde->animate();
     //Eats pellets
     if (dots > 0)
     {
@@ -542,7 +548,9 @@ void Game::update()
         }
     }    
     //Eats super pellets then sets ghosts to panic
-    for (int i = 0; i < 4; i++)
+    if (sDots > 0)
+    {
+        for (int i = 0; i < 4; i++)
         {
             bool notEaten = (!sPellets[i]->eaten);
             eatPellet(sPellets[i]);
@@ -551,7 +559,7 @@ void Game::update()
             {
                 ghostMult = 1;
                 //Prevents a panicked ghost having 2 panic states or a dead one having a panicked state
-                if (blinky->state != dead && !inghosthouse(blinky->mBody))
+                if (blinky->state != dead)
                 {
                     if(blinky->state != panic)
                     {
@@ -563,7 +571,7 @@ void Game::update()
                     blinky->stateTime = 10.0;
                 
                 }
-                if (inky->state != dead && !inghosthouse(inky->mBody))
+                if (inky->state != dead)
                 {
                     if (inky->state != panic)
                     {
@@ -575,7 +583,7 @@ void Game::update()
                     inky->stateTime = 10.0;
 
                 }
-                if (pinky->state != dead && !inghosthouse(pinky->mBody))
+                if (pinky->state != dead)
                 {
                     if (pinky->state != panic)
                     {
@@ -587,7 +595,7 @@ void Game::update()
                     pinky->stateTime = 10.0;
 
                 }
-                if (clyde->state != dead && !inghosthouse(clyde->mBody))
+                if (clyde->state != dead)
                 {
                     if (clyde->state != panic)
                     {
@@ -600,6 +608,7 @@ void Game::update()
                 }
             }
         }
+    }
     //Animates the super dots so they flash
     for (int i = 0; i < 4; i++)
     {
@@ -644,38 +653,84 @@ void Game::update()
     teleport(clyde->mBody);
     
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
-    if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && (blinky->state != panic && blinky->state != dead))
-    ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && (inky->state != panic && inky->state != dead))
-    ||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && (pinky->state != panic && pinky->state != dead))
-    ||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && (clyde->state != panic && clyde->state != dead)))
+    //If they sahre the same tile
+    if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] 
+            && (blinky->state != panic && blinky->state != dead))
+    ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && (inky->state != panic && inky->state != dead))
+    ||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && (pinky->state != panic && pinky->state != dead))
+    ||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && (clyde->state != panic && clyde->state != dead))
+    //If they share the same position
+    || (mPlyr->mSprite.getPosition().x == blinky->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == blinky->mBody.getPosition().y)
+    || (mPlyr->mSprite.getPosition().x == inky->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == inky->mBody.getPosition().y)
+    || (mPlyr->mSprite.getPosition().x == pinky->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == pinky->mBody.getPosition().y)
+    || (mPlyr->mSprite.getPosition().x == clyde->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == clyde->mBody.getPosition().y))
     {
         deathAnimation();
         lives--;
         return;
     }
     //These will eat the ghost
-    else if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] && blinky->state == panic))
+    else if (
+            (
+            (mPlyr->gridPos[0][0] == blinky->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == blinky->gridPos[0][1])
+            || 
+            (mPlyr->mSprite.getPosition().x == blinky->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == blinky->mBody.getPosition().y)
+            )
+            && blinky->state == panic)
     {
         blinky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
         blinky->spawned = false;
     }
-    else if (mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state == panic)
+    else if (
+            (
+            (mPlyr->gridPos[0][0] == inky->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == inky->gridPos[0][1])
+            || 
+            (mPlyr->mSprite.getPosition().x == inky->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == inky->mBody.getPosition().y)
+            )
+            && inky->state == panic)
     {
         inky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
         inky->spawned = false;
     }
-    else if(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state == panic)
+    else if(
+            (
+            (mPlyr->gridPos[0][0] == pinky->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == pinky->gridPos[0][1])
+            || 
+            (mPlyr->mSprite.getPosition().x == pinky->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == pinky->mBody.getPosition().y)
+            )
+            && pinky->state == panic)
     {
         pinky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
         pinky->spawned = false;
     }
-    else if (mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state == panic)
+    else if (
+            (
+            (mPlyr->gridPos[0][0] == clyde->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == clyde->gridPos[0][1])
+            || 
+            (mPlyr->mSprite.getPosition().x == clyde->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == clyde->mBody.getPosition().y)
+            )
+            && clyde->state == panic)
     {
         clyde->state = dead;
         points += 40 * ghostMult;
@@ -683,11 +738,6 @@ void Game::update()
         clyde->spawned = false;
     }
 
-    //Counts down states
-    blinky->stateCountDown();
-    inky->stateCountDown();
-    pinky->stateCountDown();
-    clyde->stateCountDown();
     
     //Revive dead ghosts
     //If a ghost is dead and its position is in the ghost house it will be set to the previous state
@@ -1113,7 +1163,7 @@ void Game::Ghosts::stateCountDown()
             stateTime = 20.0;
         }
     }
-    if (gridPos[0][1] < 18 && gridPos[0][1] > 10 && gridPos[0][0] < 24 && gridPos[0][0] > 7)
+    if ((gridPos[0][1] < 18 || gridPos[0][1] > 10) && (gridPos[0][0] < 24 || gridPos[0][0] > 7))
     {
         stateTime -= 1.0/60.0;
     }

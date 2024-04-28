@@ -99,7 +99,7 @@ public:
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
-        float stateTime = 4.0;                        //Time for ghost to be in panic mode
+        float stateTime = 7.0;                        //Time for ghost to be in panic mode
         float prevTime;                         //Previous timer for ghost state
         int frames[2] = {0, 16};                //Ghost's animation frames
         int panicFrames[4] = {10*16, 11*16, 8*16, 9 * 16};    //Frames for ghost panic
