@@ -108,7 +108,7 @@ public:
         int prevFork[2][1];                     //Used to prevent ghost from activating the same fork before moving out of it
         //int prevPos[2][1];                    //Used to prevent ghost from going backwards
         int objPos[2][1];                       //Objective position
-        direction mDir = left;                  //Ghost's direction
+        direction mDir;                         //Ghost's direction
         direction nextDir;                      //Ghost's previous direction to prevent it from going the way it came
         ghostStates state = scatter;              //State ghost is in
         ghostStates prevState;                  //Previous state ghost was in
@@ -117,6 +117,7 @@ public:
         void animate();                         //Animates ghost
         void displayMap();                      //Used to keep track of the ghosts path
         void stateCountDown();                  //Changes states after each count down
+        bool spawned = false;                   //Test if ghost is already spawned
     };
     
     struct Pellets
@@ -162,6 +163,9 @@ public:
     void findPath(Ghosts * ghost);
     void choosePath(Ghosts * ghost);
     void respawnGhost(Ghosts * ghost);                         //Used to respawn the ghost once it reaches the cage
+    void movetospawn(Ghosts *ghost);                           //Moves ghost from ghost house to outside ghost house.
+    void spawn();                                              //Initially spawns all ghosts.
+    bool inghosthouse(sf::Sprite s);
 
     //map functions
     void displaymap();

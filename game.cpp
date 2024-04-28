@@ -132,14 +132,14 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
     //testing comment when done
-    blinky->gridPos[0][0] = 15;
-    blinky->gridPos[0][1] = 9;
-    inky->gridPos[0][0] = 15;
-    inky->gridPos[0][1] = 9;
-    pinky->gridPos[0][0] = 15;
-    pinky->gridPos[0][1] = 9;
-    clyde->gridPos[0][0] =15;
-    clyde->gridPos[0][1] =9;
+    // blinky->gridPos[0][0] = 15;
+    // blinky->gridPos[0][1] = 9;
+    // inky->gridPos[0][0] = 15;
+    // inky->gridPos[0][1] = 9;
+    // pinky->gridPos[0][0] = 15;
+    // pinky->gridPos[0][1] = 9;
+    // clyde->gridPos[0][0] =15;
+    // clyde->gridPos[0][1] =9;
     //Initialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
@@ -480,10 +480,19 @@ void Game::update()
     clyde->gridPos[0][1] = returnrow(clyde->mBody);
     //Moving
     mPlyr->controls();
-    findPath(blinky);
-    findPath(inky);
-    findPath(pinky);
-    findPath(clyde);
+    if (!inghosthouse(blinky->mBody)){
+        findPath(blinky);
+    }
+    if (!inghosthouse(inky->mBody)){
+        findPath(inky);
+    }
+    if (!inghosthouse(pinky->mBody)){
+        findPath(pinky);
+    }
+    if (!inghosthouse(clyde->mBody)){
+        findPath(clyde);
+    }
+    spawn();
     choosePath(blinky);
     choosePath(inky);
     choosePath(pinky);
@@ -498,22 +507,22 @@ void Game::update()
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
     }
-    if (isClear(blinky->mDir, blinky->mBody) || blinky->state == dead)
+    if ((isClear(blinky->mDir, blinky->mBody) || blinky->state == dead) && blinky->spawned)
     {
         blinky->move(getgridx(returncol(blinky->mBody)), getgridy(returnrow(blinky->mBody)));
         blinky->animate();
     }
-    if (isClear(pinky->mDir, pinky->mBody) || pinky->state == dead)
+    if ((isClear(pinky->mDir, pinky->mBody) || pinky->state == dead) && pinky->spawned)
     {
         pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
         pinky->animate();
     }
-    if (isClear(inky->mDir, inky->mBody) || inky->state == dead)
+    if ((isClear(inky->mDir, inky->mBody) || inky->state == dead) && inky->spawned)
     {
         inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
         inky->animate();
     }
-    if (isClear(clyde->mDir, clyde->mBody) || clyde->state == dead)
+    if ((isClear(clyde->mDir, clyde->mBody) || clyde->state == dead) && clyde->spawned)
     {
         clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
         clyde->animate();
@@ -638,24 +647,28 @@ void Game::update()
         blinky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
+        blinky->spawned = false;
     }
     else if (mPlyr->gridPos[0][0] == inky->gridPos[0][0] && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && inky->state == panic)
     {
         inky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
+        inky->spawned = false;
     }
     else if(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && pinky->state == panic)
     {
         pinky->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
+        pinky->spawned = false;
     }
     else if (mPlyr->gridPos[0][0] == clyde->gridPos[0][0] && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && clyde->state == panic)
     {
         clyde->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
+        clyde->spawned = false;
     }
 
     //Counts down states
@@ -759,14 +772,16 @@ bool Game::isClear(direction dir, sf::Sprite sprite)
 {
     int x = returncol(sprite);
     int y = returnrow(sprite);
-    if (
-        (dir == up && grid[y - 1][x] == 'w')
-    || (dir == down && grid[y + 1][x] == 'w')  
-    || (dir == right && grid[y][x + 1] == 'w')  
-    || (dir == left && grid[y][x - 1] == 'w')
-    )
-    {
-        return false;
+    if (!inghosthouse(sprite)){
+        if (
+            (dir == up && grid[y - 1][x] == 'w')
+        || (dir == down && grid[y + 1][x] == 'w')  
+        || (dir == right && grid[y][x + 1] == 'w')  
+        || (dir == left && grid[y][x - 1] == 'w')
+        )
+        {
+            return false;
+        }
     }
     return true;
     
@@ -1093,15 +1108,8 @@ void Game::Ghosts::stateCountDown()
  */
 void Game::respawnGhost(Ghosts * ghost)
 {
-    if (ghost->gridPos[0][1] == ghost->objPos[0][1])
-    {
-        findPath(ghost);
-    }
-    else
-    {
-        ghost->mDir = up;
-    }
-    
+    movetospawn(ghost);
+    ghost->spawned = true;
 }
 /**
  * @brief Sets ghost objective based on its state and which ghost it is
@@ -1198,7 +1206,7 @@ void Game::findPath(Ghosts * ghost)
     {
         ghost->mvSpeed = 2.5 * scale;
         ghost->objPos[0][0] = 15;
-        ghost->objPos[0][1] = 13;
+        ghost->objPos[0][1] = 14;
     }    
 }
 /**
@@ -1330,7 +1338,12 @@ void Game::choosePath(Ghosts * ghost)
     )
     {
         ghost->mDir = right;
+    } else if (inghosthouse(ghost->mBody) && x > targetX){
+        ghost->mDir = left;
+    } else if (inghosthouse(ghost->mBody) && x < targetX){
+        ghost->mDir = right;
     }
+
     else
     {
         for (size_t i = 0; i < 4; i++)
@@ -1699,5 +1712,53 @@ void Game::teleport(sf::Sprite &s){
     } else if (returnrow(s) == 16 && returncol(s) == 30){
         s.setPosition(getgridx(1), getgridy(16));
         mPlyr->mDir = right;
+    }
+}
+/**
+ * @brief Spawn all ghosts
+ * 
+ */
+void Game::spawn(){
+    if (!inky->spawned){
+        movetospawn(inky);
+        inky->spawned = true;
+    }
+    if ((dots <= MAX_DOTS * .7) && !blinky->spawned){
+        movetospawn(blinky);
+        blinky->spawned = true;
+    }
+
+    if (blinky->spawned && !pinky->spawned && !(inghosthouse(blinky->mBody))){
+        movetospawn(pinky);
+        pinky->spawned = true;
+    }
+
+    if (!clyde->spawned && dots <= MAX_DOTS * 0.3){
+        movetospawn(clyde);
+        clyde->spawned = true;
+    }
+}
+/**
+ * @brief Move ghost to spawnpoint
+ * 
+ * @param ghost 
+ */
+void Game::movetospawn(Ghosts *ghost){
+    ghost->objPos[0][0] = 15;
+    ghost->objPos[0][1] = 14;
+    choosePath(ghost);
+}
+/**
+ * @brief Test if ghost is inside ghost house
+ * 
+ * @param s 
+ * @return true 
+ * @return false 
+ */
+bool Game::inghosthouse(sf::Sprite s){
+    if (returnrow(s) < 18 && returnrow(s) > 10 && returncol(s) < 24 && returncol(s) > 7){
+        return true;
+    } else {
+        return false;
     }
 }
