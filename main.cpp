@@ -9,12 +9,14 @@
  * 
  */
 #include "game.h"
+#include "GUI.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 int main()
 {
     int lives = 3;          //Used to keep track of when lives change
     Game game;
+    GUI gui;
     srand(time(NULL));
     //game.displaygrid(); //Uncomment to test and display grid
     //Displays menu and pauses game
@@ -44,6 +46,7 @@ int main()
             {
                 timeSinceLastUpdate -= TIME_PER_FRAME;
                 game.update();
+                gui.updateGui();
                 //When players live is 4 it will update the lives counter
                 if (game.getLives() > lives)
                 {
