@@ -145,10 +145,10 @@ public:
 
     //Game objects
     Player * mPlyr = nullptr;   //Player
-    Ghosts * inky = nullptr;    //blue ghost
-    Ghosts * blinky = nullptr;  //red ghost
-    Ghosts * pinky = nullptr;   //pink ghost
-    Ghosts * clyde = nullptr;   //orange ghost
+    Ghosts * ghost1 = nullptr;  //red ghost
+    Ghosts * ghost2 = nullptr;   //pink ghost
+    Ghosts * ghost3 = nullptr;    //blue ghost
+    Ghosts * ghost4 = nullptr;   //orange ghost
     Fruit * fruit = nullptr;    //fruit
     Pellets * pellets[MAX_DOTS];//Array of pellets
     Pellets * sPellets[4];      //Array of super pellets

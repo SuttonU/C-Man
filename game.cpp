@@ -47,76 +47,76 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     scale = (mWindow.getSize().y * 1.0 )/248.0;
     scale -= scale / 10.0;
     //Create characters
-    blinky = new Ghosts;
-    inky = new Ghosts;
-    pinky = new Ghosts;
-    clyde = new Ghosts;
+    ghost1 = new Ghosts;
+    ghost3 = new Ghosts;
+    ghost2 = new Ghosts;
+    ghost4 = new Ghosts;
     mPlyr = new Player;
     fruit = new Fruit;
     //Set textures
-    blinky->mBody.setTexture(mTextureFile);
-    blinky->mEyes.setTexture(mTextureFile);
-    inky->mBody.setTexture(mTextureFile);
-    inky->mEyes.setTexture(mTextureFile);
-    pinky->mBody.setTexture(mTextureFile);
-    pinky->mEyes.setTexture(mTextureFile);
-    clyde->mBody.setTexture(mTextureFile);
-    clyde->mEyes.setTexture(mTextureFile);
+    ghost1->mBody.setTexture(mTextureFile);
+    ghost1->mEyes.setTexture(mTextureFile);
+    ghost3->mBody.setTexture(mTextureFile);
+    ghost3->mEyes.setTexture(mTextureFile);
+    ghost2->mBody.setTexture(mTextureFile);
+    ghost2->mEyes.setTexture(mTextureFile);
+    ghost4->mBody.setTexture(mTextureFile);
+    ghost4->mEyes.setTexture(mTextureFile);
     mPlyr->mSprite.setTexture(mTextureFile);
     fruit->mSprite.setTexture(mTextureFile);
     //Scale textures
     map.setScale(scale, scale);
 
     mPlyr->mSprite.setScale(scale, scale);
-    blinky->mBody.setScale(scale, scale);
-    blinky->mEyes.setScale(scale, scale);
-    inky->mBody.setScale(scale, scale);
-    inky->mEyes.setScale(scale, scale);
-    pinky->mBody.setScale(scale, scale);
-    pinky->mEyes.setScale(scale, scale);
-    clyde->mBody.setScale(scale, scale);
-    clyde->mEyes.setScale(scale, scale);
+    ghost1->mBody.setScale(scale, scale);
+    ghost1->mEyes.setScale(scale, scale);
+    ghost3->mBody.setScale(scale, scale);
+    ghost3->mEyes.setScale(scale, scale);
+    ghost2->mBody.setScale(scale, scale);
+    ghost2->mEyes.setScale(scale, scale);
+    ghost4->mBody.setScale(scale, scale);
+    ghost4->mEyes.setScale(scale, scale);
     fruit->mSprite.setScale(scale, scale);
     setgridorigin();
     //Set positions
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
-    blinky->mBody.setPosition(getgridx(10), getgridy(14));
-    inky->mBody.setPosition(getgridx(17), getgridy(14));
-    pinky->mBody.setPosition(getgridx(13), getgridy(14));
-    clyde->mBody.setPosition(getgridx(20), getgridy(14));
+    ghost1->mBody.setPosition(getgridx(10), getgridy(14));
+    ghost3->mBody.setPosition(getgridx(17), getgridy(14));
+    ghost2->mBody.setPosition(getgridx(13), getgridy(14));
+    ghost4->mBody.setPosition(getgridx(20), getgridy(14));
     fruit->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->gridPos[0][0] = 15;
     mPlyr->gridPos[0][1] = 19;
-    blinky->gridPos[0][0] = 10;
-    blinky->gridPos[0][1] = 14;
-    inky->gridPos[0][0] = 17;
-    inky->gridPos[0][1] = 14;
-    pinky->gridPos[0][0] = 13;
-    pinky->gridPos[0][1] = 14;
-    clyde->gridPos[0][0] = 20;
-    clyde->gridPos[0][1] = 14;
+    ghost1->gridPos[0][0] = 10;
+    ghost1->gridPos[0][1] = 14;
+    ghost3->gridPos[0][0] = 17;
+    ghost3->gridPos[0][1] = 14;
+    ghost2->gridPos[0][0] = 13;
+    ghost2->gridPos[0][1] = 14;
+    ghost4->gridPos[0][0] = 20;
+    ghost4->gridPos[0][1] = 14;
     fruit->gridPos[0][0] = 15;
     fruit->gridPos[0][1] = 19;
     //Set frames
-    blinky->frames[0] = 0;
-    blinky->frames[1] = 16;
-    pinky->frames[0] = 32;
-    pinky->frames[1] = 48;
-    inky->frames[0] = 64;
-    inky->frames[1] = 80;
-    clyde->frames[0] = 96;
-    clyde->frames[1] = 112;
+    ghost1->frames[0] = 0;
+    ghost1->frames[1] = 16;
+    ghost2->frames[0] = 32;
+    ghost2->frames[1] = 48;
+    ghost3->frames[0] = 64;
+    ghost3->frames[1] = 80;
+    ghost4->frames[0] = 96;
+    ghost4->frames[1] = 112;
     //Set starting frames
-    pinky->mBody.setTextureRect(sf::IntRect(32, 16, 16, 16));
-    inky->mBody.setTextureRect(sf::IntRect(64, 16, 16, 16));
-    clyde->mBody.setTextureRect(sf::IntRect(96, 16, 16, 16));
+    ghost2->mBody.setTextureRect(sf::IntRect(32, 16, 16, 16));
+    ghost3->mBody.setTextureRect(sf::IntRect(64, 16, 16, 16));
+    ghost4->mBody.setTextureRect(sf::IntRect(96, 16, 16, 16));
     mPlyr->mSprite.setTextureRect(sf::IntRect(32, 0, 16, 16));
     //Set up grid and dots
     //Set up map tokens
-    blinky->mapToken = 'b';
-    inky->mapToken = 'i';
-    pinky->mapToken = 'p';
-    clyde-> mapToken = 'c';
+    ghost1->mapToken = '1';
+    ghost3->mapToken = '3';
+    ghost2->mapToken = '2';
+    ghost4-> mapToken = '4';
     initializegrid();
     setUpDots();
     //GUI Set up
@@ -132,23 +132,23 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
     score.setOrigin(score.getGlobalBounds().width, 0);
     score.setPosition(mWindow.getSize().x, 0);
     //testing comment when done
-    // blinky->gridPos[0][0] = 15;
-    // blinky->gridPos[0][1] = 9;
-    // inky->gridPos[0][0] = 15;
-    // inky->gridPos[0][1] = 9;
-    // pinky->gridPos[0][0] = 15;
-    // pinky->gridPos[0][1] = 9;
-    // clyde->gridPos[0][0] =15;
-    // clyde->gridPos[0][1] =9;
+    // ghost1->gridPos[0][0] = 15;
+    // ghost1->gridPos[0][1] = 9;
+    // ghost3->gridPos[0][0] = 15;
+    // ghost3->gridPos[0][1] = 9;
+    // ghost2->gridPos[0][0] = 15;
+    // ghost2->gridPos[0][1] = 9;
+    // ghost4->gridPos[0][0] =15;
+    // ghost4->gridPos[0][1] =9;
     //Initialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
         for (int j = 0; j < GRID_SIZE_X; j++)
         {
-            blinky->map[i][j] = ' ';
-            pinky->map[i][j] = ' ';
-            inky->map[i][j] = ' ';
-            clyde->map[i][j] = ' ';
+            ghost1->map[i][j] = ' ';
+            ghost2->map[i][j] = ' ';
+            ghost3->map[i][j] = ' ';
+            ghost4->map[i][j] = ' ';
         }
     }
     instructions.setFont(font);
@@ -231,34 +231,34 @@ void Game::windowEvents()
             scale = (mWindow.getSize().y * 1.0 )/312.0;
             //Scale movement speed
             mPlyr->mvSpeed = 1.25 * scale;
-            blinky->mvSpeed = 1.25 * scale;
-            pinky->mvSpeed = 1.25 * scale;
-            inky->mvSpeed = 1.25 * scale;
-            clyde->mvSpeed = 1.25 * scale;
+            ghost1->mvSpeed = 1.25 * scale;
+            ghost2->mvSpeed = 1.25 * scale;
+            ghost3->mvSpeed = 1.25 * scale;
+            ghost4->mvSpeed = 1.25 * scale;
             //Scale sprites
             map.setScale(scale, scale);
             mPlyr->mSprite.setScale(scale, scale);
-            blinky->mBody.setScale(scale, scale);
-            blinky->mEyes.setScale(scale, scale);
-            pinky->mBody.setScale(scale, scale);
-            pinky->mEyes.setScale(scale, scale);
-            inky->mBody.setScale(scale, scale);
-            inky->mEyes.setScale(scale, scale);
-            clyde->mBody.setScale(scale, scale);
-            clyde->mEyes.setScale(scale, scale);
+            ghost1->mBody.setScale(scale, scale);
+            ghost1->mEyes.setScale(scale, scale);
+            ghost2->mBody.setScale(scale, scale);
+            ghost2->mEyes.setScale(scale, scale);
+            ghost3->mBody.setScale(scale, scale);
+            ghost3->mEyes.setScale(scale, scale);
+            ghost4->mBody.setScale(scale, scale);
+            ghost4->mEyes.setScale(scale, scale);
             fruit->mSprite.setScale(scale, scale);
             //Scale positions
             map.setPosition(mWindow.getSize().x / 2, mWindow.getSize().y / 2);
             setgridorigin();
             mPlyr->mSprite.setPosition(getgridx(mPlyr->gridPos[0][0]), getgridy(mPlyr->gridPos[0][1]));
-            blinky->mBody.setPosition(getgridx(blinky->gridPos[0][0]), getgridy(blinky->gridPos[0][1]));
-            inky->mBody.setPosition(getgridx(inky->gridPos[0][0]), getgridy(inky->gridPos[0][1]));
-            pinky->mBody.setPosition(getgridx(pinky->gridPos[0][0]), getgridy(pinky->gridPos[0][1]));
-            clyde->mBody.setPosition(getgridx(clyde->gridPos[0][0]), getgridy(clyde->gridPos[0][1]));
-            blinky->mEyes.setPosition(getgridx(blinky->gridPos[0][0]), getgridy(blinky->gridPos[0][1]));
-            inky->mEyes.setPosition(getgridx(inky->gridPos[0][0]), getgridy(inky->gridPos[0][1]));
-            pinky->mEyes.setPosition(getgridx(pinky->gridPos[0][0]), getgridy(pinky->gridPos[0][1]));
-            clyde->mEyes.setPosition(getgridx(clyde->gridPos[0][0]), getgridy(clyde->gridPos[0][1]));
+            ghost1->mBody.setPosition(getgridx(ghost1->gridPos[0][0]), getgridy(ghost1->gridPos[0][1]));
+            ghost3->mBody.setPosition(getgridx(ghost3->gridPos[0][0]), getgridy(ghost3->gridPos[0][1]));
+            ghost2->mBody.setPosition(getgridx(ghost2->gridPos[0][0]), getgridy(ghost2->gridPos[0][1]));
+            ghost4->mBody.setPosition(getgridx(ghost4->gridPos[0][0]), getgridy(ghost4->gridPos[0][1]));
+            ghost1->mEyes.setPosition(getgridx(ghost1->gridPos[0][0]), getgridy(ghost1->gridPos[0][1]));
+            ghost3->mEyes.setPosition(getgridx(ghost3->gridPos[0][0]), getgridy(ghost3->gridPos[0][1]));
+            ghost2->mEyes.setPosition(getgridx(ghost2->gridPos[0][0]), getgridy(ghost2->gridPos[0][1]));
+            ghost4->mEyes.setPosition(getgridx(ghost4->gridPos[0][0]), getgridy(ghost4->gridPos[0][1]));
             fruit->mSprite.setPosition(getgridx(fruit->gridPos[0][0]), getgridy(fruit->gridPos[0][1]));
             //Scale dots
             if (dots > 0)
@@ -330,15 +330,15 @@ bool Game::start()
 Game::~Game()
 {
     delete mPlyr;  
-    delete inky;  
-    delete blinky;
-    delete pinky; 
-    delete clyde;
+    delete ghost3;  
+    delete ghost1;
+    delete ghost2; 
+    delete ghost4;
     mPlyr = nullptr; 
-    inky = nullptr;
-    blinky = nullptr;
-    pinky = nullptr; 
-    clyde = nullptr;
+    ghost3 = nullptr;
+    ghost1 = nullptr;
+    ghost2 = nullptr; 
+    ghost4 = nullptr;
     int size = dots;
     for (int i = 0; i < size; i++)
     {
@@ -470,38 +470,38 @@ void Game::update()
     //Update position
     mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
     mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
-    blinky->gridPos[0][0] = returncol(blinky->mBody);
-    blinky->gridPos[0][1] = returnrow(blinky->mBody);
-    inky->gridPos[0][0] = returncol(inky->mBody);
-    inky->gridPos[0][1] = returnrow(inky->mBody);
-    pinky->gridPos[0][0] = returncol(pinky->mBody);
-    pinky->gridPos[0][1] = returnrow(pinky->mBody);
-    clyde->gridPos[0][0] = returncol(clyde->mBody);
-    clyde->gridPos[0][1] = returnrow(clyde->mBody);
+    ghost1->gridPos[0][0] = returncol(ghost1->mBody);
+    ghost1->gridPos[0][1] = returnrow(ghost1->mBody);
+    ghost3->gridPos[0][0] = returncol(ghost3->mBody);
+    ghost3->gridPos[0][1] = returnrow(ghost3->mBody);
+    ghost2->gridPos[0][0] = returncol(ghost2->mBody);
+    ghost2->gridPos[0][1] = returnrow(ghost2->mBody);
+    ghost4->gridPos[0][0] = returncol(ghost4->mBody);
+    ghost4->gridPos[0][1] = returnrow(ghost4->mBody);
     //Counts down states
-    blinky->stateCountDown();
-    inky->stateCountDown();
-    pinky->stateCountDown();
-    clyde->stateCountDown();
+    ghost1->stateCountDown();
+    ghost3->stateCountDown();
+    ghost2->stateCountDown();
+    ghost4->stateCountDown();
     //Moving
     mPlyr->controls();
-    if (!inghosthouse(blinky->mBody)){
-        findPath(blinky);
+    if (!inghosthouse(ghost1->mBody)){
+        findPath(ghost1);
     }
-    if (!inghosthouse(inky->mBody)){
-        findPath(inky);
+    if (!inghosthouse(ghost3->mBody)){
+        findPath(ghost3);
     }
-    if (!inghosthouse(pinky->mBody)){
-        findPath(pinky);
+    if (!inghosthouse(ghost2->mBody)){
+        findPath(ghost2);
     }
-    if (!inghosthouse(clyde->mBody)){
-        findPath(clyde);
+    if (!inghosthouse(ghost4->mBody)){
+        findPath(ghost4);
     }
     spawn();
-    choosePath(blinky);
-    choosePath(inky);
-    choosePath(pinky);
-    choosePath(clyde);
+    choosePath(ghost1);
+    choosePath(ghost3);
+    choosePath(ghost2);
+    choosePath(ghost4);
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir)
     {
@@ -513,26 +513,26 @@ void Game::update()
         mPlyr->animate();
     }
     //Checks if ghosts can move
-    if ((isClear(blinky->mDir, blinky->mBody) || blinky->state == dead) && blinky->spawned)
+    if ((isClear(ghost1->mDir, ghost1->mBody) || ghost1->state == dead) && ghost1->spawned)
     {
-        blinky->move(getgridx(returncol(blinky->mBody)), getgridy(returnrow(blinky->mBody)));
+        ghost1->move(getgridx(returncol(ghost1->mBody)), getgridy(returnrow(ghost1->mBody)));
     }
-    if ((isClear(pinky->mDir, pinky->mBody) || pinky->state == dead) && pinky->spawned)
+    if ((isClear(ghost2->mDir, ghost2->mBody) || ghost2->state == dead) && ghost2->spawned)
     {
-        pinky->move(getgridx(returncol(pinky->mBody)), getgridy(returnrow(pinky->mBody)));
+        ghost2->move(getgridx(returncol(ghost2->mBody)), getgridy(returnrow(ghost2->mBody)));
     }
-    if ((isClear(inky->mDir, inky->mBody) || inky->state == dead) && inky->spawned)
+    if ((isClear(ghost3->mDir, ghost3->mBody) || ghost3->state == dead) && ghost3->spawned)
     {
-        inky->move(getgridx(returncol(inky->mBody)), getgridy(returnrow(inky->mBody)));
+        ghost3->move(getgridx(returncol(ghost3->mBody)), getgridy(returnrow(ghost3->mBody)));
     }
-    if ((isClear(clyde->mDir, clyde->mBody) || clyde->state == dead) && clyde->spawned)
+    if ((isClear(ghost4->mDir, ghost4->mBody) || ghost4->state == dead) && ghost4->spawned)
     {
-        clyde->move(getgridx(returncol(clyde->mBody)), getgridy(returnrow(clyde->mBody)));
+        ghost4->move(getgridx(returncol(ghost4->mBody)), getgridy(returnrow(ghost4->mBody)));
     }
-    blinky->animate();
-    pinky->animate();
-    inky->animate();
-    clyde->animate();
+    ghost1->animate();
+    ghost2->animate();
+    ghost3->animate();
+    ghost4->animate();
     //Eats pellets
     if (dots > 0)
     {
@@ -559,52 +559,52 @@ void Game::update()
             {
                 ghostMult = 1;
                 //Prevents a panicked ghost having 2 panic states or a dead one having a panicked state
-                if (blinky->state != dead)
+                if (ghost1->state != dead)
                 {
-                    if(blinky->state != panic)
+                    if(ghost1->state != panic)
                     {
-                        blinky->prevState = blinky->state;
-                        blinky->prevTime = blinky->stateTime;
+                        ghost1->prevState = ghost1->state;
+                        ghost1->prevTime = ghost1->stateTime;
                     }
-                    blinky->state = panic;
-                    blinky->framecount = 0;
-                    blinky->stateTime = 10.0;
+                    ghost1->state = panic;
+                    ghost1->framecount = 0;
+                    ghost1->stateTime = 10.0;
                 
                 }
-                if (inky->state != dead)
+                if (ghost3->state != dead)
                 {
-                    if (inky->state != panic)
+                    if (ghost3->state != panic)
                     {
-                        inky->prevState = inky->state;
-                        inky->prevTime = inky->stateTime;
+                        ghost3->prevState = ghost3->state;
+                        ghost3->prevTime = ghost3->stateTime;
                     }
-                    inky->state = panic;
-                    inky->framecount = 0;
-                    inky->stateTime = 10.0;
+                    ghost3->state = panic;
+                    ghost3->framecount = 0;
+                    ghost3->stateTime = 10.0;
 
                 }
-                if (pinky->state != dead)
+                if (ghost2->state != dead)
                 {
-                    if (pinky->state != panic)
+                    if (ghost2->state != panic)
                     {
-                        pinky->prevState = pinky->state;
-                        pinky->prevTime = pinky->stateTime;
+                        ghost2->prevState = ghost2->state;
+                        ghost2->prevTime = ghost2->stateTime;
                     }
-                    pinky->state = panic;
-                    pinky->framecount = 0;
-                    pinky->stateTime = 10.0;
+                    ghost2->state = panic;
+                    ghost2->framecount = 0;
+                    ghost2->stateTime = 10.0;
 
                 }
-                if (clyde->state != dead)
+                if (ghost4->state != dead)
                 {
-                    if (clyde->state != panic)
+                    if (ghost4->state != panic)
                     {
-                        clyde->prevState = clyde->state;
-                        clyde->prevTime = clyde->stateTime;
+                        ghost4->prevState = ghost4->state;
+                        ghost4->prevTime = ghost4->stateTime;
                     }
-                    clyde->state = panic;
-                    clyde->framecount = 0;
-                    clyde->stateTime = 10.0;
+                    ghost4->state = panic;
+                    ghost4->framecount = 0;
+                    ghost4->stateTime = 10.0;
                 }
             }
         }
@@ -647,30 +647,42 @@ void Game::update()
 
     //Check for teleportation
     teleport(mPlyr->mSprite);
-    teleport(blinky->mBody);
-    teleport(inky->mBody);
-    teleport(pinky->mBody);
-    teleport(clyde->mBody);
+    teleport(ghost1->mBody);
+    teleport(ghost3->mBody);
+    teleport(ghost2->mBody);
+    teleport(ghost4->mBody);
     
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
     //If they sahre the same tile
-    if ((mPlyr->gridPos[0][0] == blinky->gridPos[0][0] && mPlyr->gridPos[0][1] == blinky->gridPos[0][1] 
-            && (blinky->state != panic && blinky->state != dead))
-    ||(mPlyr->gridPos[0][0] == inky->gridPos[0][0] 
-            && mPlyr->gridPos[0][1] == inky->gridPos[0][1] && (inky->state != panic && inky->state != dead))
-    ||(mPlyr->gridPos[0][0] == pinky->gridPos[0][0] 
-            && mPlyr->gridPos[0][1] == pinky->gridPos[0][1] && (pinky->state != panic && pinky->state != dead))
-    ||(mPlyr->gridPos[0][0] == clyde->gridPos[0][0] 
-            && mPlyr->gridPos[0][1] == clyde->gridPos[0][1] && (clyde->state != panic && clyde->state != dead))
+    //Red ghost
+    if ((mPlyr->gridPos[0][0] == ghost1->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1] 
+            && (ghost1->state != panic && ghost1->state != dead))
+    //blue ghost
+    ||(mPlyr->gridPos[0][0] == ghost3->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == ghost3->gridPos[0][1] 
+            && (ghost3->state != panic && ghost3->state != dead))
+    //pink ghost
+    ||(mPlyr->gridPos[0][0] == ghost2->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == ghost2->gridPos[0][1] 
+            && (ghost2->state != panic && ghost2->state != dead))
+    //orange ghost
+    ||(mPlyr->gridPos[0][0] == ghost4->gridPos[0][0] 
+            && mPlyr->gridPos[0][1] == ghost4->gridPos[0][1] 
+            && (ghost4->state != panic && ghost4->state != dead))
     //If they share the same position
-    || (mPlyr->mSprite.getPosition().x == blinky->mBody.getPosition().x 
-            && mPlyr->mSprite.getPosition().y == blinky->mBody.getPosition().y)
-    || (mPlyr->mSprite.getPosition().x == inky->mBody.getPosition().x 
-            && mPlyr->mSprite.getPosition().y == inky->mBody.getPosition().y)
-    || (mPlyr->mSprite.getPosition().x == pinky->mBody.getPosition().x 
-            && mPlyr->mSprite.getPosition().y == pinky->mBody.getPosition().y)
-    || (mPlyr->mSprite.getPosition().x == clyde->mBody.getPosition().x 
-            && mPlyr->mSprite.getPosition().y == clyde->mBody.getPosition().y))
+    || (mPlyr->mSprite.getPosition().x == ghost1->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == ghost1->mBody.getPosition().y
+            && (ghost1->state != panic && ghost1->state != dead))
+    || (mPlyr->mSprite.getPosition().x == ghost3->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == ghost3->mBody.getPosition().y
+            && (ghost3->state != panic && ghost3->state != dead))
+    || (mPlyr->mSprite.getPosition().x == ghost2->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == ghost2->mBody.getPosition().y
+            && (ghost2->state != panic && ghost2->state != dead))
+    || (mPlyr->mSprite.getPosition().x == ghost4->mBody.getPosition().x 
+            && mPlyr->mSprite.getPosition().y == ghost4->mBody.getPosition().y
+            && (ghost4->state != panic && ghost4->state != dead)))
     {
         deathAnimation();
         lives--;
@@ -679,99 +691,99 @@ void Game::update()
     //These will eat the ghost
     else if (
             (
-            (mPlyr->gridPos[0][0] == blinky->gridPos[0][0]
-                && mPlyr->gridPos[0][1] == blinky->gridPos[0][1])
+            (mPlyr->gridPos[0][0] == ghost1->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1])
             || 
-            (mPlyr->mSprite.getPosition().x == blinky->mBody.getPosition().x 
-                && mPlyr->mSprite.getPosition().y == blinky->mBody.getPosition().y)
+            (mPlyr->mSprite.getPosition().x == ghost1->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == ghost1->mBody.getPosition().y)
             )
-            && blinky->state == panic)
+            && ghost1->state == panic)
     {
-        blinky->state = dead;
+        ghost1->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
-        blinky->spawned = false;
+        ghost1->spawned = false;
     }
     else if (
             (
-            (mPlyr->gridPos[0][0] == inky->gridPos[0][0]
-                && mPlyr->gridPos[0][1] == inky->gridPos[0][1])
+            (mPlyr->gridPos[0][0] == ghost3->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == ghost3->gridPos[0][1])
             || 
-            (mPlyr->mSprite.getPosition().x == inky->mBody.getPosition().x 
-                && mPlyr->mSprite.getPosition().y == inky->mBody.getPosition().y)
+            (mPlyr->mSprite.getPosition().x == ghost3->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == ghost3->mBody.getPosition().y)
             )
-            && inky->state == panic)
+            && ghost3->state == panic)
     {
-        inky->state = dead;
+        ghost3->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
-        inky->spawned = false;
+        ghost3->spawned = false;
     }
     else if(
             (
-            (mPlyr->gridPos[0][0] == pinky->gridPos[0][0]
-                && mPlyr->gridPos[0][1] == pinky->gridPos[0][1])
+            (mPlyr->gridPos[0][0] == ghost2->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == ghost2->gridPos[0][1])
             || 
-            (mPlyr->mSprite.getPosition().x == pinky->mBody.getPosition().x 
-                && mPlyr->mSprite.getPosition().y == pinky->mBody.getPosition().y)
+            (mPlyr->mSprite.getPosition().x == ghost2->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == ghost2->mBody.getPosition().y)
             )
-            && pinky->state == panic)
+            && ghost2->state == panic)
     {
-        pinky->state = dead;
+        ghost2->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
-        pinky->spawned = false;
+        ghost2->spawned = false;
     }
     else if (
             (
-            (mPlyr->gridPos[0][0] == clyde->gridPos[0][0]
-                && mPlyr->gridPos[0][1] == clyde->gridPos[0][1])
+            (mPlyr->gridPos[0][0] == ghost4->gridPos[0][0]
+                && mPlyr->gridPos[0][1] == ghost4->gridPos[0][1])
             || 
-            (mPlyr->mSprite.getPosition().x == clyde->mBody.getPosition().x 
-                && mPlyr->mSprite.getPosition().y == clyde->mBody.getPosition().y)
+            (mPlyr->mSprite.getPosition().x == ghost4->mBody.getPosition().x 
+                && mPlyr->mSprite.getPosition().y == ghost4->mBody.getPosition().y)
             )
-            && clyde->state == panic)
+            && ghost4->state == panic)
     {
-        clyde->state = dead;
+        ghost4->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
-        clyde->spawned = false;
+        ghost4->spawned = false;
     }
 
     
     //Revive dead ghosts
     //If a ghost is dead and its position is in the ghost house it will be set to the previous state
-    if (blinky->state == dead 
-    && blinky->gridPos[0][0] == blinky->objPos[0][0] 
-    && blinky->gridPos[0][1] == blinky->objPos[0][1])
+    if (ghost1->state == dead 
+    && ghost1->gridPos[0][0] == ghost1->objPos[0][0] 
+    && ghost1->gridPos[0][1] == ghost1->objPos[0][1])
     {
-        blinky->state = blinky->prevState;
-        blinky->objPos[0][1] = 9;
-        respawnGhost(blinky);
+        ghost1->state = ghost1->prevState;
+        ghost1->objPos[0][1] = 9;
+        respawnGhost(ghost1);
     }
-    if (pinky->state == dead 
-    && pinky->gridPos[0][0] == pinky->objPos[0][0] 
-    && pinky->gridPos[0][1] == pinky->objPos[0][1])
+    if (ghost2->state == dead 
+    && ghost2->gridPos[0][0] == ghost2->objPos[0][0] 
+    && ghost2->gridPos[0][1] == ghost2->objPos[0][1])
     {
-        pinky->state = pinky->prevState;
-        blinky->objPos[0][1] = 9;
-        respawnGhost(pinky);
+        ghost2->state = ghost2->prevState;
+        ghost1->objPos[0][1] = 9;
+        respawnGhost(ghost2);
     }
-    if (inky->state == dead 
-    && inky->gridPos[0][0] == inky->objPos[0][0] 
-    && inky->gridPos[0][1] == inky->objPos[0][1])
+    if (ghost3->state == dead 
+    && ghost3->gridPos[0][0] == ghost3->objPos[0][0] 
+    && ghost3->gridPos[0][1] == ghost3->objPos[0][1])
     {
-        inky->state = inky->prevState;
-        blinky->objPos[0][1] = 9;
-        respawnGhost(inky);
+        ghost3->state = ghost3->prevState;
+        ghost1->objPos[0][1] = 9;
+        respawnGhost(ghost3);
     }
-    if (clyde->state == dead 
-    && clyde->gridPos[0][0] == clyde->objPos[0][0] 
-    && clyde->gridPos[0][1] == clyde->objPos[0][1])
+    if (ghost4->state == dead 
+    && ghost4->gridPos[0][0] == ghost4->objPos[0][0] 
+    && ghost4->gridPos[0][1] == ghost4->objPos[0][1])
     {
-        clyde->state = clyde->prevState;
-        blinky->objPos[0][1] = 9;
-        respawnGhost(clyde);
+        ghost4->state = ghost4->prevState;
+        ghost1->objPos[0][1] = 9;
+        respawnGhost(ghost4);
     }
     updateGUI();
 }
@@ -812,10 +824,10 @@ void Game::render()
         mWindow.draw(fruit->mSprite);
     }
     
-    drawGhost(blinky);
-    drawGhost(inky);
-    drawGhost(pinky);
-    drawGhost(clyde);
+    drawGhost(ghost1);
+    drawGhost(ghost3);
+    drawGhost(ghost2);
+    drawGhost(ghost4);
     mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
@@ -873,59 +885,59 @@ void Game::reset(bool dead)
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
     mPlyr->mSprite.setTextureRect(sf::IntRect(32, 0, 16 ,16));
-    blinky->mBody.setTextureRect(sf::IntRect(blinky->frames[0], 16, 16 ,16));
-    pinky->mBody.setTextureRect(sf::IntRect(pinky->frames[0], 16, 16 ,16));
-    inky->mBody.setTextureRect(sf::IntRect(inky->frames[0], 16, 16 ,16));
-    clyde->mBody.setTextureRect(sf::IntRect(clyde->frames[0], 16, 16 ,16));
-    blinky->mBody.setPosition(getgridx(15), getgridy(9));
-    inky->mBody.setPosition(getgridx(17), getgridy(14));
-    pinky->mBody.setPosition(getgridx(13), getgridy(14));
-    clyde->mBody.setPosition(getgridx(20), getgridy(14));
-    blinky->mEyes.setPosition(getgridx(15), getgridy(9));
-    inky->mEyes.setPosition(getgridx(17), getgridy(14));
-    pinky->mEyes.setPosition(getgridx(13), getgridy(14));
-    clyde->mEyes.setPosition(getgridx(20), getgridy(14));
+    ghost1->mBody.setTextureRect(sf::IntRect(ghost1->frames[0], 16, 16 ,16));
+    ghost2->mBody.setTextureRect(sf::IntRect(ghost2->frames[0], 16, 16 ,16));
+    ghost3->mBody.setTextureRect(sf::IntRect(ghost3->frames[0], 16, 16 ,16));
+    ghost4->mBody.setTextureRect(sf::IntRect(ghost4->frames[0], 16, 16 ,16));
+    ghost1->mBody.setPosition(getgridx(15), getgridy(9));
+    ghost3->mBody.setPosition(getgridx(17), getgridy(14));
+    ghost2->mBody.setPosition(getgridx(13), getgridy(14));
+    ghost4->mBody.setPosition(getgridx(20), getgridy(14));
+    ghost1->mEyes.setPosition(getgridx(15), getgridy(9));
+    ghost3->mEyes.setPosition(getgridx(17), getgridy(14));
+    ghost2->mEyes.setPosition(getgridx(13), getgridy(14));
+    ghost4->mEyes.setPosition(getgridx(20), getgridy(14));
     //Set grid pos
     mPlyr->gridPos[0][0] = 15;
     mPlyr->gridPos[0][1] = 19;
-    blinky->gridPos[0][0] = 9;
-    pinky->gridPos[0][0] = 17;
-    inky->gridPos[0][0] = 13;
-    clyde->gridPos[0][0] = 20;
-    blinky->gridPos[0][1] = 15;
-    pinky->gridPos[0][1] = 14;
-    inky->gridPos[0][1] = 14;
-    clyde->gridPos[0][1] = 14;
+    ghost1->gridPos[0][0] = 9;
+    ghost2->gridPos[0][0] = 17;
+    ghost3->gridPos[0][0] = 13;
+    ghost4->gridPos[0][0] = 20;
+    ghost1->gridPos[0][1] = 15;
+    ghost2->gridPos[0][1] = 14;
+    ghost3->gridPos[0][1] = 14;
+    ghost4->gridPos[0][1] = 14;
 
     //Reset states
-    blinky->state = scatter;
-    pinky->state = scatter;
-    inky->state = scatter;
-    clyde->state = scatter;
-    blinky->stateTime = 7.0;
-    pinky->stateTime = 7.0;
-    inky->stateTime = 7.0;
-    clyde->stateTime = 7.0;
+    ghost1->state = scatter;
+    ghost2->state = scatter;
+    ghost3->state = scatter;
+    ghost4->state = scatter;
+    ghost1->stateTime = 7.0;
+    ghost2->stateTime = 7.0;
+    ghost3->stateTime = 7.0;
+    ghost4->stateTime = 7.0;
     //reset mdir
     mPlyr->mDir = left;
     mPlyr->bufferDir = left;
-    blinky->mDir = left;
-    pinky->mDir = left;
-    inky->mDir = left;
-    clyde->mDir = left;
+    ghost1->mDir = left;
+    ghost2->mDir = left;
+    ghost3->mDir = left;
+    ghost4->mDir = left;
     //Reset spawned
-    inky->spawned = false;
-    pinky->spawned = false;
-    clyde->spawned = false;
+    ghost3->spawned = false;
+    ghost2->spawned = false;
+    ghost4->spawned = false;
     //Reinitialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
         for (int j = 0; j < GRID_SIZE_X; j++)
         {
-            blinky->map[i][j] = ' ';
-            pinky->map[i][j] = ' ';
-            inky->map[i][j] = ' ';
-            clyde->map[i][j] = ' ';
+            ghost1->map[i][j] = ' ';
+            ghost2->map[i][j] = ' ';
+            ghost3->map[i][j] = ' ';
+            ghost4->map[i][j] = ' ';
         }
     }
     //If player died the dots will not reset
@@ -1213,7 +1225,7 @@ void Game::findPath(Ghosts * ghost)
             }
         } else if (ghost->frames[0] == 64)
         {
-            //This is inkys complicated mess of finding his target tile
+            //This is ghost3s complicated mess of finding his target tile
             int x = mPlyr->gridPos[0][0];
             int y = mPlyr->gridPos[0][1];
 
@@ -1231,8 +1243,8 @@ void Game::findPath(Ghosts * ghost)
                 x += 2;
             }
 
-            x = (x - blinky->gridPos[0][0]) * 2 + blinky->gridPos[0][0];
-            y = (y - blinky->gridPos[0][1]) * 2 + blinky->gridPos[0][1];
+            x = (x - ghost1->gridPos[0][0]) * 2 + ghost1->gridPos[0][0];
+            y = (y - ghost1->gridPos[0][1]) * 2 + ghost1->gridPos[0][1];
             ghost->objPos[0][0] = x;
             ghost->objPos[0][1] = y;
 
@@ -1676,10 +1688,10 @@ void Game::initializegrid(){
         }
     }
     grid[19][15] = 's';
-    grid[14][10] = 'r';
-    grid[14][13] = 'b';
-    grid[14][17] = 'p';
-    grid[14][20] = 'o';
+    grid[14][10] = '1';
+    grid[14][13] = '2';
+    grid[14][17] = '3';
+    grid[14][20] = '4';
 }
 /**
  * @brief Function to initialize part of grid.
@@ -1788,21 +1800,21 @@ void Game::teleport(sf::Sprite &s){
  * 
  */
 void Game::spawn(){
-    if (!blinky->spawned){
-        movetospawn(blinky);
-        blinky->spawned = true;
+    if (!ghost1->spawned){
+        movetospawn(ghost1);
+        ghost1->spawned = true;
     }
-    else if (blinky->spawned && !pinky->spawned && !(inghosthouse(blinky->mBody))){
-        movetospawn(pinky);
-        pinky->spawned = true;
+    else if (ghost1->spawned && !ghost2->spawned && !(inghosthouse(ghost1->mBody))){
+        movetospawn(ghost2);
+        ghost2->spawned = true;
     }
-    else if ((dots <= MAX_DOTS * .7 || fruit->level >= 4) && !inky->spawned && !(inghosthouse(blinky->mBody) || inghosthouse(pinky->mBody))){
-        movetospawn(inky);
-        inky->spawned = true;
+    else if ((dots <= MAX_DOTS * .7 || fruit->level >= 4) && !ghost3->spawned && !(inghosthouse(ghost1->mBody) || inghosthouse(ghost2->mBody))){
+        movetospawn(ghost3);
+        ghost3->spawned = true;
     }
-    else if (!clyde->spawned && (dots <= MAX_DOTS * 0.3  || fruit->level >= 4) && !(inghosthouse(blinky->mBody) || inghosthouse(pinky->mBody) || inghosthouse(inky->mBody))){
-        movetospawn(clyde);
-        clyde->spawned = true;
+    else if (!ghost4->spawned && (dots <= MAX_DOTS * 0.3  || fruit->level >= 4) && !(inghosthouse(ghost1->mBody) || inghosthouse(ghost2->mBody) || inghosthouse(ghost3->mBody))){
+        movetospawn(ghost4);
+        ghost4->spawned = true;
     }
 }
 /**
