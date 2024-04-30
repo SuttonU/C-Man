@@ -26,7 +26,7 @@ const int GRID_SIZE_Y = 33;
 const int MAX_DOTS = 210;
 class Game
 {
-private:
+protected:
     //Game data
     sf::RenderWindow mWindow;
     bool play = false;
@@ -78,6 +78,7 @@ private:
 public: 
     //Game functions
     Game();
+    Game(int mt) {};
     ~Game();
     void windowEvents();
     void update();
