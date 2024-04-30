@@ -16,6 +16,7 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 #include <time.h>
+#include <fstream>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -33,6 +34,7 @@ private:
     int lives;
     int xtraLive;
     int points = 0;
+    int highscore;
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
@@ -42,11 +44,15 @@ private:
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
+    sf::Sprite plyrLives;
+    sf::Sprite life;
     sf::Texture texture;
     sf::Font font;
     sf::Text playbutton;
     sf::Text infobutton;
-    sf::Text score;
+    sf::Text scoreGui;
+    sf::Text highscoreGui;
+    sf::Text gameLevel;
     sf::Text backbutton;
     sf::Text instructions;
     //map data
@@ -56,6 +62,7 @@ private:
     char grid[GRID_SIZE_Y][GRID_SIZE_X];    //Main grid used to check for portals
     float gridoriginx;
     float gridoriginy;
+    std::fstream highscoreSave;
     
 public: 
     //Game functions
@@ -68,12 +75,12 @@ public:
     void deathAnimation();
     void setUpDots();
     void displayGUI();
-    void updateGUI();
     bool isDone() const;
     bool start();
     int  getDots() const;
     int getLives() const;
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
+    void updateGui();
     sf::Texture mTextureFile;
     
 
@@ -99,7 +106,7 @@ public:
         sf::Sprite mBody;                       //Ghost body
         sf::Sprite mEyes;                       //Ghost eyes
         float mvSpeed = 1.5;                    //Ghost movement speed
-        float stateTime = 4.0;                        //Time for ghost to be in panic mode
+        float stateTime = 7.0;                        //Time for ghost to be in panic mode
         float prevTime;                         //Previous timer for ghost state
         int frames[2] = {0, 16};                //Ghost's animation frames
         int panicFrames[4] = {10*16, 11*16, 8*16, 9 * 16};    //Frames for ghost panic
@@ -145,10 +152,10 @@ public:
 
     //Game objects
     Player * mPlyr = nullptr;   //Player
-    Ghosts * inky = nullptr;    //blue ghost
-    Ghosts * blinky = nullptr;  //red ghost
-    Ghosts * pinky = nullptr;   //pink ghost
-    Ghosts * clyde = nullptr;   //orange ghost
+    Ghosts * ghost1 = nullptr;  //red ghost
+    Ghosts * ghost2 = nullptr;   //pink ghost
+    Ghosts * ghost3 = nullptr;    //blue ghost
+    Ghosts * ghost4 = nullptr;   //orange ghost
     Fruit * fruit = nullptr;    //fruit
     Pellets * pellets[MAX_DOTS];//Array of pellets
     Pellets * sPellets[4];      //Array of super pellets
