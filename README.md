@@ -1,4 +1,7 @@
 # C-Man
+
+![Pac-Man](https://coagulopath.com/wp-content/uploads/2023/08/pokemon.jpg)
+
 This project is a recreation of Namco's 1980 arcade game "Pac-Man", consisting of Pac-Man (The player), and four colored ghosts that chase the player
 
 ## Rules
