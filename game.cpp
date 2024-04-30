@@ -1300,7 +1300,7 @@ void Game::findPath(Ghosts * ghost)
     //If its panic they will move random directions
     else if (ghost->state == panic)
     {
-        //Slow down and randomize direction
+        //Slow down
         ghost->mvSpeed = 0.75 * scale;
     }
     //If their dead they will go to spawn
