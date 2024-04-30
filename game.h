@@ -96,6 +96,7 @@ public:
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
         void controls();                        //Changes sprites direction
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
     };
 
     struct Ghosts : public sf::Window
@@ -147,6 +148,7 @@ public:
         int gridPos[2][1];
         int values[8] = {10, 30, 50, 70, 100, 200, 300, 500};
         bool spawned = false;
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
 
     };
 
@@ -166,13 +168,13 @@ public:
     bool updatemenu();
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
-    void drawGhost(Ghosts * ghost);
     void findPath(Ghosts * ghost);
     void choosePath(Ghosts * ghost);
     void respawnGhost(Ghosts * ghost);                         //Used to respawn the ghost once it reaches the cage
     void movetospawn(Ghosts *ghost);                           //Moves ghost from ghost house to outside ghost house.
     void spawn();                                              //Initially spawns all ghosts.
     bool inghosthouse(sf::Sprite s);
+    virtual void draw(sf::RenderTarget& target, Pellets * pellets[MAX_DOTS], int size, sf::RenderStates status = sf::RenderStates::Default) const;
 
     //map functions
     void displaymap();

@@ -471,24 +471,7 @@ bool Game::isDone() const
  */
 void Game::update()
 {
-    //Update position
-    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
-    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
-    ghost1->gridPos[0][0] = returncol(ghost1->mBody);
-    ghost1->gridPos[0][1] = returnrow(ghost1->mBody);
-    ghost3->gridPos[0][0] = returncol(ghost3->mBody);
-    ghost3->gridPos[0][1] = returnrow(ghost3->mBody);
-    ghost2->gridPos[0][0] = returncol(ghost2->mBody);
-    ghost2->gridPos[0][1] = returnrow(ghost2->mBody);
-    ghost4->gridPos[0][0] = returncol(ghost4->mBody);
-    ghost4->gridPos[0][1] = returnrow(ghost4->mBody);
-    //Counts down states
-    ghost1->stateCountDown();
-    ghost3->stateCountDown();
-    ghost2->stateCountDown();
-    ghost4->stateCountDown();
-    //Moving
-    mPlyr->controls();
+    
     if (!inghosthouse(ghost1->mBody)){
         findPath(ghost1);
     }
@@ -506,6 +489,19 @@ void Game::update()
     choosePath(ghost3);
     choosePath(ghost2);
     choosePath(ghost4);
+    //Update position
+    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
+    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
+    ghost1->gridPos[0][0] = returncol(ghost1->mBody);
+    ghost1->gridPos[0][1] = returnrow(ghost1->mBody);
+    ghost3->gridPos[0][0] = returncol(ghost3->mBody);
+    ghost3->gridPos[0][1] = returnrow(ghost3->mBody);
+    ghost2->gridPos[0][0] = returncol(ghost2->mBody);
+    ghost2->gridPos[0][1] = returnrow(ghost2->mBody);
+    ghost4->gridPos[0][0] = returncol(ghost4->mBody);
+    ghost4->gridPos[0][1] = returnrow(ghost4->mBody);
+    //Moving
+    mPlyr->controls();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir)
     {
@@ -548,6 +544,7 @@ void Game::update()
             if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
             {
                 points += 1;
+                break;
             }      
         }
     }    
@@ -610,6 +607,7 @@ void Game::update()
                     ghost4->framecount = 0;
                     ghost4->stateTime = 10.0;
                 }
+                break;
             }
         }
     }
@@ -631,33 +629,14 @@ void Game::update()
         }
         
     }
+    
     //eats the fruit
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
         points += eatFruit(fruit);
     }
-    //Spawns a fruit when dots are at 70 and 170
-    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
-    {
-        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
-        fruit->spawned = true;
-    }
-    //Adds extra life at 10k points
-    if (points >= 1000 && xtraLive == 0)
-    {
-        lives++;
-        xtraLive = 1;
-    }
-
-    //Check for teleportation
-    teleport(mPlyr->mSprite);
-    teleport(ghost1->mBody);
-    teleport(ghost3->mBody);
-    teleport(ghost2->mBody);
-    teleport(ghost4->mBody);
-    
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
-    //If they sahre the same tile
+    //If they share the same tile
     //Red ghost
     if ((mPlyr->gridPos[0][0] == ghost1->gridPos[0][0] 
             && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1] 
@@ -693,7 +672,7 @@ void Game::update()
         return;
     }
     //These will eat the ghost
-    else if (
+    if (
             (
             (mPlyr->gridPos[0][0] == ghost1->gridPos[0][0]
                 && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1])
@@ -789,6 +768,30 @@ void Game::update()
         ghost1->objPos[0][1] = 9;
         respawnGhost(ghost4);
     }
+
+    //Check for teleportation
+    teleport(mPlyr->mSprite);
+    teleport(ghost1->mBody);
+    teleport(ghost3->mBody);
+    teleport(ghost2->mBody);
+    teleport(ghost4->mBody);
+    //Counts down states
+    ghost1->stateCountDown();
+    ghost3->stateCountDown();
+    ghost2->stateCountDown();
+    ghost4->stateCountDown();
+    //Adds extra life at 10k points
+    if (points >= 1000 && xtraLive == 0)
+    {
+        lives++;
+        xtraLive = 1;
+    }
+    //Spawns a fruit when dots are at 70 and 170
+    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
+    {
+        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
+        fruit->spawned = true;
+    }
     updateGui();
 }
 /**
@@ -818,32 +821,22 @@ void Game::render()
     }
     
     //Draw pellets
-    for (int i = 0; i < MAX_DOTS; i++)
-    {
-        if (!pellets[i]->eaten)
-        {
-            mWindow.draw(pellets[i]->mSprite);
-        }        
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        if (!sPellets[i]->eaten)
-        {  
-            mWindow.draw(sPellets[i]->mSprite);
-        }
-    }
+    draw(mWindow, pellets, MAX_DOTS);
+    draw(mWindow, sPellets, 4);
     //Draw fruit
     if (fruit->spawned)
     {
-        mWindow.draw(fruit->mSprite);
+        //mWindow.draw(fruit->mSprite);
+        fruit->draw(mWindow);
     }
     //draw ghosts
-    drawGhost(ghost1);
-    drawGhost(ghost3);
-    drawGhost(ghost2);
-    drawGhost(ghost4);
+    ghost1->draw(mWindow);
+    ghost3->draw(mWindow);
+    ghost2->draw(mWindow);
+    ghost4->draw(mWindow);
     //Draw player
-    mWindow.draw(mPlyr->mSprite);
+    mPlyr->draw(mWindow);
+    //mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
     mWindow.display();
@@ -880,24 +873,45 @@ bool Game::isClear(direction dir, sf::Sprite sprite)
  */
 void Game::Ghosts::draw(sf::RenderTarget& target, sf::RenderStates status) const
 {
-    target.draw(mBody);
-    target.draw(mEyes);
+    if (state != dead)
+    {
+        target.draw(mBody);
+    }
+    if (state != panic)
+    {
+        target.draw(mEyes);
+    }
+    
 }
 /**
- * @brief Draws all the parts of the ghost
+ * @brief draws player
  * 
- * @param ghost ghost to draw
  */
-void Game::drawGhost(Ghosts * ghost)
+void Game::Player::draw(sf::RenderTarget& target, sf::RenderStates status) const
 {
-    if (ghost->state != dead)
+    target.draw(mSprite);
+}
+/**
+ * @brief draws pellets
+ * 
+ */
+void Game::draw(sf::RenderTarget& target, Pellets * pellets[MAX_DOTS], int size, sf::RenderStates status) const
+{
+    for (int i = 0; i < size; i++)
     {
-        mWindow.draw(ghost->mBody);
+        if (!pellets[i]->eaten)
+        {
+            target.draw(pellets[i]->mSprite);
+        }
     }
-    if (ghost->state != panic)
-    {
-        mWindow.draw(ghost->mEyes);
-    }    
+}
+/**
+ * @brief draws fruit
+ * 
+ */
+void Game::Fruit::draw(sf::RenderTarget& target, sf::RenderStates status) const
+{
+    target.draw(mSprite);
 }
 /**
  * @brief Resets the sprites to their starting positions.
@@ -1332,7 +1346,8 @@ void Game::choosePath(Ghosts * ghost)
     }
     ghost->map[y][x] = ' ';
     //If the ghost can not move he will move in which ever direction is the easiest
-    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead && ghost->state != panic)
+    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead// && ghost->state != panic
+    )
     {
         if (isClear(up, ghost->mBody) && ghost->mDir != down 
         && y >= targetY
@@ -1375,6 +1390,28 @@ void Game::choosePath(Ghosts * ghost)
             
         }        
     }
+    else if(inghosthouse(ghost->mBody) && ghost->state != dead)
+    {
+        if (x > targetX){
+        ghost->mDir = left;
+        } else if (x < targetX){
+        ghost->mDir = right;
+        } else
+        {
+            for (size_t i = 0; i < 4; i++)
+            {
+                if (isClear(direction(i), ghost->mBody)
+                &&!(direction(i) == down && prevDir == up)
+                &&!(direction(i) == up && prevDir == down)
+                &&!(direction(i) == right && prevDir == left)
+                &&!(direction(i) == left && prevDir == right))
+                {
+                    ghost->mDir = direction(i);
+                    break;
+                }
+            }
+        }
+    }
     //If the ghost is dead it will directly go to the ghost spawn
     else if (ghost->state == dead)
     {
@@ -1397,8 +1434,8 @@ void Game::choosePath(Ghosts * ghost)
     }
     else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f' && (y != ghost->prevFork[0][1] || x != ghost->prevFork[0][0]))
     {
-        ghost->prevFork[0][1] = y;
-        ghost->prevFork[0][0] = x;
+        ghost->prevFork[0][1] = ghost->gridPos[0][1];
+        ghost->prevFork[0][0] = ghost->gridPos[0][0];
         int i = rand() % 4 + 1;
         if (ghost->mDir != down && direction(i) == up)
         {
@@ -1417,55 +1454,34 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
-    
-    //determines default direction for ghost to turn in
-    else if (ghost->map[y - 1][x] == ghost->mapToken 
-    && y > targetY
-    )
+        //determines default direction for ghost to turn in
+    else if (ghost->state == scatter || ghost->state == chase)
     {
-        ghost->mDir = up;
-    }
-    else if (ghost->map[y][x - 1] == ghost->mapToken 
-    && x > targetX
-    )
-    {
-        ghost->mDir = left;
-    }
-    else if (ghost->map[y + 1][x] == ghost->mapToken 
-    && y < targetY
-    )
-    {
-        ghost->mDir = down;
-    }
-    else if (ghost->map[y][x + 1] == ghost->mapToken 
-    && x < targetX
-    )
-    {
-        ghost->mDir = right;
-    } else if (inghosthouse(ghost->mBody) && x > targetX){
-        ghost->mDir = left;
-    } else if (inghosthouse(ghost->mBody) && x < targetX){
-        ghost->mDir = right;
-    }
-
-    else
-    {
-        for (size_t i = 0; i < 4; i++)
+            if (ghost->map[y - 1][x] == ghost->mapToken 
+        && y > targetY
+        )
         {
-            if (isClear(direction(i), ghost->mBody)
-            &&!(direction(i) == down && prevDir == up)
-            &&!(direction(i) == up && prevDir == down)
-            &&!(direction(i) == right && prevDir == left)
-            &&!(direction(i) == left && prevDir == right))
-            {
-                ghost->mDir = direction(i);
-                break;
-            }
-            
+            ghost->mDir = up;
         }
-        
+        else if (ghost->map[y][x - 1] == ghost->mapToken 
+        && x > targetX
+        )
+        {
+            ghost->mDir = left;
+        }
+        else if (ghost->map[y + 1][x] == ghost->mapToken 
+        && y < targetY
+        )
+        {
+            ghost->mDir = down;
+        }
+        else if (ghost->map[y][x + 1] == ghost->mapToken 
+        && x < targetX
+        )
+        {
+            ghost->mDir = right;
+        }
     }
-    
 }
 /**
  * @brief fills the ghost's map with the direction it needs to go to get to pac man
