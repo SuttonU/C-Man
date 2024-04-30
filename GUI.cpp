@@ -5,6 +5,7 @@
  */
 GUI::GUI() : Game(10)
 {
+    points = 0;
     scoreGui.setScale(scale, scale);
     scoreGui.setString(std::to_string(points) + '0');
     highscoreGui.setScale(scale, scale);
@@ -22,5 +23,4 @@ void GUI::updateGui()
 {
     scoreGui.setString(std::to_string(points) + '0');
     highscoreGui.setString(std::to_string(points) + '0');
-    gameLevel.setString(std::to_string(fruit->level));
 }
