@@ -1198,7 +1198,7 @@ void Game::findPath(Ghosts * ghost)
     //If its panic they will move random directions
     else if (ghost->state == panic)
     {
-        //Slow down and randomize direction
+        //Slow down
         ghost->mvSpeed = 0.75 * scale;
     }
     //If their dead they will go to spawn
@@ -1293,8 +1293,11 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
-    else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f')
+    else if (ghost->state == panic && grid[ghost->gridPos[0][1]][ghost->gridPos[0][0]] == 'f' 
+    &&(y != ghost->gridPos[0][1] || x != ghost->gridPos[0][0]))
     {
+        ghost->prevFork[0][0] = x;
+        ghost->prevFork[0][1] = y;
         int i = rand() % 4 + 1;
         if (ghost->mDir != down && direction(i) == up)
         {
