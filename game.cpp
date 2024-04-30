@@ -874,6 +874,16 @@ bool Game::isClear(direction dir, sf::Sprite sprite)
     
 }
 /**
+ * @brief draws all ghost parts
+ * 
+ * @param state state of ghost
+ */
+void Game::Ghosts::draw(sf::RenderTarget& target, sf::RenderStates status) const
+{
+    target.draw(mBody);
+    target.draw(mEyes);
+}
+/**
  * @brief Draws all the parts of the ghost
  * 
  * @param ghost ghost to draw

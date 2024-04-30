@@ -41,7 +41,6 @@ private:
     int ghostMult = 1;
     int cornersPos[4][2] = {{1,1}, {30,1}, {1,34}, {30,34}};   //Positions of the 4 corners{x,y}
     float scale = 1.0;      //Scale of game
-    //Ghost data
     //Title menu data
     sf::Sprite titleimage;
     sf::Sprite plyrLives;
@@ -84,7 +83,7 @@ public:
     sf::Texture mTextureFile;
     
 
-    struct Player
+    struct Player : public sf::Window
     {
         sf::Sprite mSprite;                     //Player sprite
         float mvSpeed = 1.5;                    //Player movment speed
@@ -99,7 +98,7 @@ public:
         void controls();                        //Changes sprites direction
     };
 
-    struct Ghosts
+    struct Ghosts : public sf::Window
     {
         char map[GRID_SIZE_Y][GRID_SIZE_X];
         char mapToken;
@@ -124,10 +123,11 @@ public:
         void animate();                         //Animates ghost
         void displayMap();                      //Used to keep track of the ghosts path
         void stateCountDown();                  //Changes states after each count down
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
         bool spawned = false;                   //Test if ghost is already spawned
     };
     
-    struct Pellets
+    struct Pellets : public sf::Window
     {
         Pellets(bool isSuper);                  //Pellets constructor
         sf::Sprite mSprite;                     //Pellets sprite
@@ -137,7 +137,7 @@ public:
         int frameCount = 0;                     //frame count for super pellets
         int gridPos[2][1];                      //Used to keep sprites position on grid
     };
-    struct Fruit
+    struct Fruit : public sf::Window
     {
         Fruit();
         sf::Sprite mSprite;
