@@ -749,11 +749,10 @@ void Game::render()
     {
         mWindow.draw(fruit->mSprite);
     }
-    
-    drawGhost(blinky);
-    drawGhost(inky);
-    drawGhost(pinky);
-    drawGhost(clyde);
+    blinky->draw(mWindow);
+    inky->draw(mWindow);
+    pinky->draw(mWindow);
+    clyde->draw(mWindow);
     mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
@@ -785,6 +784,16 @@ bool Game::isClear(direction dir, sf::Sprite sprite)
     }
     return true;
     
+}
+/**
+ * @brief draws all ghost parts
+ * 
+ * @param state state of ghost
+ */
+void Game::Ghosts::draw(sf::RenderTarget& target, sf::RenderStates status) const
+{
+    target.draw(mBody);
+    target.draw(mEyes);
 }
 /**
  * @brief Draws all the parts of the ghost
