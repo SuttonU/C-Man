@@ -838,10 +838,11 @@ void Game::render()
         mWindow.draw(fruit->mSprite);
     }
     //draw ghosts
-    ghost1->draw(mWindow);
-    ghost3->draw(mWindow);
-    ghost2->draw(mWindow);
-    ghost4->draw(mWindow);
+    drawGhost(ghost1);
+    drawGhost(ghost3);
+    drawGhost(ghost2);
+    drawGhost(ghost4);
+    //Draw player
     mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
