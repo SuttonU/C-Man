@@ -17,6 +17,7 @@ git pul * @version 0.1
 #include <cstring>
 #include <time.h>
 #include <fstream>
+#include <SFML/Audio.hpp>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -62,6 +63,23 @@ private:
     float gridoriginx;
     float gridoriginy;
     std::fstream highscoreSave;
+    //Audio data
+    sf::SoundBuffer mintro;
+    sf::SoundBuffer mchomp;
+    sf::SoundBuffer mdeath;
+    sf::SoundBuffer meatfruit;
+    sf::SoundBuffer meatghost;
+    sf::SoundBuffer mgainlife;
+    sf::SoundBuffer mmenu;
+    sf::SoundBuffer mpanicmode;
+    sf::Sound intro;
+    sf::Sound chomp;
+    sf::Sound death;
+    sf::Sound eatfruit;
+    sf::Sound eatghost;
+    sf::Sound gainlife;
+    sf::Sound menu;
+    sf::Sound panicmode;
     
 public: 
     //Game functions
@@ -80,6 +98,7 @@ public:
     int getLives() const;
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
     void updateGui();
+    void loadaudio();
     sf::Texture mTextureFile;
     
 

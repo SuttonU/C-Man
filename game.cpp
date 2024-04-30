@@ -326,6 +326,9 @@ void Game::windowEvents()
         else if (updatebutton(event, playbutton))
         {
             play = true;
+            menu.stop();
+            menu.setLoop(false);
+            intro.play();
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -385,6 +388,8 @@ void Game :: displaymenu(){
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
+    menu.setLoop(true);
+    menu.play();
     //windowEvents();
 }
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
@@ -509,8 +514,17 @@ void Game::update()
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
+        if (!chomp.getLoop() && (ghost1->state != panic && ghost2->state != panic && ghost3->state != panic && ghost4->state != panic)){
+            panicmode.stop();
+            panicmode.setLoop(false);
+            chomp.setLoop(true);
+            chomp.play();
+        }
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
+    }else {
+        chomp.stop();
+        chomp.setLoop(false);
     }
     //Checks if ghosts can move
     if ((isClear(ghost1->mDir, ghost1->mBody) || ghost1->state == dead) && ghost1->spawned)
@@ -544,7 +558,6 @@ void Game::update()
             if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
             {
                 points += 1;
-                break;
             }      
         }
     }    
@@ -607,10 +620,17 @@ void Game::update()
                     ghost4->framecount = 0;
                     ghost4->stateTime = 10.0;
                 }
-                break;
             }
         }
     }
+    if ((!panicmode.getLoop()) && (ghost1->state == panic || ghost2->state == panic || ghost3->state == panic || ghost4->state == panic)){
+            if (chomp.getLoop()){
+                chomp.stop();
+                chomp.setLoop(false);
+            }
+            panicmode.setLoop(true);
+            panicmode.play();
+        }
     //Animates the super dots so they flash
     for (int i = 0; i < 4; i++)
     {
@@ -629,14 +649,27 @@ void Game::update()
         }
         
     }
-    
+    //Spawns a fruit when dots are at 70 and 170
+    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
+    {
+        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
+        fruit->spawned = true;
+    }
     //eats the fruit
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
         points += eatFruit(fruit);
     }
+    //Adds extra life at 10k points
+    if (points >= 1000 && xtraLive == 0)
+    {
+        gainlife.play();
+        lives++;
+        xtraLive = 1;
+    }
+    
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
-    //If they share the same tile
+    //If they sahre the same tile
     //Red ghost
     if ((mPlyr->gridPos[0][0] == ghost1->gridPos[0][0] 
             && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1] 
@@ -667,12 +700,17 @@ void Game::update()
             && mPlyr->mSprite.getPosition().y == ghost4->mBody.getPosition().y
             && (ghost4->state != panic && ghost4->state != dead)))
     {
+        chomp.stop();
+        chomp.setLoop(false);
+        panicmode.stop();
+        panicmode.setLoop(false);
+        death.play();
         deathAnimation();
         lives--;
         return;
     }
     //These will eat the ghost
-    if (
+    else if (
             (
             (mPlyr->gridPos[0][0] == ghost1->gridPos[0][0]
                 && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1])
@@ -683,6 +721,7 @@ void Game::update()
             && ghost1->state == panic)
     {
         ghost1->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost1->spawned = false;
@@ -698,6 +737,7 @@ void Game::update()
             && ghost3->state == panic)
     {
         ghost3->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost3->spawned = false;
@@ -713,6 +753,7 @@ void Game::update()
             && ghost2->state == panic)
     {
         ghost2->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost2->spawned = false;
@@ -728,6 +769,7 @@ void Game::update()
             && ghost4->state == panic)
     {
         ghost4->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost4->spawned = false;
@@ -780,18 +822,6 @@ void Game::update()
     ghost3->stateCountDown();
     ghost2->stateCountDown();
     ghost4->stateCountDown();
-    //Adds extra life at 10k points
-    if (points >= 1000 && xtraLive == 0)
-    {
-        lives++;
-        xtraLive = 1;
-    }
-    //Spawns a fruit when dots are at 70 and 170
-    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
-    {
-        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
-        fruit->spawned = true;
-    }
     updateGui();
 }
 /**
@@ -918,6 +948,10 @@ void Game::Fruit::draw(sf::RenderTarget& target, sf::RenderStates status) const
  */
 void Game::reset(bool dead)
 {
+    chomp.stop();
+    chomp.setLoop(false);
+    panicmode.stop();
+    panicmode.setLoop(false);
     setgridorigin();
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
@@ -980,6 +1014,7 @@ void Game::reset(bool dead)
     //If player died the dots will not reset
     if (!dead)
     {
+        intro.play();
         dots = 0;
         for (int i = 0; i < MAX_DOTS; i++)
         {
@@ -1314,7 +1349,7 @@ void Game::findPath(Ghosts * ghost)
     //If its panic they will move random directions
     else if (ghost->state == panic)
     {
-        //Slow down
+        //Slow down and randomize direction
         ghost->mvSpeed = 0.75 * scale;
     }
     //If their dead they will go to spawn
@@ -1346,8 +1381,7 @@ void Game::choosePath(Ghosts * ghost)
     }
     ghost->map[y][x] = ' ';
     //If the ghost can not move he will move in which ever direction is the easiest
-    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead// && ghost->state != panic
-    )
+    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead && ghost->state != panic)
     {
         if (isClear(up, ghost->mBody) && ghost->mDir != down 
         && y >= targetY
@@ -1389,28 +1423,6 @@ void Game::choosePath(Ghosts * ghost)
             }
             
         }        
-    }
-    else if(inghosthouse(ghost->mBody) && ghost->state != dead)
-    {
-        if (x > targetX){
-        ghost->mDir = left;
-        } else if (x < targetX){
-        ghost->mDir = right;
-        } else
-        {
-            for (size_t i = 0; i < 4; i++)
-            {
-                if (isClear(direction(i), ghost->mBody)
-                &&!(direction(i) == down && prevDir == up)
-                &&!(direction(i) == up && prevDir == down)
-                &&!(direction(i) == right && prevDir == left)
-                &&!(direction(i) == left && prevDir == right))
-                {
-                    ghost->mDir = direction(i);
-                    break;
-                }
-            }
-        }
     }
     //If the ghost is dead it will directly go to the ghost spawn
     else if (ghost->state == dead)
@@ -1454,34 +1466,55 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
-        //determines default direction for ghost to turn in
-    else if (ghost->state == scatter || ghost->state == chase)
+    
+    //determines default direction for ghost to turn in
+    else if (ghost->map[y - 1][x] == ghost->mapToken 
+    && y > targetY
+    )
     {
-            if (ghost->map[y - 1][x] == ghost->mapToken 
-        && y > targetY
-        )
-        {
-            ghost->mDir = up;
-        }
-        else if (ghost->map[y][x - 1] == ghost->mapToken 
-        && x > targetX
-        )
-        {
-            ghost->mDir = left;
-        }
-        else if (ghost->map[y + 1][x] == ghost->mapToken 
-        && y < targetY
-        )
-        {
-            ghost->mDir = down;
-        }
-        else if (ghost->map[y][x + 1] == ghost->mapToken 
-        && x < targetX
-        )
-        {
-            ghost->mDir = right;
-        }
+        ghost->mDir = up;
     }
+    else if (ghost->map[y][x - 1] == ghost->mapToken 
+    && x > targetX
+    )
+    {
+        ghost->mDir = left;
+    }
+    else if (ghost->map[y + 1][x] == ghost->mapToken 
+    && y < targetY
+    )
+    {
+        ghost->mDir = down;
+    }
+    else if (ghost->map[y][x + 1] == ghost->mapToken 
+    && x < targetX
+    )
+    {
+        ghost->mDir = right;
+    } else if (inghosthouse(ghost->mBody) && x > targetX){
+        ghost->mDir = left;
+    } else if (inghosthouse(ghost->mBody) && x < targetX){
+        ghost->mDir = right;
+    }
+
+    else
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (isClear(direction(i), ghost->mBody)
+            &&!(direction(i) == down && prevDir == up)
+            &&!(direction(i) == up && prevDir == down)
+            &&!(direction(i) == right && prevDir == left)
+            &&!(direction(i) == left && prevDir == right))
+            {
+                ghost->mDir = direction(i);
+                break;
+            }
+            
+        }
+        
+    }
+    
 }
 /**
  * @brief fills the ghost's map with the direction it needs to go to get to pac man
@@ -1639,6 +1672,7 @@ Game::Fruit::Fruit()
  */
 int Game::eatFruit(Game::Fruit * fruit)
 {
+    eatfruit.play();
     fruit->spawned = false;
     return (fruit)->values[(fruit)->level];
 }
@@ -1877,4 +1911,27 @@ void Game::updateGui()
         highscore = points;
     }
     gameLevel.setString("Level: " + std::to_string(fruit->level + 1));
+}
+/**
+ * @brief Loads all audio files and sets sounds.
+ * 
+ */
+void Game::loadaudio(){
+    mintro.loadFromFile("audio/pacman_intermission.wav");
+    mchomp.loadFromFile("audio/pacman_chomp.wav");
+    mdeath.loadFromFile("audio/pacman_death.wav");
+    meatfruit.loadFromFile("audio/pacman_eatfruit.wav");
+    meatghost.loadFromFile("audio/pacman_eatghost.wav");
+    mgainlife.loadFromFile("audio/pacman_extrapac.wav");
+    mmenu.loadFromFile("audio/pacman_beginning.wav");
+    mpanicmode.loadFromFile("audio/ghostscared.wav");
+    intro.setBuffer(mintro);
+    chomp.setBuffer(mchomp);
+    death.setBuffer(mdeath);
+    eatfruit.setBuffer(meatfruit);
+    eatghost.setBuffer(meatghost);
+    gainlife.setBuffer(mgainlife);
+    menu.setBuffer(mmenu);
+    panicmode.setBuffer(mpanicmode);
+    panicmode.setVolume(25);
 }
