@@ -17,15 +17,17 @@ Points can be earned a variety of ways, either through the **Pac-Dots**, **Power
 
 * **Power Pellets** are worth 50 points
 
-* **Ghosts** are worth 200 points
+* **Ghosts** are worth 200 points x the number of ghosts you have killed in a single super dot
 
 * **Bonus Fruit**
     - **Cherry**: 100 points
     - **Strawberry**: 300 points
     - **Orange**: 500 points
     - **Apple**: 700 points
-    - **Peach**: 500 points
     - **Melon**: 1000 points
+    - **Space ship**: 2000 points
+    - **Bell**: 3000 points
+    - **Key**: 5000 points
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
