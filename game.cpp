@@ -1,6 +1,6 @@
 /**
  * @file game.cpp
- * @author Sutton Jones, Ryan Matteson
+ * @author Sutton Jones
  * @brief Functions for game class.
  * @version 0.1
  * @date 2024-03-20
@@ -42,6 +42,18 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
         std::cout << "Error loading game sprite sheet\n";
         exit(101);
     }
+    //Set up Gui
+    
+    highscoreSave.open("HighscoreSave.csv", std::fstream::in | std::fstream::out);
+    //If file does not exist it makes a new one
+    if(!highscoreSave.is_open())
+    {
+        highscoreSave.open("HighscoreSave.csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
+    }
+    highscore = 0;
+    highscoreSave >> highscore;
+    highscore /= 10;
+    highscoreSave.close();
     lives = 3;
     //Set scale of game
     scale = (mWindow.getSize().y * 1.0 )/248.0;
@@ -126,20 +138,24 @@ Game::Game() : mWindow(sf::VideoMode(1920 , 1080), "C-Man")
         exit(1);
     }
     //Score set up
-    score.setFont(font);
-    score.setString(std::to_string(points) + "0");
-    score.setScale(scale, scale);
-    score.setOrigin(score.getGlobalBounds().width, 0);
-    score.setPosition(mWindow.getSize().x, 0);
-    //testing comment when done
-    // ghost1->gridPos[0][0] = 15;
-    // ghost1->gridPos[0][1] = 9;
-    // ghost3->gridPos[0][0] = 15;
-    // ghost3->gridPos[0][1] = 9;
-    // ghost2->gridPos[0][0] = 15;
-    // ghost2->gridPos[0][1] = 9;
-    // ghost4->gridPos[0][0] =15;
-    // ghost4->gridPos[0][1] =9;
+    scoreGui.setFont(font);
+    scoreGui.setString("Score: " + std::to_string(points) + "0");
+    scoreGui.setScale(scale * 0.20, scale * 0.20);
+    scoreGui.setPosition(0, mWindow.getSize().y/5);
+    //Hihscore set up
+    highscoreGui.setFont(font);
+    highscoreGui.setString("Highscore: " + std::to_string(highscore) + "0");
+    highscoreGui.setScale(scale * 0.20, scale * 0.20);
+    highscoreGui.setPosition(0, mWindow.getSize().y / 4.0);
+    //Lives set up
+    life.setTexture(mTextureFile);
+    life.setScale(scale, scale);
+    life.setTextureRect({16, 0, 16, 16});
+    //Game level set up
+    gameLevel.setScale(scale * 0.80, scale * 0.80);
+    gameLevel.setPosition(0, mWindow.getSize().y/10);
+    gameLevel.setFont(font);
+    gameLevel.setString("Level: " + std::to_string(fruit->level + 1));
     //Initialize ghost maps
     for (int i = 0; i < GRID_SIZE_Y; i++)
     {
@@ -260,6 +276,17 @@ void Game::windowEvents()
             ghost2->mEyes.setPosition(getgridx(ghost2->gridPos[0][0]), getgridy(ghost2->gridPos[0][1]));
             ghost4->mEyes.setPosition(getgridx(ghost4->gridPos[0][0]), getgridy(ghost4->gridPos[0][1]));
             fruit->mSprite.setPosition(getgridx(fruit->gridPos[0][0]), getgridy(fruit->gridPos[0][1]));
+            //Scale Gui
+            scoreGui.setScale(scale * 0.50, scale * 0.50);
+            scoreGui.setPosition(0, mWindow.getSize().y / 5);
+            //scale highscore
+            highscoreGui.setScale(scale * 0.50, scale * 0.50);
+            highscoreGui.setPosition(0, (mWindow.getSize().y * 1.0) / 4.0);
+            //Scale lives
+            life.setScale(scale, scale);
+            //Scale level
+            gameLevel.setScale(scale * 0.50, scale * 0.50);
+            gameLevel.setPosition(0, mWindow.getSize().y/10);
             //Scale dots
             if (dots > 0)
             {
@@ -294,16 +321,11 @@ void Game::windowEvents()
                     }
                 }
             }
-            //Scale Gui
-            score.setScale(scale, scale);
         }
         //updates each button
         else if (updatebutton(event, playbutton))
         {
             play = true;
-            menu.stop();
-            menu.setLoop(false);
-            intro.play();
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -353,29 +375,18 @@ Game::~Game()
        delete sPellets[i];
        sPellets[i] = nullptr;
     }
+    highscoreSave.open("HighscoreSave.csv", std::ios::in | std::ios::out);
+    highscoreSave << highscore * 10;
+    highscoreSave.close();
 }
-/**
- * @brief Displays menu.
- * 
- */
-void Game::displaymenu(){
+void Game :: displaymenu(){
 
     mWindow.draw(titleimage);
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
-    menu.setLoop(true);
-    menu.play();
     //windowEvents();
 }
-/**
- * @brief Checks if buttons was clicked, hovered over, etc.
- * 
- * @param event 
- * @param button 
- * @return true 
- * @return false 
- */
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
     bool mouseinbutton = mousePosition.x >= button.getPosition().x - button.getGlobalBounds().width/2
@@ -412,10 +423,7 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     }
     return false;
 }
-/**
- * @brief Displays instruction page.
- * 
- */
+
 void Game :: displayinstructions(){
     mWindow.clear();
     sf::Event event;
@@ -463,24 +471,7 @@ bool Game::isDone() const
  */
 void Game::update()
 {
-    //Update position
-    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
-    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
-    ghost1->gridPos[0][0] = returncol(ghost1->mBody);
-    ghost1->gridPos[0][1] = returnrow(ghost1->mBody);
-    ghost3->gridPos[0][0] = returncol(ghost3->mBody);
-    ghost3->gridPos[0][1] = returnrow(ghost3->mBody);
-    ghost2->gridPos[0][0] = returncol(ghost2->mBody);
-    ghost2->gridPos[0][1] = returnrow(ghost2->mBody);
-    ghost4->gridPos[0][0] = returncol(ghost4->mBody);
-    ghost4->gridPos[0][1] = returnrow(ghost4->mBody);
-    //Counts down states
-    ghost1->stateCountDown();
-    ghost3->stateCountDown();
-    ghost2->stateCountDown();
-    ghost4->stateCountDown();
-    //Moving
-    mPlyr->controls();
+    
     if (!inghosthouse(ghost1->mBody)){
         findPath(ghost1);
     }
@@ -498,6 +489,19 @@ void Game::update()
     choosePath(ghost3);
     choosePath(ghost2);
     choosePath(ghost4);
+    //Update position
+    mPlyr->gridPos[0][0] = returncol(mPlyr->mSprite);
+    mPlyr->gridPos[0][1] = returnrow(mPlyr->mSprite);
+    ghost1->gridPos[0][0] = returncol(ghost1->mBody);
+    ghost1->gridPos[0][1] = returnrow(ghost1->mBody);
+    ghost3->gridPos[0][0] = returncol(ghost3->mBody);
+    ghost3->gridPos[0][1] = returnrow(ghost3->mBody);
+    ghost2->gridPos[0][0] = returncol(ghost2->mBody);
+    ghost2->gridPos[0][1] = returnrow(ghost2->mBody);
+    ghost4->gridPos[0][0] = returncol(ghost4->mBody);
+    ghost4->gridPos[0][1] = returnrow(ghost4->mBody);
+    //Moving
+    mPlyr->controls();
     //If the next move is clear then it will set the next direction to the one store in movement buffer.
     if (isClear(mPlyr->bufferDir, mPlyr->mSprite) && mPlyr->bufferDir!=mPlyr->mDir)
     {
@@ -505,17 +509,8 @@ void Game::update()
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
-        if (!chomp.getLoop() && (ghost1->state != panic && ghost2->state != panic && ghost3->state != panic && ghost4->state != panic)){
-            panicmode.stop();
-            panicmode.setLoop(false);
-            chomp.setLoop(true);
-            chomp.play();
-        }
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
-    } else {
-        chomp.stop();
-        chomp.setLoop(false);
     }
     //Checks if ghosts can move
     if ((isClear(ghost1->mDir, ghost1->mBody) || ghost1->state == dead) && ghost1->spawned)
@@ -549,6 +544,7 @@ void Game::update()
             if (eaten && notEaten)                  //If pellet was not eaten and pellet is now eaten it will add 10 points
             {
                 points += 1;
+                break;
             }      
         }
     }    
@@ -611,15 +607,8 @@ void Game::update()
                     ghost4->framecount = 0;
                     ghost4->stateTime = 10.0;
                 }
+                break;
             }
-        }
-        if ((!panicmode.getLoop()) && (ghost1->state == panic || ghost2->state == panic || ghost3->state == panic || ghost4->state == panic)){
-            if (chomp.getLoop()){
-                chomp.stop();
-                chomp.setLoop(false);
-            }
-            panicmode.setLoop(true);
-            panicmode.play();
         }
     }
     //Animates the super dots so they flash
@@ -640,34 +629,14 @@ void Game::update()
         }
         
     }
+    
     //eats the fruit
     if (fruit->spawned && (fruit->gridPos[0][0] == mPlyr->gridPos[0][0] && fruit->gridPos[1][0] == mPlyr->gridPos[1][0]))
     {
         points += eatFruit(fruit);
     }
-    //Spawns a fruit when dots are at 70 and 170
-    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
-    {
-        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
-        fruit->spawned = true;
-    }
-    //Adds extra life at 10k points
-    if (points >= 1000 && xtraLive == 0)
-    {
-        gainlife.play();
-        lives++;
-        xtraLive = 1;
-    }
-
-    //Check for teleportation
-    teleport(mPlyr->mSprite);
-    teleport(ghost1->mBody);
-    teleport(ghost3->mBody);
-    teleport(ghost2->mBody);
-    teleport(ghost4->mBody);
-    
     //If pacman shares the same tile with any ghost and their state is not in panic it will kill the player
-    //If they sahre the same tile
+    //If they share the same tile
     //Red ghost
     if ((mPlyr->gridPos[0][0] == ghost1->gridPos[0][0] 
             && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1] 
@@ -698,17 +667,12 @@ void Game::update()
             && mPlyr->mSprite.getPosition().y == ghost4->mBody.getPosition().y
             && (ghost4->state != panic && ghost4->state != dead)))
     {
-        chomp.stop();
-        chomp.setLoop(false);
-        panicmode.stop();
-        panicmode.setLoop(false);
-        death.play();
         deathAnimation();
         lives--;
         return;
     }
     //These will eat the ghost
-    else if (
+    if (
             (
             (mPlyr->gridPos[0][0] == ghost1->gridPos[0][0]
                 && mPlyr->gridPos[0][1] == ghost1->gridPos[0][1])
@@ -718,7 +682,6 @@ void Game::update()
             )
             && ghost1->state == panic)
     {
-        eatghost.play();
         ghost1->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -734,7 +697,6 @@ void Game::update()
             )
             && ghost3->state == panic)
     {
-        eatghost.play();
         ghost3->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -750,7 +712,6 @@ void Game::update()
             )
             && ghost2->state == panic)
     {
-        eatghost.play();
         ghost2->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -766,7 +727,6 @@ void Game::update()
             )
             && ghost4->state == panic)
     {
-        eatghost.play();
         ghost4->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -808,7 +768,31 @@ void Game::update()
         ghost1->objPos[0][1] = 9;
         respawnGhost(ghost4);
     }
-    updateGUI();
+
+    //Check for teleportation
+    teleport(mPlyr->mSprite);
+    teleport(ghost1->mBody);
+    teleport(ghost3->mBody);
+    teleport(ghost2->mBody);
+    teleport(ghost4->mBody);
+    //Counts down states
+    ghost1->stateCountDown();
+    ghost3->stateCountDown();
+    ghost2->stateCountDown();
+    ghost4->stateCountDown();
+    //Adds extra life at 10k points
+    if (points >= 1000 && xtraLive == 0)
+    {
+        lives++;
+        xtraLive = 1;
+    }
+    //Spawns a fruit when dots are at 70 and 170
+    if (dots == MAX_DOTS - 70 || dots == MAX_DOTS - 170)
+    {
+        fruit->mSprite.setTextureRect({16 * fruit->level, 32, 16, 16});
+        fruit->spawned = true;
+    }
+    updateGui();
 }
 /**
  * @brief returns player lives
@@ -826,36 +810,35 @@ int Game::getLives() const
 void Game::render()
 {
     mWindow.clear(sf::Color::Black);
-    //Draw player
-    for (int i = 0; i < MAX_DOTS; i++)
+    //draw gui
+    mWindow.draw(scoreGui);
+    mWindow.draw(highscoreGui);
+    mWindow.draw(gameLevel);
+    for (int i = 0; i < lives; i++)
     {
-        if (!pellets[i]->eaten)
-        {
-            mWindow.draw(pellets[i]->mSprite);
-        }        
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        if (!sPellets[i]->eaten)
-        {  
-            mWindow.draw(sPellets[i]->mSprite);
-        }
+        life.setPosition(i * 16 * scale, mWindow.getSize().y / 3);
+        mWindow.draw(life);
     }
     
+    //Draw pellets
+    draw(mWindow, pellets, MAX_DOTS);
+    draw(mWindow, sPellets, 4);
+    //Draw fruit
     if (fruit->spawned)
     {
-        mWindow.draw(fruit->mSprite);
+        //mWindow.draw(fruit->mSprite);
+        fruit->draw(mWindow);
     }
-    
-    drawGhost(ghost1);
-    drawGhost(ghost3);
-    drawGhost(ghost2);
-    drawGhost(ghost4);
-    mWindow.draw(mPlyr->mSprite);
+    //draw ghosts
+    ghost1->draw(mWindow);
+    ghost3->draw(mWindow);
+    ghost2->draw(mWindow);
+    ghost4->draw(mWindow);
+    //Draw player
+    mPlyr->draw(mWindow);
+    //mWindow.draw(mPlyr->mSprite);
     //draw map
     mWindow.draw(map);
-    //draw gui
-    mWindow.draw(score);
     mWindow.display();
 }
 /**
@@ -884,30 +867,57 @@ bool Game::isClear(direction dir, sf::Sprite sprite)
     
 }
 /**
- * @brief Draws all the parts of the ghost
+ * @brief draws all ghost parts
  * 
- * @param ghost ghost to draw
+ * @param state state of ghost
  */
-void Game::drawGhost(Ghosts * ghost)
+void Game::Ghosts::draw(sf::RenderTarget& target, sf::RenderStates status) const
 {
-    if (ghost->state != dead)
+    if (state != dead)
     {
-        mWindow.draw(ghost->mBody);
+        target.draw(mBody);
     }
-    if (ghost->state != panic)
+    if (state != panic)
     {
-        mWindow.draw(ghost->mEyes);
-    }    
+        target.draw(mEyes);
+    }
+    
+}
+/**
+ * @brief draws player
+ * 
+ */
+void Game::Player::draw(sf::RenderTarget& target, sf::RenderStates status) const
+{
+    target.draw(mSprite);
+}
+/**
+ * @brief draws pellets
+ * 
+ */
+void Game::draw(sf::RenderTarget& target, Pellets * pellets[MAX_DOTS], int size, sf::RenderStates status) const
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (!pellets[i]->eaten)
+        {
+            target.draw(pellets[i]->mSprite);
+        }
+    }
+}
+/**
+ * @brief draws fruit
+ * 
+ */
+void Game::Fruit::draw(sf::RenderTarget& target, sf::RenderStates status) const
+{
+    target.draw(mSprite);
 }
 /**
  * @brief Resets the sprites to their starting positions.
  */
 void Game::reset(bool dead)
 {
-    chomp.stop();
-    chomp.setLoop(false);
-    panicmode.stop();
-    panicmode.setLoop(false);
     setgridorigin();
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
@@ -970,7 +980,6 @@ void Game::reset(bool dead)
     //If player died the dots will not reset
     if (!dead)
     {
-        intro.play();
         dots = 0;
         for (int i = 0; i < MAX_DOTS; i++)
         {
@@ -1305,7 +1314,7 @@ void Game::findPath(Ghosts * ghost)
     //If its panic they will move random directions
     else if (ghost->state == panic)
     {
-        //Slow down and randomize direction
+        //Slow down
         ghost->mvSpeed = 0.75 * scale;
     }
     //If their dead they will go to spawn
@@ -1337,7 +1346,8 @@ void Game::choosePath(Ghosts * ghost)
     }
     ghost->map[y][x] = ' ';
     //If the ghost can not move he will move in which ever direction is the easiest
-    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead && ghost->state != panic)
+    if (!isClear(ghost->mDir, ghost->mBody) && ghost->state != dead// && ghost->state != panic
+    )
     {
         if (isClear(up, ghost->mBody) && ghost->mDir != down 
         && y >= targetY
@@ -1380,6 +1390,28 @@ void Game::choosePath(Ghosts * ghost)
             
         }        
     }
+    else if(inghosthouse(ghost->mBody) && ghost->state != dead)
+    {
+        if (x > targetX){
+        ghost->mDir = left;
+        } else if (x < targetX){
+        ghost->mDir = right;
+        } else
+        {
+            for (size_t i = 0; i < 4; i++)
+            {
+                if (isClear(direction(i), ghost->mBody)
+                &&!(direction(i) == down && prevDir == up)
+                &&!(direction(i) == up && prevDir == down)
+                &&!(direction(i) == right && prevDir == left)
+                &&!(direction(i) == left && prevDir == right))
+                {
+                    ghost->mDir = direction(i);
+                    break;
+                }
+            }
+        }
+    }
     //If the ghost is dead it will directly go to the ghost spawn
     else if (ghost->state == dead)
     {
@@ -1402,8 +1434,8 @@ void Game::choosePath(Ghosts * ghost)
     }
     else if (ghost->state == panic && grid[ghost->objPos[0][1]][ghost->objPos[0][0]] == 'f' && (y != ghost->prevFork[0][1] || x != ghost->prevFork[0][0]))
     {
-        ghost->prevFork[0][1] = y;
-        ghost->prevFork[0][0] = x;
+        ghost->prevFork[0][1] = ghost->gridPos[0][1];
+        ghost->prevFork[0][0] = ghost->gridPos[0][0];
         int i = rand() % 4 + 1;
         if (ghost->mDir != down && direction(i) == up)
         {
@@ -1422,55 +1454,34 @@ void Game::choosePath(Ghosts * ghost)
             ghost->mDir = right;
         }
     }
-    
-    //determines default direction for ghost to turn in
-    else if (ghost->map[y - 1][x] == ghost->mapToken 
-    && y > targetY
-    )
+        //determines default direction for ghost to turn in
+    else if (ghost->state == scatter || ghost->state == chase)
     {
-        ghost->mDir = up;
-    }
-    else if (ghost->map[y][x - 1] == ghost->mapToken 
-    && x > targetX
-    )
-    {
-        ghost->mDir = left;
-    }
-    else if (ghost->map[y + 1][x] == ghost->mapToken 
-    && y < targetY
-    )
-    {
-        ghost->mDir = down;
-    }
-    else if (ghost->map[y][x + 1] == ghost->mapToken 
-    && x < targetX
-    )
-    {
-        ghost->mDir = right;
-    } else if (inghosthouse(ghost->mBody) && x > targetX){
-        ghost->mDir = left;
-    } else if (inghosthouse(ghost->mBody) && x < targetX){
-        ghost->mDir = right;
-    }
-
-    else
-    {
-        for (size_t i = 0; i < 4; i++)
+            if (ghost->map[y - 1][x] == ghost->mapToken 
+        && y > targetY
+        )
         {
-            if (isClear(direction(i), ghost->mBody)
-            &&!(direction(i) == down && prevDir == up)
-            &&!(direction(i) == up && prevDir == down)
-            &&!(direction(i) == right && prevDir == left)
-            &&!(direction(i) == left && prevDir == right))
-            {
-                ghost->mDir = direction(i);
-                break;
-            }
-            
+            ghost->mDir = up;
         }
-        
+        else if (ghost->map[y][x - 1] == ghost->mapToken 
+        && x > targetX
+        )
+        {
+            ghost->mDir = left;
+        }
+        else if (ghost->map[y + 1][x] == ghost->mapToken 
+        && y < targetY
+        )
+        {
+            ghost->mDir = down;
+        }
+        else if (ghost->map[y][x + 1] == ghost->mapToken 
+        && x < targetX
+        )
+        {
+            ghost->mDir = right;
+        }
     }
-    
 }
 /**
  * @brief fills the ghost's map with the direction it needs to go to get to pac man
@@ -1628,7 +1639,6 @@ Game::Fruit::Fruit()
  */
 int Game::eatFruit(Game::Fruit * fruit)
 {
-    eatfruit.play();
     fruit->spawned = false;
     return (fruit)->values[(fruit)->level];
 }
@@ -1639,10 +1649,8 @@ void Game::Fruit::toDespawn()
 
 /****Map and grid functions****/
 
-/**
- * @brief Load files to display the map.
- * 
- */
+
+
 void Game::displaymap(){
     maptexture.loadFromFile("mapR.png");
     map.setTexture(maptexture);
@@ -1796,23 +1804,6 @@ int Game::returncol(sf::Sprite s){
     return (s.getPosition().x - (mWindow.getSize().x/2 - map.getGlobalBounds().width/2)) / ((int)8*scale);
 }
 /**
- * @brief Displays Gui
- * 
- */
-void Game::displayGUI()
-{
-
-}
-/**
- * @brief Updates Gui
- * 
- */
-void Game::updateGUI()
-{
-    score.setString(std::to_string(points) + "0");
-    score.setPosition(mWindow.getSize().x / 4, mWindow.getSize().y / 4);
-}
-/**
  * @brief Checks if a sprite is able to teleport to other side of map. Sets positions of sprite to destination.
  * 
  * @param s 
@@ -1874,25 +1865,16 @@ bool Game::inghosthouse(sf::Sprite s){
     }
 }
 /**
- * @brief Loads all audio files and sets sounds.
+ * @brief updates gui
  * 
  */
-void Game::loadaudio(){
-    mintro.loadFromFile("audio/pacman_intermission.wav");
-    mchomp.loadFromFile("audio/pacman_chomp.wav");
-    mdeath.loadFromFile("audio/pacman_death.wav");
-    meatfruit.loadFromFile("audio/pacman_eatfruit.wav");
-    meatghost.loadFromFile("audio/pacman_eatghost.wav");
-    mgainlife.loadFromFile("audio/pacman_extrapac.wav");
-    mmenu.loadFromFile("audio/pacman_beginning.wav");
-    mpanicmode.loadFromFile("audio/ghostscared.wav");
-    intro.setBuffer(mintro);
-    chomp.setBuffer(mchomp);
-    death.setBuffer(mdeath);
-    eatfruit.setBuffer(meatfruit);
-    eatghost.setBuffer(meatghost);
-    gainlife.setBuffer(mgainlife);
-    menu.setBuffer(mmenu);
-    panicmode.setBuffer(mpanicmode);
-    panicmode.setVolume(25);
+void Game::updateGui()
+{
+    scoreGui.setString("Score: " + std::to_string(points) + '0');
+    if (points >= highscore)
+    {
+        highscoreGui.setString("Highscore: " + std::to_string(points) + '0');
+        highscore = points;
+    }
+    gameLevel.setString("Level: " + std::to_string(fruit->level + 1));
 }
