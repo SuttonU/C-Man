@@ -1,6 +1,6 @@
 /**
  * @file game.h
- * @author Sutton Jones
+ * @author Sutton Jones, Ryan Matteson
  * @brief Header for Game class
 git pul * @version 0.1
  * @date 2024-03-20
@@ -16,7 +16,7 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 #include <time.h>
-#include <fstream>
+#include <SFML/Audio.hpp>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -26,7 +26,7 @@ const int GRID_SIZE_Y = 33;
 const int MAX_DOTS = 210;
 class Game
 {
-private:
+protected:
     //Game data
     sf::RenderWindow mWindow;
     bool play = false;
@@ -34,24 +34,20 @@ private:
     int lives;
     int xtraLive;
     int points = 0;
-    int highscore;
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
     int ghostMult = 1;
     int cornersPos[4][2] = {{1,1}, {30,1}, {1,34}, {30,34}};   //Positions of the 4 corners{x,y}
     float scale = 1.0;      //Scale of game
+    //Ghost data
     //Title menu data
     sf::Sprite titleimage;
-    sf::Sprite plyrLives;
-    sf::Sprite life;
     sf::Texture texture;
     sf::Font font;
     sf::Text playbutton;
     sf::Text infobutton;
-    sf::Text scoreGui;
-    sf::Text highscoreGui;
-    sf::Text gameLevel;
+    sf::Text score;
     sf::Text backbutton;
     sf::Text instructions;
     //map data
@@ -61,11 +57,28 @@ private:
     char grid[GRID_SIZE_Y][GRID_SIZE_X];    //Main grid used to check for portals
     float gridoriginx;
     float gridoriginy;
-    std::fstream highscoreSave;
+    //Audio data
+    sf::SoundBuffer mintro;
+    sf::SoundBuffer mchomp;
+    sf::SoundBuffer mdeath;
+    sf::SoundBuffer meatfruit;
+    sf::SoundBuffer meatghost;
+    sf::SoundBuffer mgainlife;
+    sf::SoundBuffer mmenu;
+    sf::SoundBuffer mpanicmode;
+    sf::Sound intro;
+    sf::Sound chomp;
+    sf::Sound death;
+    sf::Sound eatfruit;
+    sf::Sound eatghost;
+    sf::Sound gainlife;
+    sf::Sound menu;
+    sf::Sound panicmode;
     
 public: 
     //Game functions
     Game();
+    Game(int mt) {};
     ~Game();
     void windowEvents();
     void update();
@@ -74,16 +87,18 @@ public:
     void deathAnimation();
     void setUpDots();
     void displayGUI();
+    void updateGUI();
     bool isDone() const;
     bool start();
     int  getDots() const;
     int getLives() const;
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
-    void updateGui();
     sf::Texture mTextureFile;
     
+    //Audio
+    void loadaudio();
 
-    struct Player : public sf::Window
+    struct Player
     {
         sf::Sprite mSprite;                     //Player sprite
         float mvSpeed = 1.5;                    //Player movment speed
@@ -96,10 +111,9 @@ public:
         void animate();                         //Player eating animation
         void move(float col, float row);        //Moves player sprite
         void controls();                        //Changes sprites direction
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
     };
 
-    struct Ghosts : public sf::Window
+    struct Ghosts
     {
         char map[GRID_SIZE_Y][GRID_SIZE_X];
         char mapToken;
@@ -124,11 +138,10 @@ public:
         void animate();                         //Animates ghost
         void displayMap();                      //Used to keep track of the ghosts path
         void stateCountDown();                  //Changes states after each count down
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
         bool spawned = false;                   //Test if ghost is already spawned
     };
     
-    struct Pellets : public sf::Window
+    struct Pellets
     {
         Pellets(bool isSuper);                  //Pellets constructor
         sf::Sprite mSprite;                     //Pellets sprite
@@ -138,7 +151,7 @@ public:
         int frameCount = 0;                     //frame count for super pellets
         int gridPos[2][1];                      //Used to keep sprites position on grid
     };
-    struct Fruit : public sf::Window
+    struct Fruit
     {
         Fruit();
         sf::Sprite mSprite;
@@ -148,7 +161,6 @@ public:
         int gridPos[2][1];
         int values[8] = {10, 30, 50, 70, 100, 200, 300, 500};
         bool spawned = false;
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates status = sf::RenderStates::Default) const;
 
     };
 
@@ -168,13 +180,13 @@ public:
     bool updatemenu();
     bool updatebutton(sf::Event &event, sf::Text &button);
     void displayinstructions();
+    void drawGhost(Ghosts * ghost);
     void findPath(Ghosts * ghost);
     void choosePath(Ghosts * ghost);
     void respawnGhost(Ghosts * ghost);                         //Used to respawn the ghost once it reaches the cage
     void movetospawn(Ghosts *ghost);                           //Moves ghost from ghost house to outside ghost house.
     void spawn();                                              //Initially spawns all ghosts.
     bool inghosthouse(sf::Sprite s);
-    virtual void draw(sf::RenderTarget& target, Pellets * pellets[MAX_DOTS], int size, sf::RenderStates status = sf::RenderStates::Default) const;
 
     //map functions
     void displaymap();
