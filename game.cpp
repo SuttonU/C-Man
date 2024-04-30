@@ -326,6 +326,9 @@ void Game::windowEvents()
         else if (updatebutton(event, playbutton))
         {
             play = true;
+            menu.stop();
+            menu.setLoop(false);
+            intro.play();
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -385,6 +388,8 @@ void Game :: displaymenu(){
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
+    menu.setLoop(true);
+    menu.play();
     //windowEvents();
 }
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
@@ -658,6 +663,7 @@ void Game::update()
     //Adds extra life at 10k points
     if (points >= 1000 && xtraLive == 0)
     {
+        gainlife.play();
         lives++;
         xtraLive = 1;
     }
@@ -715,6 +721,7 @@ void Game::update()
             && ghost1->state == panic)
     {
         ghost1->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost1->spawned = false;
@@ -730,6 +737,7 @@ void Game::update()
             && ghost3->state == panic)
     {
         ghost3->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost3->spawned = false;
@@ -745,6 +753,7 @@ void Game::update()
             && ghost2->state == panic)
     {
         ghost2->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost2->spawned = false;
@@ -760,6 +769,7 @@ void Game::update()
             && ghost4->state == panic)
     {
         ghost4->state = dead;
+        eatghost.play();
         points += 40 * ghostMult;
         ghostMult++;
         ghost4->spawned = false;
@@ -1004,6 +1014,7 @@ void Game::reset(bool dead)
     //If player died the dots will not reset
     if (!dead)
     {
+        intro.play();
         dots = 0;
         for (int i = 0; i < MAX_DOTS; i++)
         {
@@ -1661,6 +1672,7 @@ Game::Fruit::Fruit()
  */
 int Game::eatFruit(Game::Fruit * fruit)
 {
+    eatfruit.play();
     fruit->spawned = false;
     return (fruit)->values[(fruit)->level];
 }
