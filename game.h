@@ -1,6 +1,6 @@
 /**
  * @file game.h
- * @author Sutton Jones
+ * @author Sutton Jones, Ryan Matteson
  * @brief Header for Game class
 git pul * @version 0.1
  * @date 2024-03-20
@@ -16,6 +16,7 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 #include <time.h>
+#include <SFML/Audio.hpp>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -56,6 +57,23 @@ private:
     char grid[GRID_SIZE_Y][GRID_SIZE_X];    //Main grid used to check for portals
     float gridoriginx;
     float gridoriginy;
+    //Audio data
+    sf::SoundBuffer mintro;
+    sf::SoundBuffer mchomp;
+    sf::SoundBuffer mdeath;
+    sf::SoundBuffer meatfruit;
+    sf::SoundBuffer meatghost;
+    sf::SoundBuffer mgainlife;
+    sf::SoundBuffer mmenu;
+    sf::SoundBuffer mpanicmode;
+    sf::Sound intro;
+    sf::Sound chomp;
+    sf::Sound death;
+    sf::Sound eatfruit;
+    sf::Sound eatghost;
+    sf::Sound gainlife;
+    sf::Sound menu;
+    sf::Sound panicmode;
     
 public: 
     //Game functions
@@ -76,6 +94,8 @@ public:
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
     sf::Texture mTextureFile;
     
+    //Audio
+    void loadaudio();
 
     struct Player
     {

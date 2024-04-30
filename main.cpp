@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @author Sutton Jones, Ryan, and Ryan
+ * @author Sutton Jones, Ryan Matteson, and Ryan Costin
  * @brief Runs the game in a loop
  * @version 0.1
  * @date 2024-03-20
@@ -11,6 +11,7 @@
 #include "game.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 int main()
 {
     int lives = 3;          //Used to keep track of when lives change
@@ -18,8 +19,8 @@ int main()
     srand(time(NULL));
     //game.displaygrid(); //Uncomment to test and display grid
     //Displays menu and pauses game
+    game.loadaudio();
     game.displaymenu();
-    game.displaymap();
     while (!game.start() && !game.isDone())
     {
         game.windowEvents();

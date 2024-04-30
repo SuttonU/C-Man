@@ -1,6 +1,6 @@
 /**
  * @file game.cpp
- * @author Sutton Jones
+ * @author Sutton Jones, Ryan Matteson
  * @brief Functions for game class.
  * @version 0.1
  * @date 2024-03-20
@@ -301,6 +301,9 @@ void Game::windowEvents()
         else if (updatebutton(event, playbutton))
         {
             play = true;
+            menu.stop();
+            menu.setLoop(false);
+            intro.play();
         }
         else if (updatebutton(event, infobutton)){
             displayinstructions();
@@ -351,38 +354,28 @@ Game::~Game()
        sPellets[i] = nullptr;
     }
 }
-void Game :: displaymenu(){
+/**
+ * @brief Displays menu.
+ * 
+ */
+void Game::displaymenu(){
 
     mWindow.draw(titleimage);
     mWindow.draw(playbutton);
     mWindow.draw(infobutton);
     mWindow.display();
+    menu.setLoop(true);
+    menu.play();
     //windowEvents();
 }
-
-// bool Game :: updatemenu(){
-//     sf::Event event;
-//     while(mWindow.pollEvent(event)){
-//         if (event.type == sf::Event::Closed)
-//         mWindow.close();
-
-//         if (updatebutton(event, playbutton))
-//         {
-//             play = true;
-//             return true;
-//         }
-//         if (updatebutton(event, infobutton)){
-//             displayinstructions();
-//         }
-//         mWindow.clear();
-//         mWindow.draw(titleimage);
-//         mWindow.draw(playbutton);
-//         mWindow.draw(infobutton);
-//         mWindow.display();
-//     }
-//     return false;
-// }
-
+/**
+ * @brief Checks if buttons was clicked, hovered over, etc.
+ * 
+ * @param event 
+ * @param button 
+ * @return true 
+ * @return false 
+ */
 bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     sf::Vector2i mousePosition = sf::Mouse::getPosition(mWindow);
     bool mouseinbutton = mousePosition.x >= button.getPosition().x - button.getGlobalBounds().width/2
@@ -419,7 +412,10 @@ bool Game :: updatebutton(sf::Event &event, sf::Text &button){
     }
     return false;
 }
-
+/**
+ * @brief Displays instruction page.
+ * 
+ */
 void Game :: displayinstructions(){
     mWindow.clear();
     sf::Event event;
@@ -509,8 +505,17 @@ void Game::update()
     }
     if (isClear(mPlyr->mDir, mPlyr->mSprite))
     {
+        if (!chomp.getLoop() && (ghost1->state != panic && ghost2->state != panic && ghost3->state != panic && ghost4->state != panic)){
+            panicmode.stop();
+            panicmode.setLoop(false);
+            chomp.setLoop(true);
+            chomp.play();
+        }
         mPlyr->move(getgridx(returncol(mPlyr->mSprite)), getgridy(returnrow(mPlyr->mSprite)));//Moves and sets pacman token
         mPlyr->animate();
+    } else {
+        chomp.stop();
+        chomp.setLoop(false);
     }
     //Checks if ghosts can move
     if ((isClear(ghost1->mDir, ghost1->mBody) || ghost1->state == dead) && ghost1->spawned)
@@ -608,6 +613,14 @@ void Game::update()
                 }
             }
         }
+        if ((!panicmode.getLoop()) && (ghost1->state == panic || ghost2->state == panic || ghost3->state == panic || ghost4->state == panic)){
+            if (chomp.getLoop()){
+                chomp.stop();
+                chomp.setLoop(false);
+            }
+            panicmode.setLoop(true);
+            panicmode.play();
+        }
     }
     //Animates the super dots so they flash
     for (int i = 0; i < 4; i++)
@@ -641,6 +654,7 @@ void Game::update()
     //Adds extra life at 10k points
     if (points >= 1000 && xtraLive == 0)
     {
+        gainlife.play();
         lives++;
         xtraLive = 1;
     }
@@ -684,6 +698,11 @@ void Game::update()
             && mPlyr->mSprite.getPosition().y == ghost4->mBody.getPosition().y
             && (ghost4->state != panic && ghost4->state != dead)))
     {
+        chomp.stop();
+        chomp.setLoop(false);
+        panicmode.stop();
+        panicmode.setLoop(false);
+        death.play();
         deathAnimation();
         lives--;
         return;
@@ -699,6 +718,7 @@ void Game::update()
             )
             && ghost1->state == panic)
     {
+        eatghost.play();
         ghost1->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -714,6 +734,7 @@ void Game::update()
             )
             && ghost3->state == panic)
     {
+        eatghost.play();
         ghost3->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -729,6 +750,7 @@ void Game::update()
             )
             && ghost2->state == panic)
     {
+        eatghost.play();
         ghost2->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -744,6 +766,7 @@ void Game::update()
             )
             && ghost4->state == panic)
     {
+        eatghost.play();
         ghost4->state = dead;
         points += 40 * ghostMult;
         ghostMult++;
@@ -881,6 +904,10 @@ void Game::drawGhost(Ghosts * ghost)
  */
 void Game::reset(bool dead)
 {
+    chomp.stop();
+    chomp.setLoop(false);
+    panicmode.stop();
+    panicmode.setLoop(false);
     setgridorigin();
     mPlyr->mSprite.setPosition(getgridx(15), getgridy(19));
     mPlyr->mDir = left;
@@ -943,6 +970,7 @@ void Game::reset(bool dead)
     //If player died the dots will not reset
     if (!dead)
     {
+        intro.play();
         dots = 0;
         for (int i = 0; i < MAX_DOTS; i++)
         {
@@ -1600,6 +1628,7 @@ Game::Fruit::Fruit()
  */
 int Game::eatFruit(Game::Fruit * fruit)
 {
+    eatfruit.play();
     fruit->spawned = false;
     return (fruit)->values[(fruit)->level];
 }
@@ -1610,8 +1639,10 @@ void Game::Fruit::toDespawn()
 
 /****Map and grid functions****/
 
-
-
+/**
+ * @brief Load files to display the map.
+ * 
+ */
 void Game::displaymap(){
     maptexture.loadFromFile("mapR.png");
     map.setTexture(maptexture);
@@ -1841,4 +1872,27 @@ bool Game::inghosthouse(sf::Sprite s){
     } else {
         return false;
     }
+}
+/**
+ * @brief Loads all audio files and sets sounds.
+ * 
+ */
+void Game::loadaudio(){
+    mintro.loadFromFile("audio/pacman_intermission.wav");
+    mchomp.loadFromFile("audio/pacman_chomp.wav");
+    mdeath.loadFromFile("audio/pacman_death.wav");
+    meatfruit.loadFromFile("audio/pacman_eatfruit.wav");
+    meatghost.loadFromFile("audio/pacman_eatghost.wav");
+    mgainlife.loadFromFile("audio/pacman_extrapac.wav");
+    mmenu.loadFromFile("audio/pacman_beginning.wav");
+    mpanicmode.loadFromFile("audio/ghostscared.wav");
+    intro.setBuffer(mintro);
+    chomp.setBuffer(mchomp);
+    death.setBuffer(mdeath);
+    eatfruit.setBuffer(meatfruit);
+    eatghost.setBuffer(meatghost);
+    gainlife.setBuffer(mgainlife);
+    menu.setBuffer(mmenu);
+    panicmode.setBuffer(mpanicmode);
+    panicmode.setVolume(25);
 }
