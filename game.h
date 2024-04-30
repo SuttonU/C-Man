@@ -1,6 +1,6 @@
 /**
  * @file game.h
- * @author Sutton Jones, Ryan Matteson
+ * @author Sutton Jones
  * @brief Header for Game class
 git pul * @version 0.1
  * @date 2024-03-20
@@ -16,7 +16,7 @@ git pul * @version 0.1
 #include <stack>
 #include <cstring>
 #include <time.h>
-#include <SFML/Audio.hpp>
+#include <fstream>
 enum direction
 {up, left, down, right};
 enum ghostStates
@@ -26,7 +26,7 @@ const int GRID_SIZE_Y = 33;
 const int MAX_DOTS = 210;
 class Game
 {
-protected:
+private:
     //Game data
     sf::RenderWindow mWindow;
     bool play = false;
@@ -34,6 +34,7 @@ protected:
     int lives;
     int xtraLive;
     int points = 0;
+    int highscore;
     int dotSpaces = 0;
     int dots = 0;
     int sDots = 0;
@@ -43,11 +44,15 @@ protected:
     //Ghost data
     //Title menu data
     sf::Sprite titleimage;
+    sf::Sprite plyrLives;
+    sf::Sprite life;
     sf::Texture texture;
     sf::Font font;
     sf::Text playbutton;
     sf::Text infobutton;
-    sf::Text score;
+    sf::Text scoreGui;
+    sf::Text highscoreGui;
+    sf::Text gameLevel;
     sf::Text backbutton;
     sf::Text instructions;
     //map data
@@ -57,28 +62,11 @@ protected:
     char grid[GRID_SIZE_Y][GRID_SIZE_X];    //Main grid used to check for portals
     float gridoriginx;
     float gridoriginy;
-    //Audio data
-    sf::SoundBuffer mintro;
-    sf::SoundBuffer mchomp;
-    sf::SoundBuffer mdeath;
-    sf::SoundBuffer meatfruit;
-    sf::SoundBuffer meatghost;
-    sf::SoundBuffer mgainlife;
-    sf::SoundBuffer mmenu;
-    sf::SoundBuffer mpanicmode;
-    sf::Sound intro;
-    sf::Sound chomp;
-    sf::Sound death;
-    sf::Sound eatfruit;
-    sf::Sound eatghost;
-    sf::Sound gainlife;
-    sf::Sound menu;
-    sf::Sound panicmode;
+    std::fstream highscoreSave;
     
 public: 
     //Game functions
     Game();
-    Game(int mt) {};
     ~Game();
     void windowEvents();
     void update();
@@ -87,16 +75,14 @@ public:
     void deathAnimation();
     void setUpDots();
     void displayGUI();
-    void updateGUI();
     bool isDone() const;
     bool start();
     int  getDots() const;
     int getLives() const;
     void teleport(sf::Sprite &s);                        //Check if teleporting and set position
+    void updateGui();
     sf::Texture mTextureFile;
     
-    //Audio
-    void loadaudio();
 
     struct Player
     {
