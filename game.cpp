@@ -1229,7 +1229,6 @@ void Game::Ghosts::stateCountDown()
             {
                 map[y][x] = ' ';
             }
-            
         }
         if (state == panic)
         {
